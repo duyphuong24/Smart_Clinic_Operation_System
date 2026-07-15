@@ -125,10 +125,10 @@ Leader giữ các phần quyết định chất lượng và khả năng tích h
 
 Các task này nên làm trước để Bảo và Tài có thể bắt đầu mà không bị chờ:
 
-- [ ] Tạo project Spring Boot Maven chuẩn.
-- [ ] Cấu hình SQL Server trong `application.properties`.
-- [ ] Tạo package structure chuẩn theo requirement.
-- [ ] Chốt naming convention: entity, DTO, request/response, service interface.
+- [X] Tạo project Spring Boot Maven chuẩn.
+- [X] Cấu hình SQL Server trong `application.properties`.
+- [X] Tạo package structure chuẩn theo requirement.
+- [X] Chốt naming convention: entity, DTO, request/response, service interface.
 - [ ] Chốt core entities và relationships.
 - [ ] Chốt enum status flow cho appointment, queue, encounter, invoice, payment.
 - [ ] Tạo base entity có `id`, `createdAt`, `updatedAt`, `@Version`, `isActive` nếu cần.

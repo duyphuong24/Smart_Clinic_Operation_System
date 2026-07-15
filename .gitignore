@@ -1,0 +1,18 @@
+# Build outputs
+**/target/
+
+# IDE metadata
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local environment files
+.env
+.envi
+*.env
