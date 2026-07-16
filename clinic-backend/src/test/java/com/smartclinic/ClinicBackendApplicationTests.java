@@ -1,5 +1,6 @@
 package com.smartclinic;
 
+import com.smartclinic.appointment.repository.AppointmentRepository;
 import com.smartclinic.doctor.repository.DoctorRepository;
 import com.smartclinic.masterdata.repository.RoomRepository;
 import com.smartclinic.masterdata.repository.SpecialtyRepository;
@@ -43,6 +44,9 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private DoctorAvailabilityRepository doctorAvailabilityRepository;
+
+    @MockBean
+    private AppointmentRepository appointmentRepository;
 
     @Test
     void contextLoads() {
