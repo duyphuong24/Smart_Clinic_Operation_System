@@ -126,6 +126,17 @@ common
 config
 ```
 
+Package responsibility rules:
+
+| Package | Responsibility |
+| --- | --- |
+| `auth` | Login, logout, authentication request/response, authentication use cases. It should not own user profile CRUD. |
+| `security` | Spring Security infrastructure such as `SecurityConfig`, `UserDetailsService`, principals, password encoder, and security helpers. It should not contain clinic business logic. |
+| `user` | Account and role management: `User`, `Role`, user-role mapping, account status, admin user CRUD. |
+| `staff` | Employee profile shared by receptionist, cashier, manager, and doctor. |
+| `doctor` | Doctor-specific profile such as license number, specialty, default room, consultation fee. |
+| `specialty` | Specialty CRUD. |
+| `room` | Room CRUD. |
 Main business modules use this internal structure:
 
 ```text
@@ -223,7 +234,7 @@ These tasks should be completed or drafted before members implement deeply:
 - [X] Draft team task allocation.
 - [X] Draft database design in `docs/database-design.md`.
 - [X] Draft status flow in `docs/status-flow.md`.
-- [ ] Create `BaseEntity` with `id`, `createdAt`, `updatedAt`, and `@Version`.
+- [ ] Create `BaseEntity` with `id`, `createdAt`, and `updatedAt`.
 - [ ] Create common API response format.
 - [ ] Create global exception handling for REST and web.
 - [ ] Create Spring Security skeleton.
@@ -234,10 +245,10 @@ These tasks should be completed or drafted before members implement deeply:
 Recommended `BaseEntity` decision:
 
 ```text
-BaseEntity: id, createdAt, updatedAt, version
+BaseEntity: id, createdAt, updatedAt
 ```
 
-Do not put `active` in `BaseEntity`; status/active rules differ per entity.
+Do not put `active` or `version` in `BaseEntity`; status/active rules differ per entity and optimistic locking is out of MVP scope.
 
 ### 7.3 Backend Foundation Status
 
@@ -253,7 +264,7 @@ Current foundation status:
 - [X] Domain-based package structure created.
 - [X] Backend test compiles with current skeleton.
 
-Current backend package style is domain-based, not global layered. Do not create a second global structure such as `controller/service/repository/entity` at the root.
+Current backend package style is domain-based, not global layered. Do not create a second global structure such as `controller/service/repository/entity` at the root. CRUD modules such as `user`, `staff`, `specialty`, and `room` should also follow the standard business module subpackages. Technical modules such as `auth` and `security` only create subpackages that match their real responsibilities.
 
 ### 7.4 Security/RBAC
 
