@@ -5,6 +5,7 @@ import com.smartclinic.doctor.repository.DoctorRepository;
 import com.smartclinic.masterdata.repository.RoomRepository;
 import com.smartclinic.masterdata.repository.SpecialtyRepository;
 import com.smartclinic.patient.repository.PatientRepository;
+import com.smartclinic.queue.repository.QueueItemRepository;
 import com.smartclinic.schedule.repository.DoctorAvailabilityRepository;
 import com.smartclinic.staff.repository.StaffRepository;
 import com.smartclinic.user.repository.RoleRepository;
@@ -47,6 +48,9 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private AppointmentRepository appointmentRepository;
+
+    @MockBean
+    private QueueItemRepository queueItemRepository;
 
     @Test
     void contextLoads() {
