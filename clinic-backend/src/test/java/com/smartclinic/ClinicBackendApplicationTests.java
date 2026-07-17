@@ -1,6 +1,11 @@
 package com.smartclinic;
 
+import com.smartclinic.doctor.repository.DoctorRepository;
+import com.smartclinic.masterdata.repository.RoomRepository;
+import com.smartclinic.masterdata.repository.SpecialtyRepository;
 import com.smartclinic.patient.repository.PatientRepository;
+import com.smartclinic.schedule.repository.DoctorAvailabilityRepository;
+import com.smartclinic.staff.repository.StaffRepository;
 import com.smartclinic.user.repository.RoleRepository;
 import com.smartclinic.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -23,6 +28,21 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private PatientRepository patientRepository;
+
+    @MockBean
+    private StaffRepository staffRepository;
+
+    @MockBean
+    private DoctorRepository doctorRepository;
+
+    @MockBean
+    private SpecialtyRepository specialtyRepository;
+
+    @MockBean
+    private RoomRepository roomRepository;
+
+    @MockBean
+    private DoctorAvailabilityRepository doctorAvailabilityRepository;
 
     @Test
     void contextLoads() {
