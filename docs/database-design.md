@@ -90,6 +90,7 @@ Important distinction:
 | Long text | `NVARCHAR(MAX)` | `TEXT` |
 | Money/amount | `DECIMAL(12,2)` | `FLOAT` |
 | Primary key | `BIGINT IDENTITY(1,1)` | Manual IDs |
+| Optimistic locking | Not used in MVP | `@Version` / `version` column |
 
 Notes:
 
@@ -99,20 +100,19 @@ Notes:
 
 ## 5. Table Baseline
 
-Only add fields beyond this baseline after leader review.
+Only add fields beyond this baseline after leader review. The MVP intentionally does not use a version column or JPA @Version optimistic locking.
 
 ### `users`
 
 ```text
 id BIGINT PK
-email NVARCHAR(150) UNIQUE NOT NULL
+user_name NVARCHAR(150) UNIQUE NOT NULL
 password_hash NVARCHAR(255) NOT NULL
 full_name NVARCHAR(150) NOT NULL
 phone NVARCHAR(30) NULL
 status NVARCHAR(30) NOT NULL -- ACTIVE, LOCKED
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `roles`
@@ -141,7 +141,6 @@ hired_date DATE NULL
 status NVARCHAR(30) NOT NULL -- ACTIVE, INACTIVE
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `doctors`
@@ -157,7 +156,6 @@ bio NVARCHAR(MAX) NULL
 active BIT NOT NULL DEFAULT 1
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `specialties`
@@ -197,7 +195,6 @@ allergy_note NVARCHAR(MAX) NULL
 status NVARCHAR(30) NOT NULL -- ACTIVE, ARCHIVED
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `doctor_availabilities`
@@ -230,7 +227,6 @@ created_by BIGINT FK users
 cancelled_reason NVARCHAR(MAX) NULL
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `queue_items`
@@ -249,7 +245,6 @@ checked_in_at DATETIME2 NOT NULL
 called_at DATETIME2 NULL
 completed_at DATETIME2 NULL
 created_by BIGINT FK users
-version BIGINT NULL
 ```
 
 ### `visits`
@@ -266,7 +261,6 @@ started_at DATETIME2 NULL
 ended_at DATETIME2 NULL
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `encounters`
@@ -283,7 +277,6 @@ started_at DATETIME2 NOT NULL
 completed_at DATETIME2 NULL
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `service_catalog`
@@ -297,7 +290,6 @@ price DECIMAL(12,2) NOT NULL
 active BIT NOT NULL DEFAULT 1
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `encounter_services`
@@ -328,7 +320,6 @@ issued_at DATETIME2 NOT NULL
 paid_at DATETIME2 NULL
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
-version BIGINT NULL
 ```
 
 ### `invoice_items`
@@ -361,7 +352,7 @@ paid_at DATETIME2 NOT NULL
 Required unique constraints:
 
 ```text
-uq_users_email
+uq_users_user_name
 uq_roles_name
 uq_staff_employee_code
 uq_staff_user_id

@@ -106,7 +106,7 @@ Nếu database chỉ lưu `ADMIN`, backend phải map sang `ROLE_ADMIN` trước
 | `401 Unauthorized` | Chưa đăng nhập/token không hợp lệ | API cần authentication |
 | `403 Forbidden` | Không đủ quyền | Đã đăng nhập nhưng sai role |
 | `404 Not Found` | Không tìm thấy resource | ID không tồn tại |
-| `409 Conflict` | Trùng dữ liệu hoặc conflict nghiệp vụ | Trùng appointment slot, trùng code/email |
+| `409 Conflict` | Trùng dữ liệu hoặc conflict nghiệp vụ | Trùng appointment slot, trùng code/userName |
 | `422 Unprocessable Entity` | Vi phạm business rule | Không được check-in appointment đã hủy |
 | `500 Internal Server Error` | Lỗi hệ thống | Exception không lường trước |
 
@@ -186,7 +186,7 @@ Login request:
 
 ```json
 {
-  "username": "admin",
+  "userName": "admin",
   "password": "admin123"
 }
 ```
@@ -197,7 +197,7 @@ Login response data:
 {
   "accessToken": "<token>",
   "tokenType": "Bearer",
-  "username": "admin",
+  "userName": "admin",
   "fullName": "System Admin",
   "roles": ["ROLE_ADMIN"]
 }
