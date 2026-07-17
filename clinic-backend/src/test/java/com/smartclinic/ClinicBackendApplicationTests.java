@@ -1,5 +1,6 @@
 package com.smartclinic;
 
+import com.smartclinic.patient.repository.PatientRepository;
 import com.smartclinic.user.repository.RoleRepository;
 import com.smartclinic.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,9 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private RoleRepository roleRepository;
+
+    @MockBean
+    private PatientRepository patientRepository;
 
     @Test
     void contextLoads() {
