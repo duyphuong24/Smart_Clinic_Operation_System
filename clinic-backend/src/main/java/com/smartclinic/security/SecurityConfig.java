@@ -16,6 +16,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
+@org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -35,7 +36,26 @@ public class SecurityConfig {
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/health").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/health").permitAll()
+                        .requestMatchers("/api/v1/users/**", "/api/v1/staff/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/audit-logs/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/doctors/**").hasAnyRole("ADMIN", "RECEPTIONIST", "DOCTOR", "MANAGER")
+                        .requestMatchers("/api/v1/doctors/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/specialties/**", "/api/v1/rooms/**").hasAnyRole("ADMIN", "RECEPTIONIST", "DOCTOR", "CASHIER", "MANAGER")
+                        .requestMatchers("/api/v1/specialties/**", "/api/v1/rooms/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/doctor-availabilities/**").hasAnyRole("ADMIN", "RECEPTIONIST", "DOCTOR")
+                        .requestMatchers("/api/v1/doctor-availabilities/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/patients/**").hasAnyRole("ADMIN", "RECEPTIONIST", "DOCTOR")
+                        .requestMatchers("/api/v1/patients/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/appointments/**").hasAnyRole("ADMIN", "RECEPTIONIST", "DOCTOR")
+                        .requestMatchers("/api/v1/appointments/**").hasAnyRole("ADMIN", "RECEPTIONIST")
+                        .requestMatchers("/api/v1/queue-items/**").hasAnyRole("ADMIN", "RECEPTIONIST", "DOCTOR")
+                        .requestMatchers("/api/v1/visits/**", "/api/v1/encounters/**", "/api/v1/encounter-services/**").hasAnyRole("ADMIN", "DOCTOR")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/services/**").hasAnyRole("ADMIN", "DOCTOR", "CASHIER", "MANAGER")
+                        .requestMatchers("/api/v1/services/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/invoices/**", "/api/v1/payments/**").hasAnyRole("ADMIN", "CASHIER", "MANAGER")
+                        .requestMatchers("/api/v1/invoices/**", "/api/v1/payments/**").hasAnyRole("ADMIN", "CASHIER")
+                        .requestMatchers("/api/v1/reports/**").hasAnyRole("ADMIN", "MANAGER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
