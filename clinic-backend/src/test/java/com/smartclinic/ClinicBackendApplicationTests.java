@@ -3,11 +3,13 @@ package com.smartclinic;
 import com.smartclinic.appointment.repository.AppointmentRepository;
 import com.smartclinic.doctor.repository.DoctorRepository;
 import com.smartclinic.encounter.repository.EncounterRepository;
+import com.smartclinic.encounter.repository.EncounterServiceRepository;
 import com.smartclinic.masterdata.repository.RoomRepository;
 import com.smartclinic.masterdata.repository.SpecialtyRepository;
 import com.smartclinic.patient.repository.PatientRepository;
 import com.smartclinic.queue.repository.QueueItemRepository;
 import com.smartclinic.schedule.repository.DoctorAvailabilityRepository;
+import com.smartclinic.servicecatalog.repository.ServiceCatalogRepository;
 import com.smartclinic.staff.repository.StaffRepository;
 import com.smartclinic.user.repository.RoleRepository;
 import com.smartclinic.user.repository.UserRepository;
@@ -59,6 +61,12 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private EncounterRepository encounterRepository;
+
+    @MockBean
+    private EncounterServiceRepository encounterServiceRepository;
+
+    @MockBean
+    private ServiceCatalogRepository serviceCatalogRepository;
 
     @Test
     void contextLoads() {

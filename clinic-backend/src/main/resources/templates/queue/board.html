@@ -121,10 +121,10 @@
         <!-- Walk-in Modal -->
         <div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" class="modal fade" id="walkInModal" tabindex="-1" aria-labelledby="walkInModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content glass-panel text-white" style="background: rgba(19, 26, 44, 0.95); border: 1px solid var(--border-card);">
-                    <div class="modal-header border-bottom border-secondary pb-3">
+                <div class="modal-content glass-panel" style="background: rgba(255, 255, 255, 0.95); border: 1px solid var(--border-card);">
+                    <div class="modal-header border-bottom pb-3" style="border-color: var(--border-card) !important;">
                         <h5 class="modal-title fw-bold" id="walkInModalLabel"><i class="fa-solid fa-street-view me-2 text-primary"></i>Register Walk-in Patient</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form th:action="@{/queue/walk-in}" th:object="${walkIn}" method="post">
                         <div class="modal-body py-4">
@@ -195,7 +195,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer border-top border-secondary pt-3">
+                        <div class="modal-footer border-top pt-3" style="border-color: var(--border-card) !important;">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: var(--border-radius-sm); border-color: var(--border-card);">Cancel</button>
                             <button type="submit" class="btn btn-premium" style="width: auto;">Add to Queue</button>
                         </div>
