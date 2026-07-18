@@ -2,6 +2,7 @@ package com.smartclinic;
 
 import com.smartclinic.appointment.repository.AppointmentRepository;
 import com.smartclinic.doctor.repository.DoctorRepository;
+import com.smartclinic.encounter.repository.EncounterRepository;
 import com.smartclinic.masterdata.repository.RoomRepository;
 import com.smartclinic.masterdata.repository.SpecialtyRepository;
 import com.smartclinic.patient.repository.PatientRepository;
@@ -10,6 +11,7 @@ import com.smartclinic.schedule.repository.DoctorAvailabilityRepository;
 import com.smartclinic.staff.repository.StaffRepository;
 import com.smartclinic.user.repository.RoleRepository;
 import com.smartclinic.user.repository.UserRepository;
+import com.smartclinic.visit.repository.VisitRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -51,6 +53,12 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private QueueItemRepository queueItemRepository;
+
+    @MockBean
+    private VisitRepository visitRepository;
+
+    @MockBean
+    private EncounterRepository encounterRepository;
 
     @Test
     void contextLoads() {
