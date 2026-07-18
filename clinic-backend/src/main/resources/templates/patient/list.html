@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Patients', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <div class="glass-panel p-4">
+            <!-- Header section inside panel -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold m-0 text-white">Patient Registry</h3>
+                    <p class="text-secondary m-0" style="font-size: 0.9rem;">View, search, and manage patient profiles.</p>
+                </div>
+                <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/patients/new}" class="btn btn-premium d-flex align-items-center gap-2" style="width: auto; padding: 10px 20px;">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Register Patient</span>
+                </a>
+            </div>
+
+            <!-- Search Section -->
+            <form th:action="@{/patients}" method="get" class="row g-3 mb-4">
+                <div class="col-md-9 col-lg-6">
+                    <div class="input-glow-wrapper">
+                        <input type="text" name="keyword" th:value="${keyword}" class="form-control-custom" placeholder="Search by patient code, name, or phone number...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary px-4 py-3" style="border-radius: var(--border-radius-sm); font-weight: 500; font-family: var(--font-heading); transition: var(--transition-smooth);">
+                        <i class="fa-solid fa-magnifying-glass me-2"></i>Search
+                    </button>
+                    <a th:href="@{/patients}" class="btn btn-outline-secondary px-3 py-3 ms-2" style="border-radius: var(--border-radius-sm); border-color: var(--border-card);">
+                        Reset
+                    </a>
+                </div>
+            </form>
+
+            <!-- Table Section -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0" style="border-collapse: separate; border-spacing: 0 8px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-card); color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <th class="ps-3 py-3" style="width: 15%">Code</th>
+                            <th style="width: 25%">Full Name</th>
+                            <th style="width: 12%">Gender</th>
+                            <th style="width: 15%">Date of Birth</th>
+                            <th style="width: 15%">Phone</th>
+                            <th style="width: 13%">Status</th>
+                            <th class="pe-3 text-end" style="width: 10%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="patient : ${patients}" class="glass-panel" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-card); margin-bottom: 8px;">
+                            <td class="ps-3 py-3">
+                                <span class="badge bg-secondary font-monospace px-2 py-2" th:text="${patient.patientCode}" style="font-size: 0.85rem; letter-spacing: 0.05em;">PT-00001</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white" th:text="${patient.fullName}">Nguyen Van A</span>
+                            </td>
+                            <td>
+                                <span th:text="${patient.gender}">MALE</span>
+                            </td>
+                            <td th:text="${patient.dateOfBirth != null ? #temporals.format(patient.dateOfBirth, 'dd-MM-yyyy') : '-'}">01-01-2000</td>
+                            <td th:text="${patient.phone != null && !patient.phone.isEmpty() ? patient.phone : '-'}">0901234567</td>
+                            <td>
+                                <span class="badge" th:classappend="${patient.status.name() == 'ACTIVE' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${patient.status}" style="font-size: 0.75rem; padding: 6px 12px; border-radius: 20px;">ACTIVE</span>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a th:href="@{/patients/{id}(id=${patient.id})}" class="btn btn-sm btn-outline-info" title="View Detail" style="border-radius: 6px; padding: 6px 10px;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/patients/{id}/edit(id=${patient.id})}" class="btn btn-sm btn-outline-warning" title="Edit Profile" style="border-radius: 6px; padding: 6px 10px;">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(patients)}">
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-folder-open mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="m-0">No patients found. Try altering your search query or register a new patient profile.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div th:if="${totalPages > 1}" class="d-flex align-items-center justify-content-between mt-4 pt-3" style="border-top: 1px solid var(--border-card);">
+                <div class="text-secondary" style="font-size: 0.9rem;">
+                    Showing page <span class="text-white fw-semibold" th:text="${currentPage + 1}">1</span> of <span class="text-white fw-semibold" th:text="${totalPages}">10</span>
+                    (<span th:text="${totalItems}">100</span> patients total)
+                </div>
+                
+                <nav aria-label="Patient navigation">
+                    <ul class="pagination pagination-sm m-0 gap-1">
+                        <!-- Previous Page -->
+                        <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/patients(keyword=${keyword}, page=${currentPage - 1})}" style="background: rgba(255,255,255,0.02); border-color: var(--border-card); color: var(--text-primary); border-radius: 4px;">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        
+                        <!-- Page Numbers -->
+                        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${currentPage == pageNum ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/patients(keyword=${keyword}, page=${pageNum})}" th:text="${pageNum + 1}" style="background: rgba(255,255,255,0.02); border-color: var(--border-card); color: var(--text-primary); border-radius: 4px;" th:styleappend="${currentPage == pageNum ? 'background: var(--accent-blue); border-color: var(--accent-blue); font-weight: 600;' : ''}">1</a>
+                        </li>
+                        
+                        <!-- Next Page -->
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                            <a class="page-link" th:href="@{/patients(keyword=${keyword}, page=${currentPage + 1})}" style="background: rgba(255,255,255,0.02); border-color: var(--border-card); color: var(--text-primary); border-radius: 4px;">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
