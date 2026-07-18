@@ -14,12 +14,20 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "visits")
+@Table(
+        name = "visits",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_visits_code", columnNames = "visit_code"),
+                @UniqueConstraint(name = "uq_visits_appointment_id", columnNames = "appointment_id"),
+                @UniqueConstraint(name = "uq_visits_queue_item_id", columnNames = "queue_item_id")
+        }
+)
 @Getter
 @Setter
 public class Visit extends BaseEntity {

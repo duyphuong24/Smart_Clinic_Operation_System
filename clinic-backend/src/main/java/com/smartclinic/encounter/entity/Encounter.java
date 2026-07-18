@@ -12,12 +12,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "encounters")
+@Table(
+        name = "encounters",
+        uniqueConstraints = @UniqueConstraint(name = "uq_encounters_visit_id", columnNames = "visit_id")
+)
 @Getter
 @Setter
 public class Encounter extends BaseEntity {
@@ -30,13 +34,13 @@ public class Encounter extends BaseEntity {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @Column(name = "chief_complaint", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "chief_complaint", columnDefinition = "nvarchar(max)")
     private String chiefComplaint;
 
-    @Column(name = "diagnosis", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "diagnosis", columnDefinition = "nvarchar(max)")
     private String diagnosis;
 
-    @Column(name = "clinical_note", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "clinical_note", columnDefinition = "nvarchar(max)")
     private String clinicalNote;
 
     @Enumerated(EnumType.STRING)

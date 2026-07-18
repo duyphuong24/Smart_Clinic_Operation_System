@@ -2,20 +2,26 @@ package com.smartclinic.encounter.controller;
 
 import com.smartclinic.doctor.entity.Doctor;
 import com.smartclinic.doctor.repository.DoctorRepository;
+import com.smartclinic.encounter.dto.EncounterCreateRequest;
+import com.smartclinic.encounter.dto.EncounterResponse;
+import com.smartclinic.encounter.dto.EncounterUpdateRequest;
 import com.smartclinic.encounter.entity.Encounter;
 import com.smartclinic.encounter.entity.EncounterService;
 import com.smartclinic.encounter.entity.EncounterServiceStatus;
 import com.smartclinic.encounter.entity.EncounterStatus;
 import com.smartclinic.encounter.repository.EncounterRepository;
 import com.smartclinic.encounter.repository.EncounterServiceRepository;
+import com.smartclinic.encounter.service.EncounterWorkflowService;
 import com.smartclinic.queue.entity.QueueItem;
+import com.smartclinic.queue.entity.QueueStatus;
 import com.smartclinic.queue.repository.QueueItemRepository;
 import com.smartclinic.queue.service.QueueItemService;
 import com.smartclinic.servicecatalog.entity.ServiceCatalog;
 import com.smartclinic.servicecatalog.repository.ServiceCatalogRepository;
+import com.smartclinic.visit.dto.VisitCreateRequest;
 import com.smartclinic.visit.entity.Visit;
-import com.smartclinic.visit.entity.VisitStatus;
 import com.smartclinic.visit.repository.VisitRepository;
+import com.smartclinic.visit.service.VisitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -44,6 +49,8 @@ public class ConsultationController {
     private final EncounterRepository encounterRepository;
     private final EncounterServiceRepository encounterServiceRepository;
     private final ServiceCatalogRepository serviceCatalogRepository;
+    private final VisitService visitService;
+    private final EncounterWorkflowService encounterWorkflowService;
 
     @GetMapping
     public String doctorQueue(Model model) {
@@ -60,7 +67,7 @@ public class ConsultationController {
         List<QueueItem> queueItems = queueItemRepository.findActiveByDateAndDoctor(
                 LocalDate.now(),
                 doctor.getId(),
-                List.of(com.smartclinic.queue.entity.QueueStatus.DONE, com.smartclinic.queue.entity.QueueStatus.SKIPPED)
+                List.of(QueueStatus.DONE, QueueStatus.SKIPPED)
         );
 
         model.addAttribute("doctor", doctor);
@@ -74,33 +81,27 @@ public class ConsultationController {
         QueueItem queueItem = queueItemRepository.findById(queueItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Queue Item ID"));
 
-        // Transition queue status to IN_SERVICE if it is not already
-        if (queueItem.getStatus() != com.smartclinic.queue.entity.QueueStatus.IN_SERVICE) {
+        if (queueItem.getStatus() == QueueStatus.CALLED) {
             queueItemService.startService(queueItemId);
         }
 
-        // Get or Create Visit
-        Visit visit = visitRepository.findByQueueItemId(queueItemId).orElseGet(() -> {
-            Visit newVisit = new Visit();
-            newVisit.setVisitCode("VIS-" + System.currentTimeMillis());
-            newVisit.setPatient(queueItem.getPatient());
-            newVisit.setDoctor(queueItem.getDoctor());
-            newVisit.setAppointment(queueItem.getAppointment());
-            newVisit.setQueueItem(queueItem);
-            newVisit.setStatus(VisitStatus.IN_CONSULTATION);
-            newVisit.setStartedAt(LocalDateTime.now());
-            return visitRepository.save(newVisit);
-        });
+        Visit visit = visitRepository.findByQueueItemId(queueItemId)
+                .orElseGet(() -> {
+                    VisitCreateRequest request = new VisitCreateRequest();
+                    request.setQueueItemId(queueItemId);
+                    Long visitId = visitService.create(request).getId();
+                    return visitRepository.findById(visitId)
+                            .orElseThrow(() -> new IllegalStateException("Visit was not created"));
+                });
 
-        // Get or Create Encounter
-        Encounter encounter = encounterRepository.findByVisitId(visit.getId()).orElseGet(() -> {
-            Encounter newEncounter = new Encounter();
-            newEncounter.setVisit(visit);
-            newEncounter.setDoctor(visit.getDoctor());
-            newEncounter.setStatus(EncounterStatus.OPEN);
-            newEncounter.setStartedAt(LocalDateTime.now());
-            return encounterRepository.save(newEncounter);
-        });
+        Encounter encounter = encounterRepository.findByVisitId(visit.getId())
+                .orElseGet(() -> {
+                    EncounterCreateRequest request = new EncounterCreateRequest();
+                    request.setVisitId(visit.getId());
+                    EncounterResponse response = encounterWorkflowService.create(request);
+                    return encounterRepository.findById(response.getId())
+                            .orElseThrow(() -> new IllegalStateException("Encounter was not created"));
+                });
 
         return "redirect:/consultation/encounters/" + encounter.getId();
     }
@@ -155,27 +156,12 @@ public class ConsultationController {
             @PathVariable Long id,
             @ModelAttribute("encounter") Encounter encounterData
     ) {
-        Encounter encounter = encounterRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Encounter ID"));
-
-        // Save diagnostic data
-        encounter.setChiefComplaint(encounterData.getChiefComplaint());
-        encounter.setDiagnosis(encounterData.getDiagnosis());
-        encounter.setClinicalNote(encounterData.getClinicalNote());
-        encounter.setStatus(EncounterStatus.COMPLETED);
-        encounter.setCompletedAt(LocalDateTime.now());
-        encounterRepository.save(encounter);
-
-        // Update Visit Status
-        Visit visit = encounter.getVisit();
-        visit.setStatus(VisitStatus.COMPLETED);
-        visit.setEndedAt(LocalDateTime.now());
-        visitRepository.save(visit);
-
-        // Update Queue Status
-        if (visit.getQueueItem() != null) {
-            queueItemService.done(visit.getQueueItem().getId());
-        }
+        EncounterUpdateRequest request = new EncounterUpdateRequest();
+        request.setChiefComplaint(encounterData.getChiefComplaint());
+        request.setDiagnosis(encounterData.getDiagnosis());
+        request.setClinicalNote(encounterData.getClinicalNote());
+        encounterWorkflowService.update(id, request);
+        encounterWorkflowService.complete(id);
 
         return "redirect:/consultation/encounters/" + id + "/detail";
     }
