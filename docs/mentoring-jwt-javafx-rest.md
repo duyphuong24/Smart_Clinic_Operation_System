@@ -188,3 +188,26 @@ Build integration in this order:
 5. JavaFX login screen integration.
 6. One small protected API call end-to-end before building many screens.
 7. Appointment and queue screens after the foundation is proven.
+
+## 12. Token Storage Architecture Policy
+
+- **Access Token:** Short-lived (e.g., 15–60 minutes), stateless JWT containing subject claims and role authorities. It is kept strictly in client memory (`TokenStore`) and is **never stored in the backend database**.
+- **Refresh Token:** Long-lived (e.g., 7 days), generated using cryptographically strong `SecureRandom` (64 random bytes, URL-safe Base64 encoded). Held in client memory (`TokenStore`). Raw refresh tokens are **never stored raw in the database or written to disk**. The backend hashes the incoming refresh token with **SHA-256** and stores only the hash in `refresh_tokens.token_hash`, enforced by a unique constraint `uq_refresh_tokens_token_hash` and indexed lookup.
+
+## 13. Senior Team Mentoring Guidance
+
+> **To the Engineering Team:**
+> When implementing JavaFX REST screens, always maintain a strict separation of concerns:
+> 1. **Controllers** manage UI component state, input validation, and user interaction. They MUST NOT contain HTTP header assembly, JSON serialization, or raw network calls.
+> 2. **Desktop Services** coordinate business workflows and call `ApiClient` methods asynchronously.
+> 3. **ApiClient** executes background HTTP requests using Java 21 `HttpClient` and handles automatic token rotation on `401 Unauthorized`.
+> 4. **UI Thread Safety:** Never invoke network calls on the main JavaFX Application Thread as it causes UI freezing. All asynchronous callbacks returning data or error messages MUST wrap UI state mutations inside `Platform.runLater(() -> { ... })`.
+
+## 14. Scope Clarification of `#26 Demo Docs/Data`
+
+The demo docs and data requirement includes:
+1. **Seed Accounts:** Pre-seeded accounts for all 5 roles (`admin`, `receptionist`, `doctor`, `cashier`, `manager`) with default password `Password123!`.
+2. **Seed Clinic Data:** Default specialties (General, Cardiology), rooms (R-101, R-102), service catalogs (Consultation, Lab tests), and doctor availabilities.
+3. **Setup Instructions:** `README.md` step-by-step instructions for running `./mvnw spring-boot:run` and launching `clinic-desktop`.
+4. **Demo Script:** End-to-end operation walkthrough (Patient Registration -> Appointment Booking -> Receptionist Check-In -> Doctor Queue & Consultation -> Cashier Invoice & Payment).
+5. **Postman / REST Collection:** Collection file containing login, refresh token, patient, queue, encounter, and payment API requests.
