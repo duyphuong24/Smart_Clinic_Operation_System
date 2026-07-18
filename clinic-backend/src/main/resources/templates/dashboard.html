@@ -16,7 +16,7 @@
             <div class="metric-card glass-panel">
                 <div class="metric-card-info">
                     <span class="metric-card-label">Today Appointments</span>
-                    <span class="metric-card-value">12</span>
+                    <span class="metric-card-value" th:text="${appointmentsCount}">12</span>
                 </div>
                 <div class="metric-card-icon-box box-blue">
                     <i class="fa-regular fa-calendar-check"></i>
@@ -27,7 +27,7 @@
             <div class="metric-card glass-panel">
                 <div class="metric-card-info">
                     <span class="metric-card-label">Waiting in Queue</span>
-                    <span class="metric-card-value">5</span>
+                    <span class="metric-card-value" th:text="${waitingQueueCount}">5</span>
                 </div>
                 <div class="metric-card-icon-box box-purple">
                     <i class="fa-solid fa-users"></i>
@@ -38,7 +38,7 @@
             <div class="metric-card glass-panel">
                 <div class="metric-card-info">
                     <span class="metric-card-label">Completed Visits</span>
-                    <span class="metric-card-value">8</span>
+                    <span class="metric-card-value" th:text="${completedVisitsCount}">8</span>
                 </div>
                 <div class="metric-card-icon-box box-green">
                     <i class="fa-solid fa-circle-check"></i>
@@ -49,7 +49,7 @@
             <div class="metric-card glass-panel">
                 <div class="metric-card-info">
                     <span class="metric-card-label">Today Revenue</span>
-                    <span class="metric-card-value" style="font-size: 1.5rem; line-height: 2.2rem;">3,250,000 ₫</span>
+                    <span class="metric-card-value" style="font-size: 1.5rem; line-height: 2.2rem;" th:text="${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 0, 'POINT')} + ' ₫'">3,250,000 ₫</span>
                 </div>
                 <div class="metric-card-icon-box box-orange">
                     <i class="fa-solid fa-hand-holding-dollar"></i>
