@@ -1,13 +1,13 @@
 package com.smartclinic.config;
 
+import com.smartclinic.servicecatalog.entity.ServiceCatalog;
+import com.smartclinic.servicecatalog.entity.ServiceType;
+import com.smartclinic.servicecatalog.repository.ServiceCatalogRepository;
 import com.smartclinic.user.entity.Role;
 import com.smartclinic.user.entity.User;
 import com.smartclinic.user.entity.UserStatus;
 import com.smartclinic.user.repository.RoleRepository;
 import com.smartclinic.user.repository.UserRepository;
-import com.smartclinic.servicecatalog.entity.ServiceCatalog;
-import com.smartclinic.servicecatalog.entity.ServiceType;
-import com.smartclinic.servicecatalog.repository.ServiceCatalogRepository;
 import java.math.BigDecimal;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,6 @@ public class DemoDataInitializer implements CommandLineRunner {
         ensureUser("cashier", "cashier123", "Demo Cashier", cashier);
         ensureUser("manager", "manager123", "Demo Manager", manager);
 
-        // Seed Services
         ensureService("SVC-CONS", "General Consultation", ServiceType.CONSULTATION, new BigDecimal("150000"));
         ensureService("SVC-XPUL", "Pulmonary X-Ray", ServiceType.PROCEDURE, new BigDecimal("250000"));
         ensureService("SVC-CBC", "Complete Blood Count Test", ServiceType.LAB_TEST, new BigDecimal("100000"));
@@ -76,6 +75,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         if (serviceCatalogRepository.findByServiceCodeIgnoreCase(code).isPresent()) {
             return;
         }
+
         ServiceCatalog service = new ServiceCatalog();
         service.setServiceCode(code);
         service.setName(name);
