@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Doctors', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <div class="glass-panel p-4" style="max-width: 750px; margin: 0 auto;">
+            <!-- Header Section -->
+            <div class="mb-4">
+                <h3 class="fw-bold m-0 text-white" th:text="${isEdit} ? 'Edit Doctor Profile' : 'Add Doctor Profile'">Add Doctor Profile</h3>
+                <p class="text-secondary m-0" style="font-size: 0.9rem;">Associate a staff member with a specialty, default room, and consultation fee.</p>
+            </div>
+
+            <!-- Form -->
+            <form th:action="${isEdit} ? @{/admin/doctors/{id}/edit(id=${doctorId})} : @{/admin/doctors/new}" th:object="${doctor}" method="post">
+                <div class="row g-4">
+                    <!-- Staff Selection -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="staffId" class="form-label">Linked Staff Member <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select id="staffId" th:field="*{staffId}" class="form-control-custom" th:disabled="${isEdit}" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;">
+                                    <option value="" disabled selected>Select Staff</option>
+                                    <option th:each="st : ${staffs}" 
+                                            th:value="${st.id}" th:text="${st.fullName} + ' (' + ${st.employeeCode} + ')'"></option>
+                                </select>
+                            </div>
+                            <input type="hidden" th:if="${isEdit}" th:field="*{staffId}">
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('staffId')}" th:errors="*{staffId}" style="font-size: 0.8rem;">Staff Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Specialty Selection -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="specialtyId" class="form-label">Specialty <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select id="specialtyId" th:field="*{specialtyId}" class="form-control-custom" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;">
+                                    <option value="" disabled selected>Select Specialty</option>
+                                    <option th:each="spec : ${specialties}" 
+                                            th:value="${spec.id}" th:text="${spec.name}"></option>
+                                </select>
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('specialtyId')}" th:errors="*{specialtyId}" style="font-size: 0.8rem;">Specialty Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Default Room Selection -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="defaultRoomId" class="form-label">Default Room</label>
+                            <div class="input-glow-wrapper">
+                                <select id="defaultRoomId" th:field="*{defaultRoomId}" class="form-control-custom" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;">
+                                    <option value="" selected>No Default Room</option>
+                                    <option th:each="room : ${rooms}" 
+                                            th:value="${room.id}" th:text="${room.name} + ' (' + ${room.roomCode} + ')'"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- License Number -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="licenseNo" class="form-label">License Number <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="licenseNo" th:field="*{licenseNo}" class="form-control-custom" placeholder="e.g. LIC-123456" required>
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('licenseNo')}" th:errors="*{licenseNo}" style="font-size: 0.8rem;">License Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Consultation Fee -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="consultationFee" class="form-label">Consultation Fee (VND) <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="number" id="consultationFee" th:field="*{consultationFee}" class="form-control-custom" placeholder="e.g. 150000" step="1000" min="0" required>
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('consultationFee')}" th:errors="*{consultationFee}" style="font-size: 0.8rem;">Fee Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Active status (Only during edit) -->
+                    <div class="col-md-6 d-flex align-items-center pt-3" th:if="${isEdit}">
+                        <div class="form-check form-switch p-0 d-flex align-items-center gap-3">
+                            <label class="form-label m-0" for="active" style="cursor: pointer;">Active Status</label>
+                            <input class="form-check-input ms-0" type="checkbox" id="active" th:field="*{active}" style="width: 45px; height: 24px; cursor: pointer; float: none;">
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="bio" class="form-label">Biography / Background</label>
+                            <div class="input-glow-wrapper">
+                                <textarea id="bio" th:field="*{bio}" class="form-control-custom" rows="4" placeholder="Brief details about doctor's qualifications, expertise..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-3" style="border-top: 1px solid var(--border-card);">
+                    <a th:href="@{/admin/doctors}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: var(--border-radius-sm); border-color: var(--border-card); font-family: var(--font-heading); font-weight: 500;">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-premium px-4 py-2" style="width: auto; font-family: var(--font-heading); font-weight: 600;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Doctor Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

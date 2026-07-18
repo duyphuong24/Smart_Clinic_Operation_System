@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Queue Board', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <div class="glass-panel p-4">
+            <!-- Header Section -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold m-0 text-white">Today's Queue Board</h3>
+                    <p class="text-secondary m-0" style="font-size: 0.9rem;">Manage patient flow and call numbers to consultation rooms.</p>
+                </div>
+                <button sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" type="button" class="btn btn-premium d-flex align-items-center gap-2" style="width: auto; padding: 10px 20px;" data-bs-toggle="modal" data-bs-target="#walkInModal">
+                    <i class="fa-solid fa-street-view"></i>
+                    <span>Register Walk-in</span>
+                </button>
+            </div>
+
+            <!-- Filter Controls -->
+            <form th:action="@{/queue}" method="get" class="row g-3 mb-4">
+                <div class="col-md-4 col-lg-3">
+                    <label for="doctorFilter" class="form-label mb-2">Filter by Doctor</label>
+                    <div class="input-glow-wrapper">
+                        <select id="doctorFilter" name="doctorId" class="form-control-custom" onchange="this.form.submit()" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;">
+                            <option value="">All Active Doctors</option>
+                            <option th:each="doc : ${doctors}" 
+                                    th:value="${doc.id}" th:text="${doc.fullName}" th:selected="${doc.id == selectedDoctorId}"></option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0" style="border-collapse: separate; border-spacing: 0 8px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-card); color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                            <th class="ps-3 py-3" style="width: 10%">No</th>
+                            <th style="width: 25%">Patient</th>
+                            <th style="width: 20%">Doctor</th>
+                            <th style="width: 12%">Room</th>
+                            <th style="width: 13%">Priority</th>
+                            <th style="width: 10%">Status</th>
+                            <th class="pe-3 text-end" style="width: 10%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${queueItems}" class="glass-panel" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-card); margin-bottom: 8px;">
+                            <td class="ps-3 py-3">
+                                <span class="badge bg-secondary font-monospace px-3 py-2" th:text="${item.queueNumber}" style="font-size: 0.95rem; font-weight: 700; width: 45px; display: inline-block; text-align: center;">1</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white d-block" th:text="${item.patientName}">Nguyen Van A</span>
+                                <span class="text-secondary font-monospace" th:text="${item.patientCode}" style="font-size: 0.75rem;">PT-00001</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white" th:text="${item.doctorName}">Dr. B</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle border border-secondary text-secondary" th:text="${item.roomCode != null && !item.roomCode.isEmpty() ? item.roomCode : '-'}">ROOM-101</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${
+                                    item.priority.name() == 'NORMAL' ? 'bg-secondary-subtle text-secondary border border-secondary-subtle' : 
+                                    item.priority.name() == 'HIGH' ? 'bg-warning-subtle text-warning border border-warning-subtle' : 
+                                    'bg-danger-subtle text-danger border border-danger-subtle'}" 
+                                      th:text="${item.priority}">NORMAL</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${
+                                    item.status.name() == 'WAITING' ? 'bg-secondary-subtle text-secondary border border-secondary-subtle' : 
+                                    item.status.name() == 'CALLED' ? 'bg-info-subtle text-info border border-info-subtle' : 
+                                    item.status.name() == 'IN_SERVICE' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 
+                                    item.status.name() == 'DONE' ? 'bg-success-subtle text-success border border-success-subtle' : 
+                                    'bg-danger-subtle text-danger border border-danger-subtle'}" 
+                                      th:text="${item.status}">WAITING</span>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <div class="d-flex justify-content-end gap-2" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST', 'ROLE_DOCTOR')">
+                                    <!-- Call Button -->
+                                    <form th:if="${item.status.name() == 'WAITING'}" th:action="@{/queue/{id}/call(id=${item.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-info text-white" style="border-radius: 6px; padding: 6px 10px; font-weight: 500;">
+                                            <i class="fa-solid fa-volume-high me-1"></i>Call
+                                        </button>
+                                    </form>
+                                    <!-- Start Consultation Button -->
+                                    <form th:if="${item.status.name() == 'CALLED'}" th:action="@{/queue/{id}/start(id=${item.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-primary" style="border-radius: 6px; padding: 6px 10px; font-weight: 500;">
+                                            <i class="fa-solid fa-play me-1"></i>Start
+                                        </button>
+                                    </form>
+                                    <!-- Complete/Done Button -->
+                                    <form th:if="${item.status.name() == 'IN_SERVICE'}" th:action="@{/queue/{id}/done(id=${item.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-success" style="border-radius: 6px; padding: 6px 10px; font-weight: 500;">
+                                            <i class="fa-solid fa-check me-1"></i>Done
+                                        </button>
+                                    </form>
+                                    <!-- Skip Button -->
+                                    <form th:if="${item.status.name() == 'CALLED'}" th:action="@{/queue/{id}/skip(id=${item.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Skip Patient" style="border-radius: 6px; padding: 6px 10px;">
+                                            <i class="fa-solid fa-forward"></i>
+                                        </button>
+                                    </form>
+                                    <span th:if="${item.status.name() == 'DONE' || item.status.name() == 'SKIPPED'}" class="text-secondary" style="font-size: 0.8rem; font-style: italic;">Completed</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(queueItems)}">
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-users-slash mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="m-0">No patients in the active queue currently.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Walk-in Modal -->
+        <div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" class="modal fade" id="walkInModal" tabindex="-1" aria-labelledby="walkInModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glass-panel" style="background: rgba(255, 255, 255, 0.95); border: 1px solid var(--border-card);">
+                    <div class="modal-header border-bottom pb-3" style="border-color: var(--border-card) !important;">
+                        <h5 class="modal-title fw-bold" id="walkInModalLabel"><i class="fa-solid fa-street-view me-2 text-primary"></i>Register Walk-in Patient</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/queue/walk-in}" th:object="${walkIn}" method="post">
+                        <div class="modal-body py-4">
+                            <div class="row g-3">
+                                <!-- Patient Selection -->
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="modalPatientId" class="form-label">Select Patient <span class="text-danger">*</span></label>
+                                        <div class="input-glow-wrapper">
+                                            <select id="modalPatientId" th:field="*{patientId}" class="form-control-custom" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;" required>
+                                                <option value="" disabled selected>Choose Patient</option>
+                                                <option th:each="pt : ${patients}" 
+                                                        th:value="${pt.id}" th:text="${pt.fullName} + ' (' + ${pt.patientCode} + ')'"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Doctor Selection -->
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="modalDoctorId" class="form-label">Select Doctor <span class="text-danger">*</span></label>
+                                        <div class="input-glow-wrapper">
+                                            <select id="modalDoctorId" th:field="*{doctorId}" class="form-control-custom" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;" required>
+                                                <option value="" disabled selected>Choose Doctor</option>
+                                                <option th:each="doc : ${doctors}" 
+                                                        th:value="${doc.id}" th:text="${doc.fullName}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Room Selection -->
+                                <div class="col-12">
+                                    <div class="form-group mb-3">
+                                        <label for="modalRoomId" class="form-label">Select Room</label>
+                                        <div class="input-glow-wrapper">
+                                            <select id="modalRoomId" th:field="*{roomId}" class="form-control-custom" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;">
+                                                <option value="" selected>No Room (Uses Doctor's Default)</option>
+                                                <option th:each="room : ${rooms}" 
+                                                        th:value="${room.id}" th:text="${room.name} + ' (' + ${room.roomCode} + ')'"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Queue Priority -->
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="modalPriority" class="form-label">Priority <span class="text-danger">*</span></label>
+                                        <div class="input-glow-wrapper">
+                                            <select id="modalPriority" th:field="*{priority}" class="form-control-custom" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;" required>
+                                                <option th:each="pri : ${priorities}" 
+                                                        th:value="${pri}" th:text="${pri}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reason -->
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="modalReason" class="form-label">Reason</label>
+                                        <div class="input-glow-wrapper">
+                                            <input type="text" id="modalReason" th:field="*{reason}" class="form-control-custom" placeholder="e.g. Acute pain">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top pt-3" style="border-color: var(--border-card) !important;">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: var(--border-radius-sm); border-color: var(--border-card);">Cancel</button>
+                            <button type="submit" class="btn btn-premium" style="width: auto;">Add to Queue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

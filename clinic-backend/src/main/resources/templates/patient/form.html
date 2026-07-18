@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Patients', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <div class="glass-panel p-4">
+            <!-- Header Section -->
+            <div class="mb-4">
+                <h3 class="fw-bold m-0 text-white" th:text="${isEdit} ? 'Edit Patient Profile' : 'Register New Patient'">Register New Patient</h3>
+                <p class="text-secondary m-0" style="font-size: 0.9rem;">Please provide correct information to register or update the patient's record.</p>
+            </div>
+
+            <!-- Form -->
+            <form th:action="${isEdit} ? @{/patients/{id}/edit(id=${patientId})} : @{/patients/new}" th:object="${patient}" method="post" class="needs-validation">
+                
+                <div class="row g-4">
+                    <!-- Section 1: Personal Details -->
+                    <div class="col-100">
+                        <h5 class="fw-bold mb-3 text-primary border-bottom pb-2" style="border-color: var(--border-card) !important;"><i class="fa-solid fa-user me-2"></i>Personal Details</h5>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="form-group">
+                            <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="fullName" th:field="*{fullName}" class="form-control-custom" placeholder="e.g. Nguyen Van A" required>
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" style="font-size: 0.8rem;">Full Name Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="form-group">
+                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                            <div class="input-glow-wrapper">
+                                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" class="form-control-custom">
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" style="font-size: 0.8rem;">DoB Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="form-group">
+                            <label for="gender" class="form-label">Gender</label>
+                            <div class="input-glow-wrapper">
+                                <select id="gender" th:field="*{gender}" class="form-control-custom" style="appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239ca3af%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpolyline points=%226 9 12 15 18 9%22%3E%3C/polyline%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 16px center; background-size: 16px;">
+                                    <option value="" disabled selected>Select Gender</option>
+                                    <option th:each="g : ${T(com.smartclinic.patient.entity.Gender).values()}" 
+                                            th:value="${g}" th:text="${g}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="phone" th:field="*{phone}" class="form-control-custom" placeholder="e.g. 0901234567">
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" style="font-size: 0.8rem;">Phone Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-glow-wrapper">
+                                <input type="email" id="email" th:field="*{email}" class="form-control-custom" placeholder="e.g. example@mail.com">
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="font-size: 0.8rem;">Email Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Identity Number -->
+                    <div class="col-md-6 col-lg-4">
+                        <div class="form-group">
+                            <label for="identityNumber" class="form-label">Identity Number (CCCD/Passport)</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="identityNumber" th:field="*{identityNumber}" class="form-control-custom" placeholder="e.g. 012345678912">
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('identityNumber')}" th:errors="*{identityNumber}" style="font-size: 0.8rem;">Identity Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="address" class="form-label">Home Address</label>
+                            <div class="input-glow-wrapper">
+                                <textarea id="address" th:field="*{address}" class="form-control-custom" rows="2" placeholder="Street name, District, Province..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Emergency Contact & Medical Info -->
+                    <div class="col-12 mt-4">
+                        <h5 class="fw-bold mb-3 text-primary border-bottom pb-2" style="border-color: var(--border-card) !important;"><i class="fa-solid fa-circle-info me-2"></i>Emergency & Medical Information</h5>
+                    </div>
+
+                    <!-- Emergency Contact Name -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="emergencyContactName" class="form-label">Emergency Contact Name</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="emergencyContactName" th:field="*{emergencyContactName}" class="form-control-custom" placeholder="Relative's name">
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('emergencyContactName')}" th:errors="*{emergencyContactName}" style="font-size: 0.8rem;">Contact Name Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Contact Phone -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="emergencyContactPhone" class="form-label">Emergency Contact Phone</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="emergencyContactPhone" th:field="*{emergencyContactPhone}" class="form-control-custom" placeholder="e.g. 0909876543">
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('emergencyContactPhone')}" th:errors="*{emergencyContactPhone}" style="font-size: 0.8rem;">Contact Phone Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Allergy Note -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="allergyNote" class="form-label">Allergy Note (if any)</label>
+                            <div class="input-glow-wrapper">
+                                <textarea id="allergyNote" th:field="*{allergyNote}" class="form-control-custom" rows="3" placeholder="Specify any medicine, food, or chemical allergies..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-3" style="border-top: 1px solid var(--border-card);">
+                    <a th:href="@{/patients}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: var(--border-radius-sm); border-color: var(--border-card); font-family: var(--font-heading); font-weight: 500;">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-premium px-4 py-2" style="width: auto; font-family: var(--font-heading); font-weight: 600;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

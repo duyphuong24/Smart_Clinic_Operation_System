@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Patients', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <div class="row g-4">
+            <!-- Left Side: Profile Summary -->
+            <div class="col-lg-5">
+                <div class="glass-panel p-4 h-100">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-circle mb-3" style="width: 80px; height: 80px; border: 1px solid var(--border-card);">
+                            <i class="fa-solid fa-user-injured text-primary" style="font-size: 2.2rem;"></i>
+                        </div>
+                        <h4 class="fw-bold text-white mb-1" th:text="${patient.fullName}">Nguyen Van A</h4>
+                        <span class="badge bg-secondary font-monospace px-3 py-2" th:text="${patient.patientCode}" style="font-size: 0.85rem; letter-spacing: 0.05em;">PT-00001</span>
+                    </div>
+
+                    <!-- Personal Information List -->
+                    <div class="d-flex flex-column gap-3 pt-3" style="border-top: 1px solid var(--border-card);">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary" style="font-size: 0.9rem;">Gender</span>
+                            <span class="text-white fw-medium" th:text="${patient.gender}">MALE</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary" style="font-size: 0.9rem;">Date of Birth</span>
+                            <span class="text-white fw-medium" th:text="${patient.dateOfBirth != null ? #temporals.format(patient.dateOfBirth, 'dd-MM-yyyy') : '-'}">01-01-2000</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary" style="font-size: 0.9rem;">Phone</span>
+                            <span class="text-white fw-medium" th:text="${patient.phone != null && !patient.phone.isEmpty() ? patient.phone : '-'}">0901234567</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary" style="font-size: 0.9rem;">Email</span>
+                            <span class="text-white fw-medium" th:text="${patient.email != null && !patient.email.isEmpty() ? patient.email : '-'}">example@mail.com</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary" style="font-size: 0.9rem;">Identity Number</span>
+                            <span class="text-white fw-medium" th:text="${patient.identityNumber != null && !patient.identityNumber.isEmpty() ? patient.identityNumber : '-'}">012345678912</span>
+                        </div>
+                        <div class="d-flex align-items-start justify-content-between">
+                            <span class="text-secondary" style="font-size: 0.9rem; flex-shrink: 0; width: 100px;">Address</span>
+                            <span class="text-white fw-medium text-end" th:text="${patient.address != null && !patient.address.isEmpty() ? patient.address : '-'}">District 1, HCMC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Medical Details & Emergency Contacts -->
+            <div class="col-lg-7">
+                <div class="d-flex flex-column gap-4 h-100">
+                    <!-- Medical details & Emergency Contacts Card -->
+                    <div class="glass-panel p-4">
+                        <h5 class="fw-bold mb-3 text-primary border-bottom pb-2" style="border-color: var(--border-card) !important;">
+                            <i class="fa-solid fa-circle-info me-2"></i>Medical & Contact Details
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <span class="d-block text-secondary mb-1" style="font-size: 0.85rem;">Emergency Contact</span>
+                                <span class="text-white fw-semibold" th:text="${patient.emergencyContactName != null && !patient.emergencyContactName.isEmpty() ? patient.emergencyContactName : '-'}">Relative Name</span>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="d-block text-secondary mb-1" style="font-size: 0.85rem;">Emergency Contact Phone</span>
+                                <span class="text-white fw-semibold" th:text="${patient.emergencyContactPhone != null && !patient.emergencyContactPhone.isEmpty() ? patient.emergencyContactPhone : '-'}">0909876543</span>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <span class="d-block text-secondary mb-2" style="font-size: 0.85rem;">Allergy Information</span>
+                                <div class="p-3 rounded border border-danger-subtle" style="background: rgba(239, 68, 68, 0.05);">
+                                    <span class="text-danger-emphasis fw-medium" th:text="${patient.allergyNote != null && !patient.allergyNote.isEmpty() ? patient.allergyNote : 'No allergies recorded.'}">Allergy note placeholder</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visit History Card -->
+                    <div class="glass-panel p-4 flex-grow-1">
+                        <h5 class="fw-bold mb-3 text-primary border-bottom pb-2" style="border-color: var(--border-card) !important;">
+                            <i class="fa-solid fa-history me-2"></i>Visit History
+                        </h5>
+                        
+                        <div class="text-center py-5 text-secondary">
+                            <i class="fa-solid fa-notes-medical mb-3" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                            <p class="m-0">No past visits recorded. Patient has not checked in for any consults yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer: Back and Edit Buttons -->
+            <div class="col-12 mt-4">
+                <div class="d-flex align-items-center justify-content-between pt-3" style="border-top: 1px solid var(--border-card);">
+                    <a th:href="@{/patients}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: var(--border-radius-sm); border-color: var(--border-card); font-family: var(--font-heading); font-weight: 500;">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Back to Registry
+                    </a>
+                    <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/patients/{id}/edit(id=${patient.id})}" class="btn btn-premium px-4 py-2" style="width: auto; font-family: var(--font-heading); font-weight: 600;">
+                        <i class="fa-solid fa-user-pen me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

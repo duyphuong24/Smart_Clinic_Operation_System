@@ -52,6 +52,18 @@ class ClinicBackendApplicationTests {
     @MockBean
     private QueueItemRepository queueItemRepository;
 
+    @MockBean
+    private com.smartclinic.visit.repository.VisitRepository visitRepository;
+
+    @MockBean
+    private com.smartclinic.encounter.repository.EncounterRepository encounterRepository;
+
+    @MockBean
+    private com.smartclinic.encounter.repository.EncounterServiceRepository encounterServiceRepository;
+
+    @MockBean
+    private com.smartclinic.servicecatalog.repository.ServiceCatalogRepository serviceCatalogRepository;
+
     @Test
     void contextLoads() {
     }
