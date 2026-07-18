@@ -5,6 +5,9 @@ import com.smartclinic.user.entity.User;
 import com.smartclinic.user.entity.UserStatus;
 import com.smartclinic.user.repository.RoleRepository;
 import com.smartclinic.user.repository.UserRepository;
+import com.smartclinic.servicecatalog.entity.ServiceCatalog;
+import com.smartclinic.servicecatalog.repository.ServiceCatalogRepository;
+import java.math.BigDecimal;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -21,6 +24,7 @@ public class DemoDataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ServiceCatalogRepository serviceCatalogRepository;
 
     @Override
     @Transactional
@@ -36,6 +40,12 @@ public class DemoDataInitializer implements CommandLineRunner {
         ensureUser("doctor", "doctor123", "Demo Doctor", doctor);
         ensureUser("cashier", "cashier123", "Demo Cashier", cashier);
         ensureUser("manager", "manager123", "Demo Manager", manager);
+
+        // Seed Services
+        ensureService("SVC-CONS", "General Consultation", "CONSULTATION", new BigDecimal("150000"));
+        ensureService("SVC-XPUL", "Pulmonary X-Ray", "PROCEDURE", new BigDecimal("250000"));
+        ensureService("SVC-CBC", "Complete Blood Count Test", "LAB_TEST", new BigDecimal("100000"));
+        ensureService("SVC-HECG", "Electrocardiogram (ECG)", "PROCEDURE", new BigDecimal("200000"));
     }
 
     private Role ensureRole(String name) {
@@ -59,5 +69,18 @@ public class DemoDataInitializer implements CommandLineRunner {
                 .build();
 
         userRepository.save(user);
+    }
+
+    private void ensureService(String code, String name, String type, BigDecimal price) {
+        if (serviceCatalogRepository.findByActiveTrue().stream().anyMatch(s -> s.getServiceCode().equals(code))) {
+            return;
+        }
+        ServiceCatalog service = new ServiceCatalog();
+        service.setServiceCode(code);
+        service.setName(name);
+        service.setType(type);
+        service.setPrice(price);
+        service.setActive(true);
+        serviceCatalogRepository.save(service);
     }
 }
