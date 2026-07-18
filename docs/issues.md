@@ -2,6 +2,8 @@
 
 This file is the local issue catalog used for branch names, commit messages, and GitHub issue creation. Issue numbers are stable references for this project.
 
+**Issue tracking rule:** When a project bug, feature bug, blocker, or missing requirement is found, add a new issue to this file using the next available issue number. Do not reuse existing numbers. Use that issue number in the branch name, commit context, and PR description when implementing the fix.
+
 ## Epic 01 - Project Foundation
 
 ### Issue 1: Initialize Spring Boot Backend Project
