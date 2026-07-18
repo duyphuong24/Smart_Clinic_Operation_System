@@ -14,11 +14,15 @@ public interface QueueItemService {
 
     QueueItemResponse createWalkIn(WalkInQueueRequest request);
 
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.isQueueItemOwner(#id)")
     QueueItemResponse call(Long id);
 
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.isQueueItemOwner(#id)")
     QueueItemResponse startService(Long id);
 
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.isQueueItemOwner(#id)")
     QueueItemResponse done(Long id);
 
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.isQueueItemOwner(#id)")
     QueueItemResponse skip(Long id);
 }
