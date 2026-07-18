@@ -3,6 +3,8 @@ package com.smartclinic.servicecatalog.entity;
 import com.smartclinic.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import lombok.Getter;
@@ -20,10 +22,11 @@ public class ServiceCatalog extends BaseEntity {
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 50)
-    private String type; // CONSULTATION, LAB_TEST, PROCEDURE, MEDICINE
+    private ServiceType type;
 
-    @Column(name = "price", nullable = false)
+    @Column(name = "price", nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
     @Column(name = "active", nullable = false)
