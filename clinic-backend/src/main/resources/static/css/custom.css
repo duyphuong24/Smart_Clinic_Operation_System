@@ -254,15 +254,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .alert-danger-custom {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #b91c1c;
 }
 
 .alert-success-custom {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    color: #a7f3d0;
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #15803d;
 }
 
 /* ==========================================================================
