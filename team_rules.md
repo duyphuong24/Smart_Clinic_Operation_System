@@ -227,7 +227,7 @@ com.smartclinic.Appointment
 com.smartclinic.patientManagement
 ```
 
-Business CRUD modules should use this internal structure when applicable:
+Each main backend domain module should use this internal structure:
 
 ```text
 controller
@@ -239,36 +239,6 @@ dto
 mapper
 validation
 ```
-
-Examples of business CRUD modules:
-
-```text
-user
-staff
-doctor
-specialty
-room
-patient
-appointment
-queue
-billing
-payment
-```
-
-Technical modules use only the packages they need:
-
-```text
-auth      -> controller/rest/dto/service if authentication endpoints are needed
-security  -> config/principal/service/util for Spring Security infrastructure
-common    -> api/entity/exception/enums/util/validation for shared building blocks
-config    -> application-level Spring configuration
-```
-
-Do not mix responsibilities:
-
-- Do not put Spring Security infrastructure inside clinic business services.
-- Do not put user account management inside `staff` or `doctor`.
-- Do not put room/specialty CRUD inside `doctor`.
 
 Examples:
 
@@ -441,7 +411,7 @@ idx_queue_items_date_status
 Unique constraint/index naming:
 
 ```text
-uq_users_user_name
+uq_users_email
 uq_patients_patient_code
 uq_appointments_code
 uq_queue_items_date_number
