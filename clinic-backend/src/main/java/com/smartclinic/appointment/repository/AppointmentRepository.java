@@ -18,6 +18,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findByScheduledStartBetweenOrderByScheduledStartAsc(LocalDateTime start, LocalDateTime end);
 
+    long countByScheduledStartBetween(LocalDateTime start, LocalDateTime end);
+
     @Query("""
             select case when count(a) > 0 then true else false end
             from Appointment a
