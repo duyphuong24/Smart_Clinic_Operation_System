@@ -17,13 +17,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/specialties")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 public class SpecialtyController {
 
     private final SpecialtyService specialtyService;
 
-    @GetMapping
+    @GetMapping("/masterdata")
+    public String masterDataRedirect() {
+        return "redirect:/admin/specialties";
+    }
+
+    @GetMapping("/specialties")
     public String list(Model model) {
         List<SpecialtyResponse> specialties = specialtyService.findAll();
         model.addAttribute("specialties", specialties);
@@ -31,7 +36,7 @@ public class SpecialtyController {
         return "admin/specialty-list";
     }
 
-    @GetMapping("/new")
+    @GetMapping("/specialties/new")
     public String createForm(Model model) {
         model.addAttribute("specialty", new SpecialtyRequest());
         model.addAttribute("isEdit", false);
@@ -39,7 +44,7 @@ public class SpecialtyController {
         return "admin/specialty-form";
     }
 
-    @PostMapping("/new")
+    @PostMapping("/specialties/new")
     public String create(
             @Valid @ModelAttribute("specialty") SpecialtyRequest request,
             BindingResult bindingResult,
@@ -54,7 +59,7 @@ public class SpecialtyController {
         return "redirect:/admin/specialties";
     }
 
-    @GetMapping("/{id}/edit")
+    @GetMapping("/specialties/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         SpecialtyResponse specialty = specialtyService.getById(id);
         SpecialtyRequest request = new SpecialtyRequest();
@@ -69,7 +74,7 @@ public class SpecialtyController {
         return "admin/specialty-form";
     }
 
-    @PostMapping("/{id}/edit")
+    @PostMapping("/specialties/{id}/edit")
     public String update(
             @PathVariable Long id,
             @Valid @ModelAttribute("specialty") SpecialtyRequest request,
