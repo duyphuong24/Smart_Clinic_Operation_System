@@ -1,19 +1,21 @@
 package com.smartclinic.desktop.session;
 
 import com.smartclinic.desktop.dto.LoginResponse;
+import com.smartclinic.desktop.token.TokenStore;
 import java.util.List;
 import java.util.Optional;
 
 public class SessionManager {
 
-    private String accessToken;
+    private final TokenStore tokenStore = new TokenStore();
     private String tokenType;
     private String userName;
     private String fullName;
     private List<String> roles = List.of();
 
     public void startSession(LoginResponse response) {
-        this.accessToken = response.getAccessToken();
+        tokenStore.setAccessToken(response.getAccessToken());
+        tokenStore.setRefreshToken(response.getRefreshToken());
         this.tokenType = response.getTokenType();
         this.userName = response.getUserName();
         this.fullName = response.getFullName();
@@ -21,7 +23,7 @@ public class SessionManager {
     }
 
     public void clear() {
-        this.accessToken = null;
+        tokenStore.clear();
         this.tokenType = null;
         this.userName = null;
         this.fullName = null;
@@ -29,7 +31,8 @@ public class SessionManager {
     }
 
     public boolean isAuthenticated() {
-        return accessToken != null && !accessToken.isBlank();
+        String access = tokenStore.getAccessToken();
+        return access != null && !access.isBlank();
     }
 
     public Optional<String> authorizationHeader() {
@@ -37,7 +40,15 @@ public class SessionManager {
             return Optional.empty();
         }
         String type = tokenType == null || tokenType.isBlank() ? "Bearer" : tokenType;
-        return Optional.of(type + " " + accessToken);
+        return Optional.of(type + " " + tokenStore.getAccessToken());
+    }
+
+    public String getAccessToken() {
+        return tokenStore.getAccessToken();
+    }
+
+    public String getRefreshToken() {
+        return tokenStore.getRefreshToken();
     }
 
     public String getUserName() {
