@@ -1,6 +1,7 @@
 package com.smartclinic;
 
 import com.smartclinic.appointment.repository.AppointmentRepository;
+import com.smartclinic.audit.repository.AuditLogRepository;
 import com.smartclinic.doctor.repository.DoctorRepository;
 import com.smartclinic.encounter.repository.EncounterRepository;
 import com.smartclinic.encounter.repository.EncounterServiceRepository;
@@ -35,6 +36,9 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private RoleRepository roleRepository;
+
+    @MockBean
+    private AuditLogRepository auditLogRepository;
 
     @MockBean
     private PatientRepository patientRepository;
