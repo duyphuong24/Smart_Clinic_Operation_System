@@ -18,6 +18,7 @@ import com.smartclinic.servicecatalog.repository.ServiceCatalogRepository;
 import com.smartclinic.staff.repository.StaffRepository;
 import com.smartclinic.user.repository.RoleRepository;
 import com.smartclinic.user.repository.UserRepository;
+import com.smartclinic.auth.repository.RefreshTokenRepository;
 import com.smartclinic.visit.repository.VisitRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +34,9 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private RefreshTokenRepository refreshTokenRepository;
 
     @MockBean
     private RoleRepository roleRepository;

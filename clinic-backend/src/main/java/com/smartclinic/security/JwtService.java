@@ -21,19 +21,28 @@ public class JwtService {
     private static final String ROLES_CLAIM = "roles";
 
     private final SecretKey signingKey;
-    private final long expirationMinutes;
+    private final long accessTokenValidSeconds;
 
     public JwtService(
-            @Value("${smartclinic.jwt.secret}") String secret,
-            @Value("${smartclinic.jwt.expiration-minutes}") long expirationMinutes
+            @Value("${smartclinic.jwt.signer-key}") String signerKey,
+            @Value("${smartclinic.jwt.access-token-valid-seconds}") long accessTokenValidSeconds
     ) {
-        this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationMinutes = expirationMinutes;
+        byte[] keyBytes;
+        try {
+            keyBytes = java.util.Base64.getDecoder().decode(signerKey);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("JWT signer key must be a valid Base64 encoded string", ex);
+        }
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException("JWT signer key must be at least 256 bits (32 bytes)");
+        }
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
+        this.accessTokenValidSeconds = accessTokenValidSeconds;
     }
 
     public String generateToken(UserDetails userDetails) {
         Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(expirationMinutes, ChronoUnit.MINUTES);
+        Instant expiresAt = issuedAt.plus(accessTokenValidSeconds, ChronoUnit.SECONDS);
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
