@@ -10,6 +10,7 @@ import com.smartclinic.invoice.repository.InvoiceRepository;
 import com.smartclinic.masterdata.repository.RoomRepository;
 import com.smartclinic.masterdata.repository.SpecialtyRepository;
 import com.smartclinic.patient.repository.PatientRepository;
+import com.smartclinic.payment.repository.PaymentRepository;
 import com.smartclinic.queue.repository.QueueItemRepository;
 import com.smartclinic.schedule.repository.DoctorAvailabilityRepository;
 import com.smartclinic.servicecatalog.repository.ServiceCatalogRepository;
@@ -79,6 +80,9 @@ class ClinicBackendApplicationTests {
 
     @MockBean
     private InvoiceItemRepository invoiceItemRepository;
+
+    @MockBean
+    private PaymentRepository paymentRepository;
 
     @Test
     void contextLoads() {
