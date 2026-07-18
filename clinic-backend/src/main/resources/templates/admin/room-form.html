@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Master Data', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <div class="glass-panel p-4" style="max-width: 600px; margin: 0 auto;">
+            <!-- Header Section -->
+            <div class="mb-4">
+                <h3 class="fw-bold m-0 text-white" th:text="${isEdit} ? 'Edit Room' : 'Add Room'">Add Room</h3>
+                <p class="text-secondary m-0" style="font-size: 0.9rem;">Configure physical rooms or desks inside the clinic.</p>
+            </div>
+
+            <!-- Form -->
+            <form th:action="${isEdit} ? @{/admin/rooms/{id}/edit(id=${roomId})} : @{/admin/rooms/new}" th:object="${room}" method="post">
+                <div class="row g-4">
+                    <!-- Room Code -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="roomCode" class="form-label">Room Code <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="roomCode" th:field="*{roomCode}" class="form-control-custom" placeholder="e.g. ROOM-101" required th:disabled="${isEdit}">
+                            </div>
+                            <!-- Hidden input because disabled inputs are not submitted in POST forms -->
+                            <input type="hidden" th:if="${isEdit}" th:field="*{roomCode}">
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('roomCode')}" th:errors="*{roomCode}" style="font-size: 0.8rem;">Room Code Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Room Name -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Room Name <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="name" th:field="*{name}" class="form-control-custom" placeholder="e.g. Consultation Room 1" required>
+                            </div>
+                            <div class="text-danger mt-1" th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="font-size: 0.8rem;">Name Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Floor -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="floor" class="form-label">Floor</label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="floor" th:field="*{floor}" class="form-control-custom" placeholder="e.g. 1st Floor / Ground Floor">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active status (Only during edit) -->
+                    <div class="col-12" th:if="${isEdit}">
+                        <div class="form-check form-switch p-0 d-flex align-items-center gap-3">
+                            <label class="form-label m-0" for="active" style="cursor: pointer;">Active Status</label>
+                            <input class="form-check-input ms-0" type="checkbox" id="active" th:field="*{active}" style="width: 45px; height: 24px; cursor: pointer; float: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-3" style="border-top: 1px solid var(--border-card);">
+                    <a th:href="@{/admin/rooms}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: var(--border-radius-sm); border-color: var(--border-card); font-family: var(--font-heading); font-weight: 500;">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-premium px-4 py-2" style="width: auto; font-family: var(--font-heading); font-weight: 600;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Room
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
