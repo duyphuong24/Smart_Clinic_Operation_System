@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Consultation Detail', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <div class="glass-panel p-5" style="max-width: 850px; margin: 0 auto;">
+            <!-- Report Header -->
+            <div class="text-center mb-5 pb-4 border-bottom border-secondary">
+                <h2 class="fw-bold text-white mb-1">SMART CLINIC MEDICAL REPORT</h2>
+                <p class="text-secondary m-0" style="font-size: 0.9rem;">Official consultation summary and clinical record.</p>
+            </div>
+
+            <!-- Meta Data Row -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-hospital-user me-2"></i>Patient Profile</h6>
+                    <div class="d-flex flex-column gap-2 text-white" style="font-size: 0.95rem;">
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">Name:</span> <strong th:text="${patient.fullName}">Nguyen Van A</strong></div>
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">Patient Code:</span> <span class="badge bg-secondary font-monospace" th:text="${patient.patientCode}">PT-00001</span></div>
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">DOB / Gender:</span> <span th:text="${patient.dateOfBirth} + ' / ' + ${patient.gender}">01-01-2000 / MALE</span></div>
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">Phone:</span> <span th:text="${patient.phone}">0901234567</span></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-file-invoice me-2"></i>Encounter Summary</h6>
+                    <div class="d-flex flex-column gap-2 text-white" style="font-size: 0.95rem;">
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">Encounter ID:</span> <strong th:text="${encounter.id}">ENC-123</strong></div>
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">Doctor:</span> <span th:text="${encounter.doctor.staff.user.fullName}">Dr. B</span></div>
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">Date:</span> <span th:text="${#temporals.format(encounter.completedAt, 'dd-MM-yyyy HH:mm')}">18-07-2026 15:30</span></div>
+                        <div><span class="text-secondary" style="width: 120px; display: inline-block;">Status:</span> <span class="badge bg-success-subtle text-success border border-success-subtle" th:text="${encounter.status}">COMPLETED</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnostics -->
+            <div class="mb-5">
+                <h6 class="fw-bold text-primary mb-3 border-bottom pb-2" style="border-color: var(--border-card) !important;">
+                    <i class="fa-solid fa-file-medical me-2"></i>Clinical Findings
+                </h6>
+                <div class="d-flex flex-column gap-4">
+                    <div>
+                        <span class="d-block text-secondary mb-1" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Chief Complaint</span>
+                        <div class="p-3 rounded text-white" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-card);" th:text="${encounter.chiefComplaint}">Symptoms reported by the patient.</div>
+                    </div>
+                    <div>
+                        <span class="d-block text-secondary mb-1" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Diagnosis</span>
+                        <div class="p-3 rounded text-white" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-card);" th:text="${encounter.diagnosis}">Doctor's diagnosis.</div>
+                    </div>
+                    <div>
+                        <span class="d-block text-secondary mb-1" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Clinical Notes / Treatment Plan</span>
+                        <div class="p-3 rounded text-white" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-card);" th:text="${encounter.clinicalNote != null && !encounter.clinicalNote.isEmpty() ? encounter.clinicalNote : 'No extra notes.'}">Clinical notes.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Summary -->
+            <div class="mb-5">
+                <h6 class="fw-bold text-primary mb-3 border-bottom pb-2" style="border-color: var(--border-card) !important;">
+                    <i class="fa-solid fa-list-check me-2"></i>Ordered Services & Procedures
+                </h6>
+                <div class="table-responsive">
+                    <table class="table align-middle text-white m-0" style="border-collapse: separate; border-spacing: 0 4px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-card); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">
+                                <th class="ps-2 py-2" style="width: 45%">Service Name</th>
+                                <th style="width: 25%">Unit Price</th>
+                                <th style="width: 15%">Qty</th>
+                                <th class="pe-2 text-end" style="width: 15%">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${orderedServices}">
+                                <td class="ps-2 py-2 fw-semibold text-white" th:text="${order.serviceCatalog.name}">General Consultation</td>
+                                <td th:text="${#numbers.formatDecimal(order.unitPrice, 1, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</td>
+                                <td th:text="${order.quantity}">1</td>
+                                <td class="pe-2 text-end fw-semibold text-primary" th:text="${#numbers.formatDecimal(order.unitPrice * order.quantity, 1, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(orderedServices)}">
+                                <td colspan="4" class="text-center py-4 text-secondary">No extra services ordered.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="d-flex align-items-center justify-content-between pt-4 border-top border-secondary">
+                <a th:href="@{/consultation}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: var(--border-radius-sm); border-color: var(--border-card);">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Back to Queue
+                </a>
+                <button onclick="window.print()" class="btn btn-premium px-4 py-2" style="width: auto;">
+                    <i class="fa-solid fa-print me-2"></i>Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
