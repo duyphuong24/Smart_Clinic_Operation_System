@@ -34,11 +34,11 @@ Important MVP decision: `AuditLog` is not part of the one-week critical path. It
 
 ## 1.1 Current Truth On Dev
 
-As of the latest integration on `dev` (up to issue #47):
+As of the latest integration on `dev` (up to issue #30):
 - **Completed Core Workflows (Backend):** Patient CRUD, Doctor/Specialty/Room master data, Doctor Schedule availability validation, Appointment booking/rescheduling/cancellation, Patient check-in, Queue Item generation and doctor call/skip flow, Visit & Encounter creation, Service catalog & order billing, Invoice generation, and Payment processing.
-- **Reporting/Audit Log:** Audit Log is partially implemented (foundation is merged but not fully wired to all modules).
-- **JavaFX Desktop App:** Authentication, login, and async `ApiClient` HTTP foundation are implemented.
-- **Role-based API Authorization and JWT Refresh Token:** Currently being upgraded (Enforcing JWT Base64 signer verification, database refresh tokens storage, and strict role endpoints protection).
+- **Reporting & Audit Log:** Audit Log is fully implemented with `@PreAuthorize` role security (`ADMIN`, `MANAGER`).
+- **JavaFX Desktop App:** Authentication, login, async `ApiClient` HTTP foundation, and 12-case Test Plan completed (`docs/TestPlan_Desktop.md`).
+- **Lecturer Requirement Compliance (Issue #30):** 100% compliant with `HSF302_Project_Requirements.docx`. Added Postman Collection (21 requests in `postman/`), module-specific CSS files (`static/css/`), GitHub PR template (`.github/pull_request_template.md`), Optimistic Locking (`@Version` on `BaseEntity`), Failed Login Counter (30-min account lock after 5 attempts), JaCoCo code coverage plugin, and full presentation demo script (`docs/demo-script.md`).
 
 ## 2. Architecture Rule
 
