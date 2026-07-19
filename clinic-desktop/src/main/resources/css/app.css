@@ -399,3 +399,72 @@
     -fx-background-color: #f4f2ee;
     -fx-text-fill: #4b5563;
 }
+
+.patient-status-active {
+    -fx-background-color: rgba(16, 185, 129, 0.12);
+    -fx-text-fill: #047857;
+}
+
+.patient-status-archived {
+    -fx-background-color: rgba(239, 68, 68, 0.12);
+    -fx-text-fill: #b91c1c;
+}
+
+.patient-status-default {
+    -fx-background-color: #f4f2ee;
+    -fx-text-fill: #4b5563;
+}
+
+.detail-panel {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-border-color: rgba(0, 0, 0, 0.08);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-border-width: 1;
+}
+
+.detail-panel-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2937;
+}
+
+.detail-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2937;
+}
+
+.detail-code {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+}
+
+.detail-placeholder {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}
+
+.detail-field-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #9ca3af;
+}
+
+.detail-field-value {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1f2937;
+    -fx-wrap-text: true;
+}
+
+.archived-warning {
+    -fx-background-color: rgba(245, 158, 11, 0.1);
+    -fx-border-color: rgba(245, 158, 11, 0.25);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-text-fill: #b45309;
+    -fx-padding: 8 10;
+    -fx-wrap-text: true;
+}

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartclinic.desktop.api.ApiClient;
 import com.smartclinic.desktop.api.AppointmentApiClient;
 import com.smartclinic.desktop.api.AuthApiClient;
+import com.smartclinic.desktop.api.PatientApiClient;
 import com.smartclinic.desktop.api.QueueApiClient;
 import com.smartclinic.desktop.controller.HomeController;
 import com.smartclinic.desktop.controller.InvoiceDetailController;
@@ -20,6 +21,7 @@ import com.smartclinic.desktop.navigation.SceneNavigator;
 import com.smartclinic.desktop.navigation.ViewLoader;
 import com.smartclinic.desktop.service.AppointmentDesktopService;
 import com.smartclinic.desktop.service.AuthService;
+import com.smartclinic.desktop.service.PatientDesktopService;
 import com.smartclinic.desktop.session.SessionManager;
 import java.lang.reflect.InvocationTargetException;
 import java.net.http.HttpClient;
@@ -32,6 +34,7 @@ public class AppContext {
     private final SessionManager sessionManager;
     private final AuthService authService;
     private final AppointmentDesktopService appointmentDesktopService;
+    private final PatientDesktopService patientDesktopService;
     private final NavigationService navigationService;
     private SceneNavigator sceneNavigator;
 
@@ -45,9 +48,11 @@ public class AppContext {
         AuthApiClient authApiClient = new AuthApiClient(apiClient);
         AppointmentApiClient appointmentApiClient = new AppointmentApiClient(apiClient);
         QueueApiClient queueApiClient = new QueueApiClient(apiClient);
+        PatientApiClient patientApiClient = new PatientApiClient(apiClient);
 
         this.authService = new AuthService(authApiClient, sessionManager);
         this.appointmentDesktopService = new AppointmentDesktopService(appointmentApiClient, queueApiClient);
+        this.patientDesktopService = new PatientDesktopService(patientApiClient);
 
         ViewLoader viewLoader = new ViewLoader(this);
         this.navigationService = new NavigationService(viewLoader, sessionManager);
@@ -71,7 +76,7 @@ public class AppContext {
             return new TodayAppointmentsController(appointmentDesktopService);
         }
         if (controllerClass == PatientSearchController.class) {
-            return new PatientSearchController();
+            return new PatientSearchController(patientDesktopService);
         }
         if (controllerClass == WalkInController.class) {
             return new WalkInController();
