@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="12.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.QueueBoardController">
+    <Label styleClass="page-heading" text="Queue Board" />
+    <Label styleClass="page-description" text="Monitor waiting patients and update queue status for the current day." wrapText="true" />
+    <Label fx:id="statusLabel" styleClass="page-status" wrapText="true" />
+</VBox>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="12.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.WalkInController">
+    <Label styleClass="page-heading" text="Quick Walk-in" />
+    <Label styleClass="page-description" text="Register a walk-in patient and add them directly to today's queue." wrapText="true" />
+    <Label fx:id="statusLabel" styleClass="page-status" wrapText="true" />
+</VBox>
