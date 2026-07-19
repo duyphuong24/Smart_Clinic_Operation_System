@@ -3,7 +3,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_LEFT" spacing="12.0" styleClass="home-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.HomeController">
+<VBox spacing="12.0" styleClass="home-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.HomeController">
     <Label fx:id="welcomeTitle" styleClass="home-title" text="Welcome" />
     <Label fx:id="roleBadge" styleClass="badge-role" text="Role" />
     <Label fx:id="welcomeMessage" styleClass="home-subtitle" wrapText="true" />

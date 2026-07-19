@@ -1,10 +1,14 @@
 package com.smartclinic.desktop.controller;
 
+import com.smartclinic.desktop.navigation.DesktopRoute;
+import com.smartclinic.desktop.navigation.NavigationService;
 import com.smartclinic.desktop.navigation.SceneNavigator;
 import com.smartclinic.desktop.service.AuthService;
 import com.smartclinic.desktop.session.SessionManager;
+import com.smartclinic.desktop.util.AlertUtil;
 import com.smartclinic.desktop.util.RoleUtil;
-import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Map;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,9 +22,18 @@ public class MainShellController {
     private final SessionManager sessionManager;
     private final AuthService authService;
     private final SceneNavigator sceneNavigator;
+    private final NavigationService navigationService;
+
+    private final Map<DesktopRoute, Button> menuButtons = new EnumMap<>(DesktopRoute.class);
 
     @FXML
     private Label pageTitleLabel;
+
+    @FXML
+    private Label breadcrumbLabel;
+
+    @FXML
+    private Label navbarUserLabel;
 
     @FXML
     private Label userNameLabel;
@@ -34,70 +47,25 @@ public class MainShellController {
     @FXML
     private VBox sidebarMenu;
 
-    @FXML
-    private Button homeMenuButton;
-
-    @FXML
-    private Button appointmentsMenuButton;
-
-    @FXML
-    private Button patientsMenuButton;
-
-    @FXML
-    private Button queueMenuButton;
-
-    @FXML
-    private Button invoicesMenuButton;
-
     public MainShellController(
             SessionManager sessionManager,
             AuthService authService,
-            SceneNavigator sceneNavigator
+            SceneNavigator sceneNavigator,
+            NavigationService navigationService
     ) {
         this.sessionManager = sessionManager;
         this.authService = authService;
         this.sceneNavigator = sceneNavigator;
+        this.navigationService = navigationService;
     }
 
     @FXML
     private void initialize() {
         userNameLabel.setText(sessionManager.getFullName());
         userRoleLabel.setText(RoleUtil.primaryRoleLabel(sessionManager.getRoles()));
-        configureRoleBasedMenu();
-        showHome();
-    }
-
-    @FXML
-    private void onHome() {
-        showHome();
-    }
-
-    @FXML
-    private void onAppointments() {
-        setActiveMenu(appointmentsMenuButton);
-        pageTitleLabel.setText("Today Appointments");
-        showPlaceholder("Today Appointments screen will load appointment data from /api/v1/appointments/today.");
-    }
-
-    @FXML
-    private void onPatients() {
-        setActiveMenu(patientsMenuButton);
-        pageTitleLabel.setText("Patient Search");
-        showPlaceholder("Patient search will call /api/v1/patients/search.");
-    }
-
-    @FXML
-    private void onQueue() {
-        setActiveMenu(queueMenuButton);
-        pageTitleLabel.setText("Queue Board");
-        showPlaceholder("Queue board will call /api/v1/queue-items/today.");
-    }
-
-    @FXML
-    private void onInvoices() {
-        setActiveMenu(invoicesMenuButton);
-        pageTitleLabel.setText("Pending Invoices");
-        showPlaceholder("Pending invoices will call /api/v1/invoices/pending.");
+        navbarUserLabel.setText(sessionManager.getUserName());
+        buildSidebarMenu();
+        navigateTo(DesktopRoute.HOME);
     }
 
     @FXML
@@ -106,50 +74,77 @@ public class MainShellController {
         sceneNavigator.showLogin();
     }
 
-    private void showHome() {
-        setActiveMenu(homeMenuButton);
-        pageTitleLabel.setText("Home");
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/home-view.fxml"));
-            loader.setController(new HomeController(sessionManager));
-            Parent homeView = loader.load();
-            contentPane.getChildren().setAll(homeView);
-        } catch (IOException ex) {
-            showPlaceholder("Unable to load home view.");
+    public void navigateTo(DesktopRoute route) {
+        NavigationService.NavigationResult result = navigationService.navigate(route);
+        if (!result.allowed()) {
+            showAccessDenied(route);
+            updateHeader(route);
+            setActiveMenu(null);
+            return;
+        }
+
+        contentPane.getChildren().setAll(result.content());
+        updateHeader(route);
+        setActiveMenu(route);
+    }
+
+    private void buildSidebarMenu() {
+        sidebarMenu.getChildren().clear();
+        menuButtons.clear();
+
+        for (DesktopRoute route : navigationService.visibleMenuRoutes()) {
+            Button menuButton = new Button(route.getPageTitle());
+            menuButton.setMaxWidth(Double.MAX_VALUE);
+            menuButton.getStyleClass().add("menu-button");
+            menuButton.setOnAction(event -> navigateTo(route));
+            sidebarMenu.getChildren().add(menuButton);
+            menuButtons.put(route, menuButton);
         }
     }
 
-    private void showPlaceholder(String message) {
-        Label placeholder = new Label(message);
-        placeholder.getStyleClass().add("home-subtitle");
-        placeholder.setWrapText(true);
-        contentPane.getChildren().setAll(placeholder);
+    private void updateHeader(DesktopRoute route) {
+        pageTitleLabel.setText(route.getPageTitle());
+        breadcrumbLabel.setText(route.getBreadcrumb());
     }
 
-    private void configureRoleBasedMenu() {
-        var roles = sessionManager.getRoles();
-        appointmentsMenuButton.setVisible(RoleUtil.hasAnyRole(roles, "ROLE_ADMIN", "ROLE_RECEPTIONIST"));
-        appointmentsMenuButton.setManaged(appointmentsMenuButton.isVisible());
-        patientsMenuButton.setVisible(RoleUtil.hasAnyRole(roles, "ROLE_ADMIN", "ROLE_RECEPTIONIST"));
-        patientsMenuButton.setManaged(patientsMenuButton.isVisible());
-        queueMenuButton.setVisible(RoleUtil.hasAnyRole(roles, "ROLE_ADMIN", "ROLE_RECEPTIONIST", "ROLE_DOCTOR"));
-        queueMenuButton.setManaged(queueMenuButton.isVisible());
-        invoicesMenuButton.setVisible(RoleUtil.hasAnyRole(roles, "ROLE_ADMIN", "ROLE_CASHIER"));
-        invoicesMenuButton.setManaged(invoicesMenuButton.isVisible());
-    }
-
-    private void setActiveMenu(Button activeButton) {
-        for (var node : sidebarMenu.getChildren()) {
-            if (node instanceof Button button) {
-                button.getStyleClass().remove("menu-button-active");
-                if (!button.getStyleClass().contains("menu-button")) {
-                    button.getStyleClass().add("menu-button");
-                }
+    private void setActiveMenu(DesktopRoute active) {
+        menuButtons.forEach((route, button) -> {
+            button.getStyleClass().remove("menu-button-active");
+            if (!button.getStyleClass().contains("menu-button")) {
+                button.getStyleClass().add("menu-button");
             }
+        });
+
+        if (active == null) {
+            return;
+        }
+
+        Button activeButton = menuButtons.get(active);
+        if (activeButton == null) {
+            return;
         }
         activeButton.getStyleClass().remove("menu-button");
         if (!activeButton.getStyleClass().contains("menu-button-active")) {
             activeButton.getStyleClass().add("menu-button-active");
+        }
+    }
+
+    private void showAccessDenied(DesktopRoute route) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/common/access-denied-view.fxml"));
+            AccessDeniedController controller = new AccessDeniedController();
+            controller.setDeniedRoute(route);
+            loader.setController(controller);
+            Parent accessDeniedView = loader.load();
+            contentPane.getChildren().setAll(accessDeniedView);
+            AlertUtil.showError("Access Denied", new IllegalStateException(
+                    "You do not have permission to open \"" + route.getPageTitle() + "\"."
+            ));
+        } catch (Exception ex) {
+            Label fallback = new Label("You do not have permission to open this screen.");
+            fallback.getStyleClass().add("error-label");
+            fallback.setWrapText(true);
+            contentPane.getChildren().setAll(fallback);
         }
     }
 }

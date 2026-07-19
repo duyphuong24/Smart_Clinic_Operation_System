@@ -5,6 +5,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -17,17 +19,17 @@
 
             <Label styleClass="sidebar-brand" text="Smart Clinic">
                 <VBox.margin>
-                    <Insets bottom="24.0" left="8.0" />
+                    <Insets bottom="8.0" left="8.0" />
                 </VBox.margin>
             </Label>
 
-            <VBox fx:id="sidebarMenu" spacing="6.0" VBox.vgrow="ALWAYS">
-                <Button fx:id="homeMenuButton" maxWidth="Infinity" onAction="#onHome" styleClass="menu-button-active" text="Home" />
-                <Button fx:id="appointmentsMenuButton" maxWidth="Infinity" onAction="#onAppointments" styleClass="menu-button" text="Today Appointments" />
-                <Button fx:id="patientsMenuButton" maxWidth="Infinity" onAction="#onPatients" styleClass="menu-button" text="Patient Search" />
-                <Button fx:id="queueMenuButton" maxWidth="Infinity" onAction="#onQueue" styleClass="menu-button" text="Queue Board" />
-                <Button fx:id="invoicesMenuButton" maxWidth="Infinity" onAction="#onInvoices" styleClass="menu-button" text="Pending Invoices" />
-            </VBox>
+            <Label styleClass="sidebar-section-label" text="WORKFLOWS">
+                <VBox.margin>
+                    <Insets bottom="12.0" left="8.0" top="8.0" />
+                </VBox.margin>
+            </Label>
+
+            <VBox fx:id="sidebarMenu" spacing="6.0" VBox.vgrow="ALWAYS" />
 
             <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="sidebar-footer">
                 <VBox HBox.hgrow="ALWAYS">
@@ -43,7 +45,12 @@
         <BorderPane>
             <top>
                 <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="main-navbar">
-                    <Label fx:id="pageTitleLabel" styleClass="page-title" text="Home" />
+                    <VBox spacing="4.0">
+                        <Label fx:id="pageTitleLabel" styleClass="page-title" text="Home" />
+                        <Label fx:id="breadcrumbLabel" styleClass="breadcrumb-label" text="Home" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="navbarUserLabel" styleClass="navbar-user-badge" text="user" />
                 </HBox>
             </top>
             <center>
