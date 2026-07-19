@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 public class AuthService {
 
     private static final String TOKEN_TYPE = "Bearer";
@@ -102,7 +101,9 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public LoginResponse refresh(TokenRefreshRequest request) {
+
         String rawToken = request.getRefreshToken();
         String hash = hashToken(rawToken);
 
@@ -169,6 +170,7 @@ public class AuthService {
         );
     }
 
+    @Transactional
     public void logout(String rawRefreshToken) {
         if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
             return;

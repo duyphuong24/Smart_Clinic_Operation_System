@@ -495,8 +495,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Status code is 200', function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test('Status code is 200 or 201', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -507,14 +507,22 @@
 						"method": "POST",
 						"header": [
 							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"appointmentId\": 1,\n  \"priority\": \"NORMAL\"\n}"
+						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/appointments/1/check-in",
+							"raw": "{{baseUrl}}/api/v1/queue-items/check-in",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "appointments", "1", "check-in"]
+							"path": ["api", "v1", "queue-items", "check-in"]
 						},
 						"description": "Checks in patient and adds them to the daily queue."
 					}
@@ -548,15 +556,15 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/queue",
+							"raw": "{{baseUrl}}/api/v1/queue-items",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "queue"]
+							"path": ["api", "v1", "queue-items"]
 						},
 						"description": "Gets today's queue items."
 					}
 				},
 				{
-					"name": "Update Queue Status",
+					"name": "Start Queue Item Service",
 					"event": [
 						{
 							"listen": "test",
@@ -574,24 +582,16 @@
 						"method": "PATCH",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"status\": \"IN_PROGRESS\"\n}"
-						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/queue/1/status",
+							"raw": "{{baseUrl}}/api/v1/queue-items/1/start-service",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "queue", "1", "status"]
+							"path": ["api", "v1", "queue-items", "1", "start-service"]
 						},
-						"description": "Updates queue status to IN_PROGRESS or COMPLETED."
+						"description": "Starts service for queue item 1."
 					}
 				}
 			]

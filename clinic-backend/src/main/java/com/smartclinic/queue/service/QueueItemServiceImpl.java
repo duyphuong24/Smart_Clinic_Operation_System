@@ -127,6 +127,10 @@ public class QueueItemServiceImpl implements QueueItemService {
             throw new BadRequestException("Only IN_SERVICE queue item can be done");
         }
         item.setStatus(QueueStatus.DONE);
+        if (item.getAppointment() != null) {
+            item.getAppointment().setStatus(AppointmentStatus.COMPLETED);
+            appointmentRepository.save(item.getAppointment());
+        }
         return QueueItemMapper.toResponse(queueItemRepository.save(item));
     }
 
