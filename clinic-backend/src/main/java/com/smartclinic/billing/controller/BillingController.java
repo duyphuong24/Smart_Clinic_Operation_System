@@ -46,11 +46,17 @@ public class BillingController {
     }
 
     @PostMapping("/generate")
-    public String generate(@RequestParam Long encounterId) {
-        InvoiceCreateRequest request = new InvoiceCreateRequest();
-        request.setEncounterId(encounterId);
-        InvoiceResponse response = invoiceService.generate(request);
-        return "redirect:/billing/invoices/" + response.getId();
+    public String generate(@RequestParam Long encounterId, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            InvoiceCreateRequest request = new InvoiceCreateRequest();
+            request.setEncounterId(encounterId);
+            InvoiceResponse response = invoiceService.generate(request);
+            redirectAttributes.addFlashAttribute("success", "Invoice generated successfully: " + response.getInvoiceNumber());
+            return "redirect:/billing/invoices/" + response.getId();
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Failed to generate invoice: " + ex.getMessage());
+            return "redirect:/billing";
+        }
     }
 
     @GetMapping("/invoices/{id}")
@@ -62,10 +68,23 @@ public class BillingController {
     }
 
     @PostMapping("/invoices/{id}/cancel")
-    public String cancel(@PathVariable Long id, @RequestParam(required = false) String reason) {
-        InvoiceCancelRequest request = new InvoiceCancelRequest();
-        request.setReason(reason);
-        invoiceService.cancel(id, request);
+    public String cancel(
+            @PathVariable Long id, 
+            @RequestParam(required = false) String reason,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
+    ) {
+        if (reason == null || reason.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Failed to cancel: Reason for cancellation is required.");
+            return "redirect:/billing/invoices/" + id;
+        }
+        try {
+            InvoiceCancelRequest request = new InvoiceCancelRequest();
+            request.setReason(reason);
+            InvoiceResponse response = invoiceService.cancel(id, request);
+            redirectAttributes.addFlashAttribute("success", "Invoice " + response.getInvoiceNumber() + " has been cancelled.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Failed to cancel invoice: " + ex.getMessage());
+        }
         return "redirect:/billing/invoices/" + id;
     }
 }
