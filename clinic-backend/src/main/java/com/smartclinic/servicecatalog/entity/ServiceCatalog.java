@@ -19,7 +19,7 @@ public class ServiceCatalog extends BaseEntity {
     @Column(name = "service_code", nullable = false, unique = true, length = 50)
     private String serviceCode;
 
-    @Column(name = "name", nullable = false, length = 150)
+    @Column(name = "name", nullable = false, length = 150, national = true)
     private String name;
 
     @Enumerated(EnumType.STRING)

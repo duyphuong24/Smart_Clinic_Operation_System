@@ -25,7 +25,7 @@ public class Patient extends BaseEntity {
     @Column(name = "patient_code", nullable = false, unique = true, length = 50)
     private String patientCode;
 
-    @Column(name = "full_name", nullable = false, length = 150)
+    @Column(name = "full_name", nullable = false, length = 150, national = true)
     private String fullName;
 
     @Column(name = "date_of_birth")
