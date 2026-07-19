@@ -60,6 +60,20 @@ public class ApiClient {
         return sendWithRetry(requestSupplier, responseType, authenticated);
     }
 
+    public <T> CompletableFuture<ApiResponse<T>> patch(
+            String path,
+            TypeReference<ApiResponse<T>> responseType,
+            boolean authenticated
+    ) {
+        Supplier<HttpRequest> requestSupplier = () -> {
+            HttpRequest.Builder builder = baseRequest(path)
+                    .method("PATCH", HttpRequest.BodyPublishers.noBody());
+            addAuthorization(builder, authenticated);
+            return builder.build();
+        };
+        return sendWithRetry(requestSupplier, responseType, authenticated);
+    }
+
     private <T> CompletableFuture<ApiResponse<T>> sendWithRetry(
             Supplier<HttpRequest> requestSupplier,
             TypeReference<ApiResponse<T>> responseType,

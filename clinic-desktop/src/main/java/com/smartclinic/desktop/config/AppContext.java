@@ -94,7 +94,7 @@ public class AppContext {
             return new WalkInController(queueDesktopService);
         }
         if (controllerClass == QueueBoardController.class) {
-            return new QueueBoardController();
+            return new QueueBoardController(queueDesktopService, sessionManager);
         }
         if (controllerClass == PendingInvoicesController.class) {
             return new PendingInvoicesController();
