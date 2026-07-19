@@ -504,3 +504,37 @@
     -fx-text-fill: #065f46;
     -fx-wrap-text: true;
 }
+
+.dialog-card {
+    -fx-background-color: #fdfcf9;
+    -fx-min-width: 460;
+    -fx-max-width: 520;
+}
+
+.dialog-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2937;
+}
+
+.dialog-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #4b5563;
+    -fx-wrap-text: true;
+}
+
+.dialog-details-grid {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-border-color: rgba(0, 0, 0, 0.08);
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 16;
+}
+
+.dialog-note {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7280;
+    -fx-wrap-text: true;
+    -fx-padding: 4 0 0 0;
+}

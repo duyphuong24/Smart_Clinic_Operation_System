@@ -55,7 +55,7 @@ public class TodayAppointmentControllerSample {
 
         appointmentService.checkIn(selectedAppointment.getId())
                 .thenAccept(queueItem -> Platform.runLater(() -> {
-                    showInfoAlert("Thành công", "Đã check-in thành công bệnh nhân! Số thứ tự hàng đợi: " + queueItem.getQueueNumber());
+                    showInfoAlert("Thành công", "Đã check-in thành công bệnh nhân! Số thứ tự hàng đợi: " + queueItem.displayQueueNumber());
                     loadTodayAppointments(); // Refresh list
                 }))
                 .exceptionally(ex -> {

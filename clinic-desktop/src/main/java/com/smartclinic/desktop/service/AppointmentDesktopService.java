@@ -30,7 +30,12 @@ public class AppointmentDesktopService {
     }
 
     public CompletableFuture<QueueItemResponse> checkIn(Long appointmentId) {
+        return checkIn(appointmentId, "NORMAL");
+    }
+
+    public CompletableFuture<QueueItemResponse> checkIn(Long appointmentId, String priority) {
         AppointmentCheckInRequest request = new AppointmentCheckInRequest(appointmentId);
+        request.setPriority(priority == null || priority.isBlank() ? "NORMAL" : priority);
         return queueApiClient.checkIn(request)
                 .thenApply(ApiResponse::getData);
     }
