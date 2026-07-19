@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 class JwtServiceTest {
 
-    private static final String SECRET = "test-secret-key-for-smart-clinic-jwt-32chars-minimum";
-    private static final String OTHER_SECRET = "other-secret-key-for-smart-clinic-jwt-32chars-minimum";
+    private static final String SECRET = "dGVzdC1zaWduZXIta2V5LXNob3VsZC1iZS1hdC1sZWFzdC0yNTYtYml0cy1sb25nLWZvci1zaWduaW5nLXVzZQ==";
+    private static final String OTHER_SECRET = "b3RoZXItc2lnbmVyLWtleS1zaG91bGQtYmUtYXQtbGVhc3QtMjU2LWJpdHMtbG9uZy1mb3Itc2lnbmluZy11c2U=";
 
     @Test
     void generateTokenShouldExposeSubjectAndRoles() {

@@ -32,6 +32,14 @@ smart-clinic-operations-system
 
 Important MVP decision: `AuditLog` is not part of the one-week critical path. It is optional after the core workflow is stable.
 
+## 1.1 Current Truth On Dev
+
+As of the latest integration on `dev` (up to issue #47):
+- **Completed Core Workflows (Backend):** Patient CRUD, Doctor/Specialty/Room master data, Doctor Schedule availability validation, Appointment booking/rescheduling/cancellation, Patient check-in, Queue Item generation and doctor call/skip flow, Visit & Encounter creation, Service catalog & order billing, Invoice generation, and Payment processing.
+- **Reporting/Audit Log:** Audit Log is partially implemented (foundation is merged but not fully wired to all modules).
+- **JavaFX Desktop App:** Authentication, login, and async `ApiClient` HTTP foundation are implemented.
+- **Role-based API Authorization and JWT Refresh Token:** Currently being upgraded (Enforcing JWT Base64 signer verification, database refresh tokens storage, and strict role endpoints protection).
+
 ## 2. Architecture Rule
 
 The project has two presentation layers:
@@ -234,13 +242,13 @@ These tasks should be completed or drafted before members implement deeply:
 - [X] Draft team task allocation.
 - [X] Draft database design in `docs/database-design.md`.
 - [X] Draft status flow in `docs/status-flow.md`.
-- [ ] Create `BaseEntity` with `id`, `createdAt`, and `updatedAt`.
-- [ ] Create common API response format.
-- [ ] Create global exception handling for REST and web.
-- [ ] Create Spring Security skeleton.
-- [ ] Seed demo accounts by role.
-- [ ] Draft API contract in `docs/api-contract.md`.
-- [ ] Create sample health endpoint for JavaFX connectivity test.
+- [X] Create `BaseEntity` with `id`, `createdAt`, and `updatedAt`.
+- [X] Create common API response format.
+- [X] Create global exception handling for REST and web.
+- [X] Create Spring Security skeleton.
+- [X] Seed demo accounts by role.
+- [X] Draft API contract in `docs/api-contract.md`.
+- [X] Create sample health endpoint for JavaFX connectivity test.
 
 Recommended `BaseEntity` decision:
 
@@ -280,13 +288,13 @@ ROLE_MANAGER
 
 Tasks:
 
-- [ ] Implement `User`, `Role`, `Staff`, and `Doctor` relationship.
-- [ ] Configure login/logout with Spring Security.
-- [ ] Configure BCrypt password encoder.
+- [X] Implement `User`, `Role`, `Staff`, and `Doctor` relationship.
+- [X] Configure login/logout with Spring Security.
+- [X] Configure BCrypt password encoder.
 - [ ] Configure role-based web URL access.
 - [ ] Configure role-based REST API access.
-- [ ] Add access denied page.
-- [ ] Seed demo users for all roles.
+- [X] Add access denied page.
+- [X] Seed demo users for all roles.
 
 Access summary:
 
@@ -302,25 +310,25 @@ Access summary:
 
 Appointment tasks:
 
-- [ ] Create appointment.
-- [ ] View appointments by date.
-- [ ] View today appointments.
-- [ ] Reschedule appointment.
-- [ ] Cancel appointment.
-- [ ] Validate doctor availability.
-- [ ] Prevent duplicate doctor slot in service layer.
-- [ ] Prevent invalid status transition.
+- [X] Create appointment.
+- [X] View appointments by date.
+- [X] View today appointments.
+- [X] Reschedule appointment.
+- [X] Cancel appointment.
+- [X] Validate doctor availability.
+- [X] Prevent duplicate doctor slot in service layer.
+- [X] Prevent invalid status transition.
 
 Queue tasks:
 
-- [ ] Check in appointment.
-- [ ] Create queue item after check-in.
-- [ ] Create walk-in queue item.
-- [ ] Generate queue number.
-- [ ] View today's queue.
-- [ ] Filter queue by doctor.
-- [ ] Doctor calls next patient.
-- [ ] Update queue status.
+- [X] Check in appointment.
+- [X] Create queue item after check-in.
+- [X] Create walk-in queue item.
+- [X] Generate queue number.
+- [X] View today's queue.
+- [X] Filter queue by doctor.
+- [X] Doctor calls next patient.
+- [X] Update queue status.
 
 Rules:
 
@@ -370,9 +378,9 @@ POST /api/v1/invoices/{id}/payments
 JavaFX REST integration tasks for Member 1:
 
 - [ ] Define DTOs used by JavaFX.
-- [ ] Define API response format.
-- [ ] Implement auth session/token/cookie handling strategy.
-- [ ] Implement JavaFX API client wrapper.
+- [X] Define API response format.
+- [X] Implement auth session/token/cookie handling strategy.
+- [X] Implement JavaFX API client wrapper.
 - [ ] Implement JavaFX service implementations that call API clients.
 - [ ] Connect Member 3 screens to real APIs.
 - [ ] Map API errors to JavaFX alerts.
@@ -598,9 +606,9 @@ Owner: Member 1, support by all.
 - [X] Team rules.
 - [X] Database design draft.
 - [X] Status flow draft.
-- [ ] Security skeleton.
-- [ ] Seed data.
-- [ ] API contract draft.
+- [X] Security skeleton.
+- [X] Seed data.
+- [X] API contract draft.
 - [ ] Base web layout.
 
 ### Milestone 2 - Clinic Master Data
@@ -815,7 +823,7 @@ All:
 
 Only implement these if the MVP is already stable:
 
-- [ ] Audit log.
+- [Partial] Audit log (foundation is merged but not fully wired to all modules).
 - [ ] Prescription.
 - [ ] Medicine inventory.
 - [ ] Notification.

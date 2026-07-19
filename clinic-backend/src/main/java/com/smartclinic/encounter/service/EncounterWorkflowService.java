@@ -10,7 +10,9 @@ public interface EncounterWorkflowService {
 
     EncounterResponse create(EncounterCreateRequest request);
 
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.isEncounterOwner(#id)")
     EncounterResponse update(Long id, EncounterUpdateRequest request);
 
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.isEncounterOwner(#id)")
     EncounterResponse complete(Long id);
 }

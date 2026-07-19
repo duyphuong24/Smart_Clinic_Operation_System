@@ -451,3 +451,33 @@ Create professional documentation and sample data so the project can be presente
 - Screenshots are added.
 
 **Labels:** documentation, demo, priority:high
+
+### Issue 27: JWT Access and Refresh Token Database Storage & Rotation
+
+**Title:** Upgrade JWT Security with Refresh Token Database Storage & Rotation
+
+**Description:**
+Implement database-backed refresh tokens for JWT rotation, storing hashes in database with unique constraints, enforcing SecureRandom token generation, and revoking active sessions on reuse detection or logout.
+
+**Acceptance Criteria:**
+- Refresh token is generated using cryptographically strong SecureRandom.
+- Only SHA-256 hashes of refresh tokens are stored in the database.
+- Refresh token database table has unique constraints and indexes.
+- Rotation reuse blocks active sessions and revokes refresh tokens.
+- Access token is strictly stateless and not stored in the database.
+
+**Labels:** security, backend, priority:high
+
+### Issue 28: Security Config Role Matrix and Audit Logs Alignment
+
+**Title:** Align Spring Security config with security-matrix.md and secure audit logs
+
+**Description:**
+Align endpoint matchers in SecurityConfig 100% with security-matrix.md, ensuring MANAGER can read invoices, payments, services, and restrict /api/v1/audit-logs to ADMIN and MANAGER.
+
+**Acceptance Criteria:**
+- /api/v1/audit-logs/** is restricted to ADMIN and MANAGER.
+- MANAGER role is granted read-only GET access to invoices, payments, and services.
+- RECEPTIONIST and other unauthorized roles receive 403 Forbidden on audit logs.
+
+**Labels:** security, backend, priority:high

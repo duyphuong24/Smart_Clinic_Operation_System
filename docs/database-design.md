@@ -19,7 +19,7 @@ User login
 -> Basic reporting/demo
 ```
 
-`AuditLog` is intentionally excluded from the MVP critical path. It can be added later if the core workflow is stable.
+`AuditLog` has been partially implemented on `dev` as a foundation (though its wiring to all business workflows remains a partial follow-up).
 
 ## 2. Core Entities
 
@@ -113,6 +113,21 @@ phone NVARCHAR(30) NULL
 status NVARCHAR(30) NOT NULL -- ACTIVE, LOCKED
 created_at DATETIME2 NOT NULL
 updated_at DATETIME2 NULL
+```
+
+### `refresh_tokens`
+
+```text
+id BIGINT PK IDENTITY
+user_id BIGINT FK users NOT NULL
+token_hash NVARCHAR(255) UNIQUE NOT NULL -- SHA-256 hash of raw refresh token
+issued_at DATETIME2 NOT NULL
+expires_at DATETIME2 NOT NULL
+revoked_at DATETIME2 NULL
+replaced_by_token_hash NVARCHAR(255) NULL
+CONSTRAINT uq_refresh_tokens_token_hash UNIQUE (token_hash)
+INDEX idx_refresh_tokens_token_hash (token_hash)
+INDEX idx_refresh_tokens_user_id (user_id)
 ```
 
 ### `roles`

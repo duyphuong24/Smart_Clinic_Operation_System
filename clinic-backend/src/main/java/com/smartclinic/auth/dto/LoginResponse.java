@@ -9,6 +9,9 @@ import lombok.Getter;
 public class LoginResponse {
 
     private final String accessToken;
+    private final String refreshToken;
+    private final long expiresIn;
+    private final long refreshExpiresIn;
     private final String tokenType;
     private final String userName;
     private final String fullName;
