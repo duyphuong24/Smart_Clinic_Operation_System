@@ -47,9 +47,17 @@ public final class PatientUiUtil {
         };
     }
 
-    public static String buildDetailSummary(PatientResponse patient) {
-        return "Phone: " + formatValue(patient.getPhone())
-                + " | Email: " + formatValue(patient.getEmail())
-                + " | Address: " + formatValue(patient.getAddress());
+    public static String formatPatientLabel(PatientResponse patient) {
+        if (patient == null) {
+            return "-";
+        }
+        String name = patient.getFullName() == null || patient.getFullName().isBlank()
+                ? "Unknown"
+                : patient.getFullName();
+        String code = patient.getPatientCode();
+        if (code == null || code.isBlank()) {
+            return name;
+        }
+        return name + " (" + code + ")";
     }
 }

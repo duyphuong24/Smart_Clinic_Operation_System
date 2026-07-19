@@ -224,7 +224,7 @@ public class TodayAppointmentsController implements NavigationAware {
                         return;
                     }
 
-                    String queueNumber = queueItem == null ? "-" : queueItem.getQueueNumber();
+                    String queueNumber = queueItem == null ? "-" : queueItem.displayQueueNumber();
                     AlertUtil.showInfo(
                             "Check-in Successful",
                             "Patient checked in. Queue number: " + queueNumber

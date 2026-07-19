@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.smartclinic.desktop.dto.ApiResponse;
 import com.smartclinic.desktop.dto.AppointmentCheckInRequest;
 import com.smartclinic.desktop.dto.QueueItemResponse;
+import com.smartclinic.desktop.dto.WalkInQueueRequest;
 import java.util.concurrent.CompletableFuture;
 
 public class QueueApiClient {
@@ -17,6 +18,15 @@ public class QueueApiClient {
     public CompletableFuture<ApiResponse<QueueItemResponse>> checkIn(AppointmentCheckInRequest request) {
         return apiClient.post(
                 "/queue-items/check-in",
+                request,
+                new TypeReference<ApiResponse<QueueItemResponse>>() {},
+                true
+        );
+    }
+
+    public CompletableFuture<ApiResponse<QueueItemResponse>> createWalkIn(WalkInQueueRequest request) {
+        return apiClient.post(
+                "/queue-items/walk-in",
                 request,
                 new TypeReference<ApiResponse<QueueItemResponse>>() {},
                 true
