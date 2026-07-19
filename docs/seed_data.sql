@@ -101,7 +101,7 @@ IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SVC-XPUL')
 -- 7. SEED STAFF
 IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-001')
     INSERT INTO staff (user_id, employee_code, staff_type, status, hired_date, version, created_at, updated_at)
-    SELECT id, 'EMP-001', 'MANAGER', 'ACTIVE', '2025-01-01', 0, GETDATE(), GETDATE() FROM users WHERE user_name = 'admin';
+    SELECT id, 'EMP-001', 'ADMINISTRATOR', 'ACTIVE', '2025-01-01', 0, GETDATE(), GETDATE() FROM users WHERE user_name = 'admin';
 
 IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-002')
     INSERT INTO staff (user_id, employee_code, staff_type, status, hired_date, version, created_at, updated_at)

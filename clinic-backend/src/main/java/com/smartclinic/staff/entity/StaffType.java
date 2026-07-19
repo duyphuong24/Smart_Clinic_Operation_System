@@ -4,5 +4,6 @@ public enum StaffType {
     RECEPTIONIST,
     DOCTOR,
     CASHIER,
-    MANAGER
+    MANAGER,
+    ADMINISTRATOR
 }

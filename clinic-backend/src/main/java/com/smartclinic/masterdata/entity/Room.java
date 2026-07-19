@@ -32,7 +32,7 @@ public class Room {
     @Column(name = "room_code", nullable = false, length = 50)
     private String roomCode;
 
-    @Column(name = "name", nullable = false, length = 100, national = true)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
     @Column(name = "floor", length = 30)
