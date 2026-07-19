@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="dialog-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.CheckInDialogController">
+    <padding>
+        <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+    </padding>
+
+    <Label styleClass="dialog-title" text="Confirm Check-in" />
+    <Label styleClass="dialog-subtitle" text="Review appointment details before adding the patient to today's queue." wrapText="true" />
+
+    <GridPane hgap="12.0" styleClass="dialog-details-grid" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120.0" prefWidth="120.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="220.0" />
+        </columnConstraints>
+
+        <Label styleClass="detail-field-label" text="Appointment" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <Label fx:id="appointmentCodeLabel" styleClass="detail-field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label styleClass="detail-field-label" text="Patient" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <Label fx:id="patientLabel" styleClass="detail-field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label styleClass="detail-field-label" text="Doctor" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <Label fx:id="doctorLabel" styleClass="detail-field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label styleClass="detail-field-label" text="Room" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <Label fx:id="roomLabel" styleClass="detail-field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label styleClass="detail-field-label" text="Time Slot" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <Label fx:id="timeSlotLabel" styleClass="detail-field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <Label styleClass="detail-field-label" text="Status" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <Label fx:id="statusLabel" styleClass="detail-field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+        <Label styleClass="detail-field-label" text="Priority" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+        <ComboBox fx:id="priorityCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+    </GridPane>
+
+    <Label styleClass="dialog-note" text="Only BOOKED appointments can be checked in. One appointment creates one queue item." wrapText="true" />
+
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Button onAction="#onCancel" styleClass="btn-secondary" text="Cancel" />
+        <Button fx:id="confirmButton" defaultButton="true" onAction="#onConfirm" styleClass="btn-success" text="Confirm Check-in" />
+    </HBox>
+</VBox>

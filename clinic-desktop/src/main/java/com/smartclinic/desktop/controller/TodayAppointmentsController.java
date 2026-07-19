@@ -5,6 +5,7 @@ import com.smartclinic.desktop.navigation.NavigationAware;
 import com.smartclinic.desktop.service.AppointmentDesktopService;
 import com.smartclinic.desktop.util.AlertUtil;
 import com.smartclinic.desktop.util.AppointmentUiUtil;
+import com.smartclinic.desktop.util.CheckInDialog;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 
 public class TodayAppointmentsController implements NavigationAware {
 
@@ -126,16 +125,8 @@ public class TodayAppointmentsController implements NavigationAware {
             return;
         }
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Check-in");
-        confirm.setHeaderText(null);
-        confirm.setContentText("Check in " + selected.getPatientName() + " for appointment "
-                + selected.getAppointmentCode() + "?");
-        confirm.showAndWait().ifPresent(button -> {
-            if (button == ButtonType.OK) {
-                performCheckIn(selected);
-            }
-        });
+        CheckInDialog.show(selected, checkInButton.getScene().getWindow())
+                .ifPresent(result -> performCheckIn(selected, result.priority()));
     }
 
     private void configureFilters() {
@@ -214,9 +205,9 @@ public class TodayAppointmentsController implements NavigationAware {
                 }));
     }
 
-    private void performCheckIn(AppointmentResponse appointment) {
+    private void performCheckIn(AppointmentResponse appointment, String priority) {
         setLoading(true);
-        appointmentService.checkIn(appointment.getId())
+        appointmentService.checkIn(appointment.getId(), priority)
                 .whenComplete((queueItem, throwable) -> Platform.runLater(() -> {
                     setLoading(false);
                     if (throwable != null) {
