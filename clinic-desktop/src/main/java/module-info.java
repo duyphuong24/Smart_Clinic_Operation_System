@@ -11,6 +11,7 @@ module com.smartclinic.desktop {
 
     exports com.smartclinic.desktop.app;
     exports com.smartclinic.desktop.config;
+    exports com.smartclinic.desktop.navigation;
     exports com.smartclinic.desktop.service;
     exports com.smartclinic.desktop.session;
 }

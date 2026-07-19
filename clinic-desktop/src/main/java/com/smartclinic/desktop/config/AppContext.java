@@ -3,11 +3,15 @@ package com.smartclinic.desktop.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartclinic.desktop.api.ApiClient;
 import com.smartclinic.desktop.api.AuthApiClient;
+import com.smartclinic.desktop.controller.HomeController;
 import com.smartclinic.desktop.controller.LoginController;
+import com.smartclinic.desktop.controller.MainShellController;
+import com.smartclinic.desktop.navigation.SceneNavigator;
 import com.smartclinic.desktop.service.AuthService;
 import com.smartclinic.desktop.session.SessionManager;
 import java.lang.reflect.InvocationTargetException;
 import java.net.http.HttpClient;
+import javafx.stage.Stage;
 
 public class AppContext {
 
@@ -15,6 +19,7 @@ public class AppContext {
 
     private final SessionManager sessionManager;
     private final AuthService authService;
+    private SceneNavigator sceneNavigator;
 
     public AppContext() {
         this.sessionManager = new SessionManager();
@@ -25,9 +30,19 @@ public class AppContext {
         this.authService = new AuthService(authApiClient, sessionManager);
     }
 
+    public void bindStage(Stage stage) {
+        this.sceneNavigator = new SceneNavigator(stage, this);
+    }
+
     public Object createController(Class<?> controllerClass) {
         if (controllerClass == LoginController.class) {
-            return new LoginController(authService);
+            return new LoginController(authService, sceneNavigator);
+        }
+        if (controllerClass == MainShellController.class) {
+            return new MainShellController(sessionManager, authService, sceneNavigator);
+        }
+        if (controllerClass == HomeController.class) {
+            return new HomeController(sessionManager);
         }
 
         try {
@@ -35,6 +50,10 @@ public class AppContext {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
             throw new IllegalStateException("Unable to create controller: " + controllerClass.getName(), ex);
         }
+    }
+
+    public SceneNavigator getSceneNavigator() {
+        return sceneNavigator;
     }
 
     public SessionManager getSessionManager() {
