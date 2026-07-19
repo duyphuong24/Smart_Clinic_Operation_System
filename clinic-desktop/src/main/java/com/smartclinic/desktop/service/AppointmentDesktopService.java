@@ -6,6 +6,7 @@ import com.smartclinic.desktop.dto.ApiResponse;
 import com.smartclinic.desktop.dto.AppointmentCheckInRequest;
 import com.smartclinic.desktop.dto.AppointmentResponse;
 import com.smartclinic.desktop.dto.QueueItemResponse;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,7 +21,11 @@ public class AppointmentDesktopService {
     }
 
     public CompletableFuture<List<AppointmentResponse>> getTodayAppointments() {
-        return appointmentApiClient.getTodayAppointments()
+        return findByDate(LocalDate.now());
+    }
+
+    public CompletableFuture<List<AppointmentResponse>> findByDate(LocalDate date) {
+        return appointmentApiClient.findByDate(date)
                 .thenApply(ApiResponse::getData);
     }
 
