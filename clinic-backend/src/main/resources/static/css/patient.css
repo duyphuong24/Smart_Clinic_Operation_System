@@ -1,0 +1,27 @@
+/* ==========================================================================
+   === Patient Registry Module ===
+   ========================================================================== */
+
+.patient-card {
+    border-left: 4px solid var(--accent-blue);
+    transition: var(--transition-smooth);
+}
+
+.patient-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.patient-badge-active {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.patient-search-bar {
+    max-width: 500px;
+    margin-bottom: 24px;
+}

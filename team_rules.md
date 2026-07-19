@@ -142,40 +142,12 @@ Rules:
 
 ## 4. Pull Request Rules
 
-Pull request title format:
+Pull Request rules and template are defined in [.github/pull_request_template.md](.github/pull_request_template.md).
 
-```text
-[TYPE] Short description
-```
-
-Examples:
-
-```text
-[FEAT] Add authentication and RBAC
-[FEAT] Add patient management pages
-[FIX] Prevent duplicate appointment slots
-[DOCS] Update API contract
-```
-
-Pull request description template:
-
-```markdown
-## Summary
-- Describe what changed.
-
-## Test
-- Describe how this was tested.
-
-## Notes
-- Mention anything reviewers should know.
-```
-
-PR rules:
-
-- Open PR into `main` unless the leader creates another integration branch.
-- The leader should review business logic, schema changes, API changes, and security changes before merge.
-- Resolve merge conflicts locally before requesting final review.
-- Attach screenshots for UI changes when possible.
+- All PRs must follow the automated template provided in `.github/pull_request_template.md`.
+- PR titles must follow: `[TYPE] Short description` (e.g. `[FEAT] Add authentication and RBAC`, `[FIX] Prevent duplicate appointment slots`).
+- Link related issues in the PR description (e.g., `Closes #12`).
+- Ensure all unit & integration tests pass (`mvn test`) before requesting merge.
 
 ## 5. Issue Tracking Rules
 
