@@ -7,11 +7,15 @@ public class AppointmentResponse {
     private Long id;
     private String appointmentCode;
     private Long patientId;
+    private String patientCode;
     private String patientName;
     private Long doctorId;
     private String doctorName;
+    private Long roomId;
+    private String roomCode;
     private LocalDateTime scheduledStart;
     private LocalDateTime scheduledEnd;
+    private String reason;
     private String status;
 
     public Long getId() {
@@ -38,6 +42,14 @@ public class AppointmentResponse {
         this.patientId = patientId;
     }
 
+    public String getPatientCode() {
+        return patientCode;
+    }
+
+    public void setPatientCode(String patientCode) {
+        this.patientCode = patientCode;
+    }
+
     public String getPatientName() {
         return patientName;
     }
@@ -62,6 +74,22 @@ public class AppointmentResponse {
         this.doctorName = doctorName;
     }
 
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getRoomCode() {
+        return roomCode;
+    }
+
+    public void setRoomCode(String roomCode) {
+        this.roomCode = roomCode;
+    }
+
     public LocalDateTime getScheduledStart() {
         return scheduledStart;
     }
@@ -78,11 +106,23 @@ public class AppointmentResponse {
         this.scheduledEnd = scheduledEnd;
     }
 
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isCheckInAllowed() {
+        return "BOOKED".equals(status);
     }
 }

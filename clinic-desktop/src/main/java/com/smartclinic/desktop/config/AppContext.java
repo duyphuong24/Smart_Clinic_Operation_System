@@ -39,6 +39,7 @@ public class AppContext {
         this.sessionManager = new SessionManager();
         HttpClient httpClient = HttpClient.newHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
         ApiClient apiClient = new ApiClient(httpClient, objectMapper, sessionManager, resolveBaseUrl());
 
         AuthApiClient authApiClient = new AuthApiClient(apiClient);

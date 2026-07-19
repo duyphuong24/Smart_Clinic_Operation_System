@@ -34,6 +34,22 @@ public final class AlertUtil {
         alert.showAndWait();
     }
 
+    public static void showWarning(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    public static void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     private static Throwable unwrap(Throwable throwable) {
         if (throwable instanceof CompletionException && throwable.getCause() != null) {
             return throwable.getCause();
