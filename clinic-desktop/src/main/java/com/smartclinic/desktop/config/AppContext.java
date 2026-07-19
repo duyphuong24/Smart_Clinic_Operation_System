@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartclinic.desktop.api.ApiClient;
 import com.smartclinic.desktop.api.AppointmentApiClient;
 import com.smartclinic.desktop.api.AuthApiClient;
+import com.smartclinic.desktop.api.DoctorApiClient;
 import com.smartclinic.desktop.api.PatientApiClient;
 import com.smartclinic.desktop.api.QueueApiClient;
+import com.smartclinic.desktop.api.RoomApiClient;
 import com.smartclinic.desktop.controller.HomeController;
 import com.smartclinic.desktop.controller.InvoiceDetailController;
 import com.smartclinic.desktop.controller.LoginController;
@@ -21,6 +23,7 @@ import com.smartclinic.desktop.navigation.SceneNavigator;
 import com.smartclinic.desktop.navigation.ViewLoader;
 import com.smartclinic.desktop.service.AppointmentDesktopService;
 import com.smartclinic.desktop.service.AuthService;
+import com.smartclinic.desktop.service.QueueDesktopService;
 import com.smartclinic.desktop.service.PatientDesktopService;
 import com.smartclinic.desktop.session.SessionManager;
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +38,7 @@ public class AppContext {
     private final AuthService authService;
     private final AppointmentDesktopService appointmentDesktopService;
     private final PatientDesktopService patientDesktopService;
+    private final QueueDesktopService queueDesktopService;
     private final NavigationService navigationService;
     private SceneNavigator sceneNavigator;
 
@@ -49,10 +53,18 @@ public class AppContext {
         AppointmentApiClient appointmentApiClient = new AppointmentApiClient(apiClient);
         QueueApiClient queueApiClient = new QueueApiClient(apiClient);
         PatientApiClient patientApiClient = new PatientApiClient(apiClient);
+        DoctorApiClient doctorApiClient = new DoctorApiClient(apiClient);
+        RoomApiClient roomApiClient = new RoomApiClient(apiClient);
 
         this.authService = new AuthService(authApiClient, sessionManager);
         this.appointmentDesktopService = new AppointmentDesktopService(appointmentApiClient, queueApiClient);
         this.patientDesktopService = new PatientDesktopService(patientApiClient);
+        this.queueDesktopService = new QueueDesktopService(
+                queueApiClient,
+                doctorApiClient,
+                roomApiClient,
+                patientDesktopService
+        );
 
         ViewLoader viewLoader = new ViewLoader(this);
         this.navigationService = new NavigationService(viewLoader, sessionManager);
@@ -79,7 +91,7 @@ public class AppContext {
             return new PatientSearchController(patientDesktopService);
         }
         if (controllerClass == WalkInController.class) {
-            return new WalkInController();
+            return new WalkInController(queueDesktopService);
         }
         if (controllerClass == QueueBoardController.class) {
             return new QueueBoardController();
