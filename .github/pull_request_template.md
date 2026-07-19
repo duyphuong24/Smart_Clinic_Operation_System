@@ -1,27 +1,27 @@
-## 📝 Mô tả thay đổi
-<!-- Mô tả ngắn gọn những gì đã thay đổi, mục đích và lý do thực hiện -->
+## 📝 Description
+<!-- Concise summary of changes, rationale, and context -->
 
-## 🔗 Liên kết Issue
+## 🔗 Related Issue
 Closes #<issue-number>
 
-## 🏷️ Loại thay đổi
-- [ ] 🐛 Bug fix (sửa lỗi non-breaking)
-- [ ] ✨ New feature (tính năng mới non-breaking)
-- [ ] 💥 Breaking change (thay đổi làm thay đổi hành vi/API cũ)
+## 🏷️ Type of Change
+- [ ] 🐛 Bug fix (non-breaking change fixing an issue)
+- [ ] ✨ New feature (non-breaking change adding functionality)
+- [ ] 💥 Breaking change (fix or feature causing existing functionality to fail)
 - [ ] ♻️ Refactoring / Documentation / Testing
 
-## 📋 Checklist trước khi merge
-- [ ] Code tuân thủ quy chuẩn (Coding Conventions) của dự án
-- [ ] Đã tự review code của chính mình trước khi tạo PR
-- [ ] Đã thêm / cập nhật Unit Tests & Integration Tests liên quan
-- [ ] Tất cả tests PASS (`mvn test` thành công 100%)
-- [ ] Không còn `System.out.println()` hay `TODO` dư thừa
-- [ ] Đã cập nhật tài liệu nếu có thay đổi API / quy trình nghiệp vụ
+## 📋 Checklist Before Merging
+- [ ] Code complies with project coding conventions
+- [ ] Self-reviewed code prior to opening Pull Request
+- [ ] Added or updated relevant Unit & Integration Tests
+- [ ] All unit/integration tests PASS (`mvn test` succeeded with 100% pass rate)
+- [ ] Removed leftover `System.out.println()` and temporary `TODO` comments
+- [ ] Updated documentation for API endpoints or business behavior changes
 
-## 🖼️ Screenshots (nếu có thay đổi giao diện Web / Desktop)
-| Trước thay đổi | Sau thay đổi |
-|----------------|--------------|
-|                |              |
+## 🖼️ Screenshots (UI Changes for Web / Desktop App)
+| Before Change | After Change |
+|---------------|--------------|
+|               |              |
 
-## 💬 Ghi chú cho Reviewer
-<!-- Các điểm cần Reviewer chú ý đặc biệt khi kiểm tra code -->
+## 💬 Notes for Reviewers
+<!-- Highlight critical areas requiring special reviewer attention -->
