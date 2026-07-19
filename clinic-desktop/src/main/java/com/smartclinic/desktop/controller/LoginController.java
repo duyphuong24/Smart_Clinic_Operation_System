@@ -1,6 +1,7 @@
 package com.smartclinic.desktop.controller;
 
 import com.smartclinic.desktop.dto.LoginResponse;
+import com.smartclinic.desktop.navigation.SceneNavigator;
 import com.smartclinic.desktop.service.AuthService;
 import com.smartclinic.desktop.util.AlertUtil;
 import javafx.application.Platform;
@@ -8,11 +9,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 
 public class LoginController {
 
     private final AuthService authService;
+    private final SceneNavigator sceneNavigator;
 
     @FXML
     private TextField userNameField;
@@ -24,16 +27,20 @@ public class LoginController {
     private Button loginButton;
 
     @FXML
-    private Label statusLabel;
+    private Label errorLabel;
 
-    public LoginController(AuthService authService) {
+    @FXML
+    private ProgressIndicator loadingIndicator;
+
+    public LoginController(AuthService authService, SceneNavigator sceneNavigator) {
         this.authService = authService;
+        this.sceneNavigator = sceneNavigator;
     }
 
     @FXML
     private void initialize() {
-        userNameField.setText("admin");
-        passwordField.setText("admin123");
+        hideError();
+        userNameField.requestFocus();
     }
 
     @FXML
@@ -42,7 +49,7 @@ public class LoginController {
         String password = passwordField.getText() == null ? "" : passwordField.getText();
 
         if (userName.isBlank() || password.isBlank()) {
-            statusLabel.setText("Enter user name and password.");
+            showError("Enter user name and password.");
             return;
         }
 
@@ -54,17 +61,33 @@ public class LoginController {
     private void handleLoginResult(LoginResponse response, Throwable throwable) {
         setLoading(false);
         if (throwable != null) {
-            statusLabel.setText(AlertUtil.userMessage(throwable));
+            showError(AlertUtil.userMessage(throwable));
+            passwordField.clear();
+            passwordField.requestFocus();
             return;
         }
 
-        statusLabel.setText("Logged in as " + response.getFullName() + " (" + String.join(", ", response.getRoles()) + ")");
+        hideError();
+        sceneNavigator.showMainShell();
     }
 
     private void setLoading(boolean loading) {
         loginButton.setDisable(loading);
         userNameField.setDisable(loading);
         passwordField.setDisable(loading);
-        statusLabel.setText(loading ? "Signing in..." : "");
+        loadingIndicator.setVisible(loading);
+        loadingIndicator.setManaged(loading);
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
+    }
+
+    private void hideError() {
+        errorLabel.setText("");
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
     }
 }
