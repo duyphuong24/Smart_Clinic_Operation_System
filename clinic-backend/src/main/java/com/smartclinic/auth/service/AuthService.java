@@ -54,30 +54,52 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
+            );
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User user = loadUser(userDetails.getUsername());
-        List<String> roles = extractRoles(userDetails);
-        
-        String accessToken = jwtService.generateToken(userDetails);
-        String rawRefreshToken = generateRawRefreshToken();
-        
-        // Store hashed refresh token in database
-        storeRefreshToken(user, rawRefreshToken);
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User user = loadUser(userDetails.getUsername());
 
-        return new LoginResponse(
-                accessToken,
-                rawRefreshToken,
-                accessTokenValidSeconds,
-                refreshTokenValidSeconds,
-                TOKEN_TYPE,
-                user.getUserName(),
-                user.getFullName(),
-                roles
-        );
+            // Reset failed login count on successful login
+            if (user.getFailedLoginAttempts() != null && user.getFailedLoginAttempts() > 0) {
+                user.setFailedLoginAttempts(0);
+                user.setLockTime(null);
+                userRepository.save(user);
+            }
+
+            List<String> roles = extractRoles(userDetails);
+            
+            String accessToken = jwtService.generateToken(userDetails);
+            String rawRefreshToken = generateRawRefreshToken();
+            
+            // Store hashed refresh token in database
+            storeRefreshToken(user, rawRefreshToken);
+
+            return new LoginResponse(
+                    accessToken,
+                    rawRefreshToken,
+                    accessTokenValidSeconds,
+                    refreshTokenValidSeconds,
+                    TOKEN_TYPE,
+                    user.getUserName(),
+                    user.getFullName(),
+                    roles
+            );
+        } catch (BadCredentialsException ex) {
+            // Increment failed login count
+            userRepository.findByUserName(request.getUserName()).ifPresent(user -> {
+                int attempts = (user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts()) + 1;
+                user.setFailedLoginAttempts(attempts);
+                if (attempts >= 5) {
+                    user.setStatus(UserStatus.LOCKED);
+                    user.setLockTime(LocalDateTime.now());
+                }
+                userRepository.save(user);
+            });
+            throw ex;
+        }
     }
 
     public LoginResponse refresh(TokenRefreshRequest request) {

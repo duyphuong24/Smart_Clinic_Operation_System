@@ -102,6 +102,6 @@ public class GlobalExceptionHandler {
     ) {
         return ResponseEntity
                 .status(status)
-                .body(ApiResponse.error(message, request.getRequestURI()));
+                .body(ApiResponse.error(status.getReasonPhrase(), message, request.getRequestURI()));
     }
 }

@@ -58,6 +58,13 @@ public class User {
     @Column(name = "status", nullable = false, length = 30)
     private UserStatus status;
 
+    @Column(name = "failed_login_attempts")
+    @Builder.Default
+    private Integer failedLoginAttempts = 0;
+
+    @Column(name = "lock_time")
+    private LocalDateTime lockTime;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -1,0 +1,24 @@
+/* ==========================================================================
+   === Queue Board Module ===
+   ========================================================================== */
+
+.queue-board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.queue-card-waiting {
+    border-top: 3px solid var(--color-warning);
+}
+
+.queue-card-in-progress {
+    border-top: 3px solid var(--accent-blue);
+}
+
+.queue-number-badge {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    color: var(--accent-blue);
+}
