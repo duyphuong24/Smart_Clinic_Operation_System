@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Queue Module specific styles
+   ========================================================================== */
+
+.queue-table {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+}
+
+.queue-table-row {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid var(--border-card) !important;
+    margin-bottom: 8px !important;
+}
+
+.queue-number-badge {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    width: 45px !important;
+    display: inline-block !important;
+    text-align: center !important;
+}
+
+.queue-patient-code {
+    font-size: 0.75rem !important;
+}
+
+.queue-action-btn {
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-weight: 500 !important;
+}
+
+.queue-modal-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid var(--border-card) !important;
+}
+
+.queue-modal-header {
+    border-color: var(--border-card) !important;
+}
+
+.queue-modal-footer {
+    border-color: var(--border-card) !important;
+}

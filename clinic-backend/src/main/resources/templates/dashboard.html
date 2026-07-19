@@ -4,6 +4,9 @@
       th:replace="~{layout/main :: layout('Dashboard', ~{::content_fragment})}">
 <body>
     <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+
         <!-- Welcome Message -->
         <div class="mb-4">
             <h2 class="fw-bold">Welcome back, <span sec:authentication="name">User</span>!</h2>
@@ -49,7 +52,7 @@
             <div class="metric-card glass-panel">
                 <div class="metric-card-info">
                     <span class="metric-card-label">Today Revenue</span>
-                    <span class="metric-card-value" style="font-size: 1.5rem; line-height: 2.2rem;" th:text="${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 0, 'POINT')} + ' ₫'">3,250,000 ₫</span>
+                    <span class="metric-card-value dashboard-revenue-text" th:text="${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 0, 'POINT')} + ' ₫'">3,250,000 ₫</span>
                 </div>
                 <div class="metric-card-icon-box box-orange">
                     <i class="fa-solid fa-hand-holding-dollar"></i>
@@ -64,11 +67,11 @@
                 <div class="glass-panel p-4 h-100">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h4 class="m-0 fw-bold"><i class="fa-solid fa-list-ol me-2 text-primary"></i>Today's Active Queue</h4>
-                        <a th:href="@{/queue}" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 6px; font-size: 0.85rem;">View All</a>
+                        <a th:href="@{/queue}" class="btn btn-sm btn-outline-primary px-3 dashboard-action-btn-all btn-cancel-custom">View All</a>
                     </div>
                     
                     <div class="text-center py-5 text-secondary">
-                        <i class="fa-solid fa-users-rectangle mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <i class="fa-solid fa-users-rectangle mb-3 empty-state-icon-lg"></i>
                         <p class="m-0">Hàng đợi trống hoặc các bệnh nhân đang chờ sẽ hiển thị ở đây khi phân hệ hàng đợi được kết nối.</p>
                     </div>
                 </div>
@@ -80,34 +83,34 @@
                     <h4 class="mb-4 fw-bold"><i class="fa-solid fa-bolt me-2 text-warning"></i>Quick Actions</h4>
                     
                     <div class="d-flex flex-column gap-3">
-                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/patients}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between" style="border-radius: 12px; border-color: var(--border-card); background: rgba(255,255,255,0.01);">
+                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/patients}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1" style="font-size: 0.95rem;">Register Patient</span>
-                                <span class="d-block text-secondary" style="font-size: 0.8rem;">Add a new patient profile</span>
+                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Register Patient</span>
+                                <span class="d-block text-secondary dashboard-quick-action-desc">Add a new patient profile</span>
                             </div>
                             <i class="fa-solid fa-user-plus text-primary"></i>
                         </a>
 
-                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/appointments}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between" style="border-radius: 12px; border-color: var(--border-card); background: rgba(255,255,255,0.01);">
+                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/appointments}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1" style="font-size: 0.95rem;">Book Appointment</span>
-                                <span class="d-block text-secondary" style="font-size: 0.8rem;">Schedule a slot with a doctor</span>
+                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Book Appointment</span>
+                                <span class="d-block text-secondary dashboard-quick-action-desc">Schedule a slot with a doctor</span>
                             </div>
                             <i class="fa-solid fa-calendar-plus text-purple"></i>
                         </a>
 
-                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_DOCTOR')" th:href="@{/consultation}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between" style="border-radius: 12px; border-color: var(--border-card); background: rgba(255,255,255,0.01);">
+                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_DOCTOR')" th:href="@{/consultation}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1" style="font-size: 0.95rem;">Consultation Desk</span>
-                                <span class="d-block text-secondary" style="font-size: 0.8rem;">Treat patients in the queue</span>
+                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Consultation Desk</span>
+                                <span class="d-block text-secondary dashboard-quick-action-desc">Treat patients in the queue</span>
                             </div>
                             <i class="fa-solid fa-stethoscope text-success"></i>
                         </a>
 
-                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_CASHIER')" th:href="@{/billing}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between" style="border-radius: 12px; border-color: var(--border-card); background: rgba(255,255,255,0.01);">
+                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_CASHIER')" th:href="@{/billing}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1" style="font-size: 0.95rem;">Pending Invoices</span>
-                                <span class="d-block text-secondary" style="font-size: 0.8rem;">Collect payments & issue bills</span>
+                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Pending Invoices</span>
+                                <span class="d-block text-secondary dashboard-quick-action-desc">Collect payments & issue bills</span>
                             </div>
                             <i class="fa-solid fa-receipt text-warning"></i>
                         </a>

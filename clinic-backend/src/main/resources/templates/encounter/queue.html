@@ -4,6 +4,9 @@
       th:replace="~{layout/main :: layout('Consultation', ~{::content_fragment})}">
 <body>
     <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/encounter.css}" rel="stylesheet">
+
         <!-- Error Alert if doctor profile is not linked -->
         <div th:if="${error != null}" class="alert-custom alert-danger-custom mb-4">
             <i class="fa-solid fa-triangle-exclamation"></i>
@@ -15,7 +18,7 @@
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
                     <h3 class="fw-bold m-0 text-white">Consultation Queue</h3>
-                    <p class="text-secondary m-0" style="font-size: 0.9rem;">
+                    <p class="text-secondary m-0 text-sm">
                         Logged in as: <span class="text-white fw-semibold" th:text="${doctor.fullName}">Dr. B</span> 
                         | Specialty: <span class="text-white fw-semibold" th:text="${doctor.specialtyName}">General</span>
                     </p>
@@ -24,24 +27,24 @@
 
             <!-- Table -->
             <div class="table-responsive">
-                <table class="table table-hover align-middle text-white m-0" style="border-collapse: separate; border-spacing: 0 8px;">
+                <table class="table table-hover align-middle text-white m-0 encounter-table">
                     <thead>
-                        <tr style="border-bottom: 2px solid var(--border-card); color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                            <th class="ps-3 py-3" style="width: 10%">No</th>
-                            <th style="width: 30%">Patient</th>
-                            <th style="width: 20%">Priority</th>
-                            <th style="width: 20%">Status</th>
-                            <th class="pe-3 text-end" style="width: 20%">Actions</th>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-10">No</th>
+                            <th class="w-30">Patient</th>
+                            <th class="w-20">Priority</th>
+                            <th class="w-20">Status</th>
+                            <th class="pe-3 text-end w-20">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="item : ${queueItems}" class="glass-panel" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-card); margin-bottom: 8px;">
+                        <tr th:each="item : ${queueItems}" class="glass-panel encounter-table-row">
                             <td class="ps-3 py-3">
-                                <span class="badge bg-secondary font-monospace px-3 py-2" th:text="${item.queueNumber}" style="font-size: 0.95rem; font-weight: 700; width: 45px; display: inline-block; text-align: center;">1</span>
+                                <span class="badge bg-secondary font-monospace px-3 py-2 queue-number-badge" th:text="${item.queueNumber}">1</span>
                             </td>
                             <td>
                                 <span class="fw-semibold text-white d-block" th:text="${item.patient.fullName}">Nguyen Van A</span>
-                                <span class="text-secondary font-monospace" th:text="${item.patient.patientCode}" style="font-size: 0.75rem;">PT-00001</span>
+                                <span class="text-secondary font-monospace queue-patient-code" th:text="${item.patient.patientCode}">PT-00001</span>
                             </td>
                             <td>
                                 <span class="badge" th:classappend="${
@@ -62,22 +65,22 @@
                             <td class="pe-3 text-end">
                                 <div class="d-flex justify-content-end gap-2">
                                     <!-- Call patient -->
-                                    <form th:if="${item.status.name() == 'WAITING'}" th:action="@{/queue/{id}/call(id=${item.id})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-outline-info" style="border-radius: 6px; padding: 6px 12px; font-weight: 500;">
+                                    <form th:if="${item.status.name() == 'WAITING'}" th:action="@{/queue/{id}/call(id=${item.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-info queue-action-btn">
                                             <i class="fa-solid fa-bullhorn me-1"></i>Call
                                         </button>
                                     </form>
 
                                     <!-- Start Consultation -->
-                                    <form th:if="${item.status.name() == 'CALLED' || item.status.name() == 'WAITING'}" th:action="@{/consultation/start(queueItemId=${item.id})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-premium" style="width: auto; border-radius: 6px; padding: 6px 12px; font-weight: 500;">
+                                    <form th:if="${item.status.name() == 'CALLED' || item.status.name() == 'WAITING'}" th:action="@{/consultation/start(queueItemId=${item.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-premium queue-action-btn btn-premium-custom">
                                             <i class="fa-solid fa-user-doctor me-1"></i>Start Consult
                                         </button>
                                     </form>
 
                                     <!-- Continue Consultation -->
-                                    <form th:if="${item.status.name() == 'IN_SERVICE'}" th:action="@{/consultation/start(queueItemId=${item.id})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-primary" style="border-radius: 6px; padding: 6px 12px; font-weight: 500;">
+                                    <form th:if="${item.status.name() == 'IN_SERVICE'}" th:action="@{/consultation/start(queueItemId=${item.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-primary queue-action-btn">
                                             <i class="fa-solid fa-chevron-right me-1"></i>Resume
                                         </button>
                                     </form>
@@ -87,7 +90,7 @@
                         <!-- Empty State -->
                         <tr th:if="${#lists.isEmpty(queueItems)}">
                             <td colspan="5" class="text-center py-5 text-secondary">
-                                <i class="fa-solid fa-notes-medical mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <i class="fa-solid fa-notes-medical mb-3 empty-state-icon-lg"></i>
                                 <p class="m-0">No patients waiting in your queue.</p>
                             </td>
                         </tr>

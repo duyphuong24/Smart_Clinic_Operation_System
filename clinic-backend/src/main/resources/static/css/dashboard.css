@@ -1,0 +1,27 @@
+/* ==========================================================================
+   Dashboard Module specific styles
+   ========================================================================== */
+
+.dashboard-revenue-text {
+    font-size: 1.5rem !important;
+    line-height: 2.2rem !important;
+}
+
+.dashboard-action-btn-all {
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+}
+
+.dashboard-quick-action-card {
+    border-radius: 12px !important;
+    border-color: var(--border-card) !important;
+    background: rgba(255, 255, 255, 0.01) !important;
+}
+
+.dashboard-quick-action-title {
+    font-size: 0.95rem !important;
+}
+
+.dashboard-quick-action-desc {
+    font-size: 0.8rem !important;
+}

@@ -1,0 +1,19 @@
+/* ==========================================================================
+   Appointment Module specific styles
+   ========================================================================== */
+
+.appointment-table {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+}
+
+.appointment-table-row {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid var(--border-card) !important;
+    margin-bottom: 8px !important;
+}
+
+.appointment-form-panel {
+    max-width: 750px;
+    margin: 0 auto;
+}

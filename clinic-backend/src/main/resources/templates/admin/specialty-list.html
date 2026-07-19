@@ -4,19 +4,22 @@
       th:replace="~{layout/main :: layout('Master Data', ~{::content_fragment})}">
 <body>
     <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/masterdata.css}" rel="stylesheet">
+
         <div class="glass-panel p-4">
             <!-- Header Section -->
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
                     <h3 class="fw-bold m-0 text-white">Clinic Master Data</h3>
-                    <p class="text-secondary m-0" style="font-size: 0.9rem;">Manage rooms, specialties, and clinic configurations.</p>
+                    <p class="text-secondary m-0 text-sm">Manage rooms, specialties, and clinic configurations.</p>
                 </div>
             </div>
 
             <!-- Tabbed Navigation -->
-            <ul class="nav nav-tabs mb-4" style="border-bottom: 1px solid var(--border-card);">
+            <ul class="nav nav-tabs mb-4 masterdata-nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active px-4 py-2 border-0 text-white" th:href="@{/admin/specialties}" style="background: rgba(255,255,255,0.03); border-radius: 8px 8px 0 0; border-bottom: 2px solid var(--accent-blue) !important; font-weight: 600;">
+                    <a class="nav-link active px-4 py-2 border-0 text-white masterdata-tab-link" th:href="@{/admin/specialties}">
                         <i class="fa-solid fa-layer-group me-2"></i>Specialties
                     </a>
                 </li>
@@ -29,7 +32,7 @@
 
             <!-- Specialties List Controls -->
             <div class="d-flex justify-content-end mb-3">
-                <a th:href="@{/admin/specialties/new}" class="btn btn-premium d-flex align-items-center gap-2" style="width: auto; padding: 8px 16px;">
+                <a th:href="@{/admin/specialties/new}" class="btn btn-premium d-flex align-items-center gap-2 btn-premium-custom">
                     <i class="fa-solid fa-plus"></i>
                     <span>Add Specialty</span>
                 </a>
@@ -37,26 +40,26 @@
 
             <!-- Table -->
             <div class="table-responsive">
-                <table class="table table-hover align-middle text-white m-0" style="border-collapse: separate; border-spacing: 0 8px;">
+                <table class="table table-hover align-middle text-white m-0 masterdata-table">
                     <thead>
-                        <tr style="border-bottom: 2px solid var(--border-card); color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                            <th class="ps-3 py-3" style="width: 25%">Specialty Name</th>
-                            <th style="width: 50%">Description</th>
-                            <th style="width: 15%">Status</th>
-                            <th class="pe-3 text-end" style="width: 10%">Actions</th>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-25">Specialty Name</th>
+                            <th class="w-50">Description</th>
+                            <th class="w-15">Status</th>
+                            <th class="pe-3 text-end w-10">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="spec : ${specialties}" class="glass-panel" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-card); margin-bottom: 8px;">
+                        <tr th:each="spec : ${specialties}" class="glass-panel masterdata-table-row">
                             <td class="ps-3 py-3">
                                 <span class="fw-semibold text-white" th:text="${spec.name}">General Medicine</span>
                             </td>
                             <td th:text="${spec.description != null && !spec.description.isEmpty() ? spec.description : '-'}">General health check-up and consulting</td>
                             <td>
-                                <span class="badge" th:classappend="${spec.active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${spec.active ? 'ACTIVE' : 'INACTIVE'}" style="font-size: 0.75rem; padding: 6px 12px; border-radius: 20px;">ACTIVE</span>
+                                <span class="badge masterdata-status-badge" th:classappend="${spec.active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${spec.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
                             </td>
                             <td class="pe-3 text-end">
-                                <a th:href="@{/admin/specialties/{id}/edit(id=${spec.id})}" class="btn btn-sm btn-outline-warning" title="Edit Specialty" style="border-radius: 6px; padding: 6px 10px;">
+                                <a th:href="@{/admin/specialties/{id}/edit(id=${spec.id})}" class="btn btn-sm btn-outline-warning masterdata-action-btn" title="Edit Specialty">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
                             </td>
@@ -64,7 +67,7 @@
                         <!-- Empty State -->
                         <tr th:if="${#lists.isEmpty(specialties)}">
                             <td colspan="4" class="text-center py-5 text-secondary">
-                                <i class="fa-solid fa-folder-open mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <i class="fa-solid fa-folder-open mb-3 empty-state-icon-lg"></i>
                                 <p class="m-0">No specialties configured yet.</p>
                             </td>
                         </tr>

@@ -4,36 +4,39 @@
       th:replace="~{layout/main :: layout('Consultation', ~{::content_fragment})}">
 <body>
     <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/encounter.css}" rel="stylesheet">
+
         <div class="glass-panel p-4">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div>
                     <h3 class="fw-bold m-0 text-white">Consultation Desk</h3>
-                    <p class="text-secondary m-0" style="font-size: 0.9rem;">Patients currently in service and ready for clinical encounter workflow.</p>
+                    <p class="text-secondary m-0 text-sm">Patients currently in service and ready for clinical encounter workflow.</p>
                 </div>
-                <a th:href="@{/queue}" class="btn btn-outline-primary px-3" style="border-radius: 6px;">
+                <a th:href="@{/queue}" class="btn btn-outline-primary px-3 btn-cancel-custom">
                     <i class="fa-solid fa-users-rectangle me-2"></i>Queue Board
                 </a>
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover align-middle text-white m-0" style="border-collapse: separate; border-spacing: 0 8px;">
+                <table class="table table-hover align-middle text-white m-0 encounter-table">
                     <thead>
-                        <tr style="border-bottom: 2px solid var(--border-card); color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                            <th class="ps-3 py-3">Queue No</th>
-                            <th>Patient</th>
-                            <th>Doctor</th>
-                            <th>Room</th>
-                            <th>Status</th>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-15">Queue No</th>
+                            <th class="w-30">Patient</th>
+                            <th class="w-25">Doctor</th>
+                            <th class="w-15">Room</th>
+                            <th class="w-15">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="item : ${queueItems}" class="glass-panel" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-card);">
+                        <tr th:each="item : ${queueItems}" class="glass-panel encounter-table-row">
                             <td class="ps-3 py-3">
-                                <span class="badge bg-secondary font-monospace px-3 py-2" th:text="${item.queueNumber}">1</span>
+                                <span class="badge bg-secondary font-monospace px-3 py-2 queue-number-badge" th:text="${item.queueNumber}">1</span>
                             </td>
                             <td>
                                 <span class="fw-semibold text-white d-block" th:text="${item.patientName}">Patient</span>
-                                <span class="text-secondary font-monospace" th:text="${item.patientCode}" style="font-size: 0.75rem;">PT-00001</span>
+                                <span class="text-secondary font-monospace queue-patient-code" th:text="${item.patientCode}">PT-00001</span>
                             </td>
                             <td th:text="${item.doctorName}">Doctor</td>
                             <td>
@@ -45,7 +48,7 @@
                         </tr>
                         <tr th:if="${#lists.isEmpty(queueItems)}">
                             <td colspan="5" class="text-center py-5 text-secondary">
-                                <i class="fa-solid fa-stethoscope mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <i class="fa-solid fa-stethoscope mb-3 empty-state-icon-lg"></i>
                                 <p class="m-0">No patient is currently in service.</p>
                             </td>
                         </tr>

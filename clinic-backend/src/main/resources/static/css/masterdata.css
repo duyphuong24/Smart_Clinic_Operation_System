@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Master Data Module (Specialties & Rooms) specific styles
+   ========================================================================== */
+
+.masterdata-table {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+}
+
+.masterdata-table-row {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid var(--border-card) !important;
+    margin-bottom: 8px !important;
+}
+
+.masterdata-form-panel {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.masterdata-nav-tabs {
+    border-bottom: 1px solid var(--border-card) !important;
+}
+
+.masterdata-tab-link {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-radius: 8px 8px 0 0 !important;
+    border-bottom: 2px solid var(--accent-blue) !important;
+    font-weight: 600 !important;
+}
+
+.masterdata-status-badge {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+}
+
+.masterdata-action-btn {
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+}
+
+.masterdata-checkbox {
+    width: 45px !important;
+    height: 24px !important;
+    cursor: pointer !important;
+    float: none !important;
+}

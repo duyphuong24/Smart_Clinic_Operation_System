@@ -4,20 +4,23 @@
       th:replace="~{layout/main :: layout(${title}, ~{::content_fragment})}">
 <body>
     <div th:fragment="content_fragment">
-        <div class="glass-panel p-5 text-center" style="max-width: 650px; margin: 50px auto;">
-            <div class="d-inline-flex align-items-center justify-content-center bg-dark-subtle rounded-circle mb-4" style="width: 90px; height: 90px; border: 1px solid var(--border-card);">
-                <i class="fa-solid" th:classappend="${icon}" style="font-size: 2.8rem;"></i>
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/error.css}" rel="stylesheet">
+
+        <div class="glass-panel p-5 text-center error-panel">
+            <div class="d-inline-flex align-items-center justify-content-center bg-dark-subtle rounded-circle mb-4 error-icon-box">
+                <i class="fa-solid error-icon-symbol" th:classappend="${icon}"></i>
             </div>
             
             <h3 class="fw-bold text-white mb-2" th:text="${moduleName}">Module Name</h3>
-            <p class="text-secondary mb-4" style="font-size: 1.05rem;" th:text="${description}">Short description of the module.</p>
+            <p class="text-secondary mb-4 error-desc-text" th:text="${description}">Short description of the module.</p>
             
-            <div class="p-3 rounded text-start mb-4" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-card); font-size: 0.95rem; line-height: 1.6; color: var(--text-primary);">
+            <div class="p-3 rounded text-start mb-4 error-details-box">
                 <i class="fa-solid fa-circle-info text-info me-2"></i>
                 <span th:text="${details}">Additional module specification and architecture info.</span>
             </div>
             
-            <a th:href="@{/dashboard}" class="btn btn-premium px-4 py-2" style="width: auto; font-family: var(--font-heading); font-weight: 600;">
+            <a th:href="@{/dashboard}" class="btn btn-premium px-4 py-2 btn-premium-custom">
                 <i class="fa-solid fa-house me-2"></i>Go to Dashboard
             </a>
         </div>
