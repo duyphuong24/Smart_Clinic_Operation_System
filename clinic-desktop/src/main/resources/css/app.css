@@ -538,3 +538,87 @@
     -fx-wrap-text: true;
     -fx-padding: 4 0 0 0;
 }
+
+.btn-info {
+    -fx-background-color: #0ea5e9;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+
+.btn-info:hover {
+    -fx-background-color: #0284c7;
+}
+
+.btn-primary {
+    -fx-background-color: #0072ff;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #0059cc;
+}
+
+.btn-danger-outline {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ef4444;
+    -fx-border-color: rgba(239, 68, 68, 0.45);
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+}
+
+.btn-danger-outline:hover {
+    -fx-background-color: rgba(239, 68, 68, 0.08);
+}
+
+.queue-status-waiting {
+    -fx-background-color: rgba(107, 114, 128, 0.12);
+    -fx-text-fill: #374151;
+}
+
+.queue-status-called {
+    -fx-background-color: rgba(14, 165, 233, 0.12);
+    -fx-text-fill: #0369a1;
+}
+
+.queue-status-in-service {
+    -fx-background-color: rgba(0, 114, 255, 0.12);
+    -fx-text-fill: #1d4ed8;
+}
+
+.queue-status-done {
+    -fx-background-color: rgba(16, 185, 129, 0.12);
+    -fx-text-fill: #047857;
+}
+
+.queue-status-skipped {
+    -fx-background-color: rgba(239, 68, 68, 0.12);
+    -fx-text-fill: #b91c1c;
+}
+
+.queue-status-default {
+    -fx-background-color: #f4f2ee;
+    -fx-text-fill: #4b5563;
+}
+
+.queue-priority-normal {
+    -fx-background-color: rgba(107, 114, 128, 0.12);
+    -fx-text-fill: #374151;
+}
+
+.queue-priority-urgent {
+    -fx-background-color: rgba(239, 68, 68, 0.12);
+    -fx-text-fill: #b91c1c;
+}
