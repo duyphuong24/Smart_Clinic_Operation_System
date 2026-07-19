@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Staff', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/masterdata.css}" rel="stylesheet">
+
+        <div class="glass-panel p-4 masterdata-form-panel">
+            <!-- Header Section -->
+            <div class="mb-4">
+                <h3 class="fw-bold m-0 text-white" th:text="${isEdit} ? 'Edit Staff Profile' : 'Add Staff Profile'">Add Staff Profile</h3>
+                <p class="text-secondary m-0 text-sm">Provision a staff member by linking a user login account, setting their employee code, role, and hired date.</p>
+            </div>
+
+            <!-- Form -->
+            <form th:action="${isEdit} ? @{/admin/staff/{id}/edit(id=${staffId})} : @{/admin/staff/new}" th:object="${staff}" method="post">
+                <div class="row g-4">
+                    <!-- User Account Selection -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="userId" class="form-label">Linked User Account <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select id="userId" th:field="*{userId}" class="form-control-custom select-custom-arrow" th:disabled="${isEdit}" required>
+                                    <option value="" disabled selected>Select User Account</option>
+                                    <option th:each="u : ${users}" 
+                                            th:value="${u.id}" th:text="${u.fullName} + ' (' + ${u.userName} + ')'"></option>
+                                </select>
+                            </div>
+                            <input type="hidden" th:if="${isEdit}" th:field="*{userId}">
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">User Account Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Employee Code -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="employeeCode" class="form-label">Employee Code <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="employeeCode" th:field="*{employeeCode}" class="form-control-custom" placeholder="e.g. EMP-001" required>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('employeeCode')}" th:errors="*{employeeCode}">Employee Code Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Staff Type -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="staffType" class="form-label">Staff Role / Type <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select id="staffType" th:field="*{staffType}" class="form-control-custom select-custom-arrow" required>
+                                    <option value="" disabled selected>Select Type</option>
+                                    <option th:each="type : ${staffTypes}" 
+                                            th:value="${type}" th:text="${type}"></option>
+                                </select>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('staffType')}" th:errors="*{staffType}">Staff Type Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Hired Date -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="hiredDate" class="form-label">Hired Date</label>
+                            <div class="input-glow-wrapper">
+                                <input type="date" id="hiredDate" th:field="*{hiredDate}" class="form-control-custom">
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('hiredDate')}" th:errors="*{hiredDate}">Hired Date Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Status Selection (Only during edit) -->
+                    <div class="col-md-6" th:if="${isEdit}">
+                        <div class="form-group">
+                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select id="status" th:field="*{status}" class="form-control-custom select-custom-arrow" required>
+                                    <option th:each="stStatus : ${staffStatuses}" 
+                                            th:value="${stStatus}" th:text="${stStatus}"></option>
+                                </select>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">Status Error</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top-card">
+                    <a th:href="@{/admin/staff}" class="btn btn-outline-secondary px-4 py-2 btn-cancel-custom">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-premium px-4 py-2 btn-premium-custom">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Staff Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

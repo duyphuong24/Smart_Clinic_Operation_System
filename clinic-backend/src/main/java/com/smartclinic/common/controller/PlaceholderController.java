@@ -16,14 +16,4 @@ public class PlaceholderController {
         model.addAttribute("icon", "fa-file-invoice-dollar text-warning");
         return "error/placeholder";
     }
-
-    @GetMapping("/admin/staff")
-    public String staffPlaceholder(Model model) {
-        model.addAttribute("title", "Staff");
-        model.addAttribute("moduleName", "Staff Administration");
-        model.addAttribute("description", "Manage employee records, allocate roles, and view login activities.");
-        model.addAttribute("details", "Staff provisioning, accounts creation, and security role configurations (receptionists, doctors, cashiers, managers) are handled by the system administrator.");
-        model.addAttribute("icon", "fa-users-gear text-primary");
-        return "error/placeholder";
-    }
 }
