@@ -1,44 +1,40 @@
 /* ==========================================================================
-   Patient Module specific styles
+   Doctor Module specific styles
    ========================================================================== */
 
-.patient-table {
+.doctor-table {
     border-collapse: separate !important;
     border-spacing: 0 8px !important;
 }
 
-.patient-table-row {
+.doctor-table-row {
     background: rgba(255, 255, 255, 0.01) !important;
     border: 1px solid var(--border-card) !important;
     margin-bottom: 8px !important;
 }
 
-.patient-avatar-box {
+.doctor-form-panel {
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+.doctor-avatar-box {
     width: 80px;
     height: 80px;
     border: 1px solid var(--border-card);
 }
 
-.patient-avatar-icon {
+.doctor-avatar-icon {
     font-size: 2.2rem;
 }
 
-.patient-status-badge {
+.doctor-status-badge {
     font-size: 0.75rem !important;
     padding: 6px 12px !important;
     border-radius: 20px !important;
 }
 
-.patient-action-btn {
+.doctor-action-btn {
     border-radius: 6px !important;
     padding: 6px 10px !important;
-}
-
-.patient-detail-address {
-    flex-shrink: 0;
-    width: 100px;
-}
-
-.patient-allergy-box {
-    background: rgba(239, 68, 68, 0.05);
 }

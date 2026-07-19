@@ -1,22 +1,27 @@
 /* ==========================================================================
-   === Dashboard Module ===
+   Dashboard Module specific styles
    ========================================================================== */
 
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-    margin-bottom: 40px;
+.dashboard-revenue-text {
+    font-size: 1.5rem !important;
+    line-height: 2.2rem !important;
 }
 
-.metric-card {
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.dashboard-action-btn-all {
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
 }
 
-.metric-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+.dashboard-quick-action-card {
+    border-radius: 12px !important;
+    border-color: var(--border-card) !important;
+    background: rgba(255, 255, 255, 0.01) !important;
+}
+
+.dashboard-quick-action-title {
+    font-size: 0.95rem !important;
+}
+
+.dashboard-quick-action-desc {
+    font-size: 0.8rem !important;
 }

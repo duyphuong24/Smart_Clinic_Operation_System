@@ -1,35 +1,19 @@
 /* ==========================================================================
-   === Appointment Module ===
+   Appointment Module specific styles
    ========================================================================== */
 
-.appointment-slot {
-    padding: 16px;
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--border-card);
-    transition: var(--transition-smooth);
+.appointment-table {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
 }
 
-.appointment-slot:hover {
-    border-color: var(--accent-blue);
-    background: rgba(0, 114, 255, 0.02);
+.appointment-table-row {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid var(--border-card) !important;
+    margin-bottom: 8px !important;
 }
 
-.status-scheduled {
-    color: var(--accent-blue);
-    background: rgba(0, 114, 255, 0.1);
-}
-
-.status-checked-in {
-    color: var(--color-warning);
-    background: rgba(245, 158, 11, 0.1);
-}
-
-.status-completed {
-    color: var(--color-success);
-    background: rgba(16, 185, 129, 0.1);
-}
-
-.status-cancelled {
-    color: var(--color-danger);
-    background: rgba(239, 68, 68, 0.1);
+.appointment-form-panel {
+    max-width: 750px;
+    margin: 0 auto;
 }
