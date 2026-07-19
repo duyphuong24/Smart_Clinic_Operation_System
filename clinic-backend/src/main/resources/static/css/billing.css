@@ -1,0 +1,110 @@
+/* ==========================================================================
+   Billing & Cashier Module specific styles
+   ========================================================================== */
+
+.billing-tab-link.active {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-bottom: 2px solid var(--accent-orange) !important;
+    font-weight: 600 !important;
+}
+
+.billing-table {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+}
+
+.billing-table-row {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid var(--border-card) !important;
+    transition: all var(--transition-speed) ease;
+}
+
+.billing-table-row:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
+    transform: translateY(-1px);
+}
+
+.billing-action-btn {
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    font-size: 0.85rem !important;
+}
+
+.billing-status-badge {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+}
+
+.billing-detail-panel {
+    max-width: 850px !important;
+    margin: 0 auto !important;
+}
+
+.billing-meta-label {
+    width: 120px !important;
+    display: inline-block !important;
+}
+
+.billing-heading-border {
+    border-color: var(--border-card) !important;
+}
+
+.billing-total-amount-highlight {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--accent-orange) !important;
+}
+
+.billing-cancel-box {
+    background: rgba(239, 68, 68, 0.05) !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+    border-radius: var(--border-radius-sm) !important;
+}
+
+/* ==========================================================================
+   Print Optimization for Invoices
+   ========================================================================== */
+@media print {
+    /* Hide everything on the webpage except the invoice content */
+    body * {
+        visibility: hidden !important;
+    }
+    
+    .billing-detail-panel, 
+    .billing-detail-panel * {
+        visibility: visible !important;
+    }
+    
+    .billing-detail-panel {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        border: none !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Make text black for printer compatibility */
+    .billing-detail-panel th,
+    .billing-detail-panel td,
+    .billing-detail-panel span,
+    .billing-detail-panel p,
+    .billing-detail-panel h2,
+    .billing-detail-panel h4,
+    .billing-detail-panel h6,
+    .billing-detail-panel strong {
+        color: #000000 !important;
+    }
+    
+    /* Hide actions and sidebar elements inside print viewport */
+    .billing-detail-panel .btn,
+    .billing-detail-panel form,
+    .billing-detail-panel .border-top {
+        display: none !important;
+    }
+}

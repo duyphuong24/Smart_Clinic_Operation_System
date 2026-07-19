@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Invoices', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/billing.css}" rel="stylesheet">
+
+        <!-- Success/Error Alerts -->
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show mb-4 border-0 text-danger bg-danger-subtle px-3 py-2 text-xs d-flex align-items-center justify-content-between" role="alert" style="border-radius: var(--border-radius-sm);">
+            <div>
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                <span th:text="${error}">Error Message</span>
+            </div>
+            <button type="button" class="btn-close shadow-none py-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+        <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show mb-4 border-0 text-success bg-success-subtle px-3 py-2 text-xs d-flex align-items-center justify-content-between" role="alert" style="border-radius: var(--border-radius-sm);">
+            <div>
+                <i class="fa-solid fa-circle-check me-2"></i>
+                <span th:text="${success}">Success Message</span>
+            </div>
+            <button type="button" class="btn-close shadow-none py-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="glass-panel mb-4 p-2 d-flex gap-2">
+            <button class="btn btn-outline-light border-0 px-4 py-2 billing-tab-link active" id="pendingTabBtn" onclick="switchBillingTab('pending')">
+                <i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i>Pending Billings
+                <span class="badge bg-warning text-dark ms-2" th:text="${#lists.size(pendingBillings)}">0</span>
+            </button>
+            <button class="btn btn-outline-light border-0 px-4 py-2 billing-tab-link" id="historyTabBtn" onclick="switchBillingTab('history')">
+                <i class="fa-solid fa-file-invoice-dollar me-2 text-success"></i>Invoice History
+                <span class="badge bg-success text-white ms-2" th:text="${#lists.size(invoiceHistory)}">0</span>
+            </button>
+        </div>
+
+        <!-- 1. Pending Billings Section -->
+        <div id="pendingSection" class="glass-panel p-4">
+            <div class="mb-4">
+                <h4 class="fw-bold m-0 text-white">Pending Billings</h4>
+                <p class="text-secondary m-0 text-sm">Consultations that are completed by doctors and ready for invoice generation.</p>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0 billing-table">
+                    <thead>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-20">Encounter Date</th>
+                            <th class="w-20">Patient Code</th>
+                            <th class="w-25">Patient Name</th>
+                            <th class="w-25">Doctor</th>
+                            <th class="pe-3 text-end w-10">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="enc : ${pendingBillings}" class="glass-panel billing-table-row">
+                            <td class="ps-3 py-3 font-monospace text-xs" th:text="${enc.completedAt != null ? #temporals.format(enc.completedAt, 'dd-MM-yyyy HH:mm') : '-'}">20-07-2026 12:00</td>
+                            <td>
+                                <span class="badge bg-secondary font-monospace px-2 py-2 text-badge-sz" th:text="${enc.visit.patient.patientCode}">PT-00001</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white" th:text="${enc.visit.patient.fullName}">John Doe</span>
+                            </td>
+                            <td>
+                                <span class="text-white-50" th:text="'Dr. ' + ${enc.doctor.staff.user.fullName}">Dr. Smith</span>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <form th:action="@{/billing/generate}" method="post" class="m-0">
+                                    <input type="hidden" name="encounterId" th:value="${enc.id}">
+                                    <button type="submit" class="btn btn-premium billing-action-btn d-flex align-items-center gap-1 ms-auto btn-premium-custom">
+                                        <i class="fa-solid fa-receipt"></i>
+                                        <span>Bill</span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <!-- Empty state -->
+                        <tr th:if="${#lists.isEmpty(pendingBillings)}">
+                            <td colspan="5" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-square-check mb-3 text-success empty-state-icon-lg"></i>
+                                <p class="m-0">All billings processed! No pending encounters found.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. Invoice History Section (Hidden by default) -->
+        <div id="historySection" class="glass-panel p-4 d-none">
+            <div class="mb-4">
+                <h4 class="fw-bold m-0 text-white">Invoice History</h4>
+                <p class="text-secondary m-0 text-sm">Archived medical bill invoices and cash records.</p>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0 billing-table">
+                    <thead>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-20">Invoice No</th>
+                            <th class="w-15">Issued Date</th>
+                            <th class="w-20">Patient Code</th>
+                            <th class="w-20">Patient Name</th>
+                            <th class="w-15">Total Amount</th>
+                            <th class="w-10">Status</th>
+                            <th class="pe-3 text-end w-10">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="inv : ${invoiceHistory}" class="glass-panel billing-table-row">
+                            <td class="ps-3 py-3 font-monospace text-xs" th:text="${inv.invoiceNumber}">INV-20260720-000001</td>
+                            <td th:text="${inv.issuedAt != null ? #temporals.format(inv.issuedAt, 'dd-MM-yyyy HH:mm') : '-'}">20-07-2026 12:00</td>
+                            <td>
+                                <span class="badge bg-secondary font-monospace px-2 py-2 text-badge-sz" th:text="${inv.patientCode}">PT-00001</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white" th:text="${inv.patientName}">John Doe</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-accent" th:text="${#numbers.formatDecimal(inv.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</span>
+                            </td>
+                            <td>
+                                <span class="badge billing-status-badge" th:classappend="${inv.status.name() == 'ISSUED' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${inv.status}">ISSUED</span>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <a th:href="@{/billing/invoices/{id}(id=${inv.id})}" class="btn btn-sm btn-outline-info billing-action-btn" title="View Details">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Empty state -->
+                        <tr th:if="${#lists.isEmpty(invoiceHistory)}">
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-folder-open mb-3 empty-state-icon-lg"></i>
+                                <p class="m-0">No invoice history found.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- JS for Tab Switching -->
+        <script>
+            function switchBillingTab(tab) {
+                const pendingBtn = document.getElementById('pendingTabBtn');
+                const historyBtn = document.getElementById('historyTabBtn');
+                const pendingSec = document.getElementById('pendingSection');
+                const historySec = document.getElementById('historySection');
+
+                if (tab === 'pending') {
+                    pendingBtn.classList.add('active');
+                    historyBtn.classList.remove('active');
+                    pendingSec.classList.remove('d-none');
+                    historySec.classList.add('d-none');
+                } else {
+                    historyBtn.classList.add('active');
+                    pendingBtn.classList.remove('active');
+                    historySec.classList.remove('d-none');
+                    pendingSec.classList.add('d-none');
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>
