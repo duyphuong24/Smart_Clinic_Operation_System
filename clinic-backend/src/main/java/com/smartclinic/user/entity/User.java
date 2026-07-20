@@ -48,7 +48,7 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    @Column(name = "full_name", nullable = false, length = 150)
+    @Column(name = "full_name", nullable = false, columnDefinition = "nvarchar(150)")
     private String fullName;
 
     @Column(name = "phone", length = 30)

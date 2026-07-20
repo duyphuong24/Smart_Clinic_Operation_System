@@ -70,6 +70,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/staff/**", "/users/**", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/audit-logs/**", "/reports/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/encounters/**").hasAnyRole("ADMIN", "DOCTOR")
+                        .requestMatchers("/billing/**", "/invoices/**", "/payments/**").hasAnyRole("ADMIN", "CASHIER", "MANAGER")
+                        .requestMatchers("/patients/**", "/appointments/**", "/queue/**").hasAnyRole("ADMIN", "RECEPTIONIST", "DOCTOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
