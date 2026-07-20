@@ -6,11 +6,13 @@ import com.smartclinic.encounter.dto.EncounterCreateRequest;
 import com.smartclinic.encounter.dto.EncounterResponse;
 import com.smartclinic.encounter.dto.EncounterUpdateRequest;
 import com.smartclinic.encounter.entity.Encounter;
-import com.smartclinic.encounter.entity.EncounterService;
-import com.smartclinic.encounter.entity.EncounterServiceStatus;
 import com.smartclinic.encounter.entity.EncounterStatus;
 import com.smartclinic.encounter.repository.EncounterRepository;
-import com.smartclinic.encounter.repository.EncounterServiceRepository;
+import com.smartclinic.encounter.serviceorder.entity.EncounterServiceOrder;
+import com.smartclinic.encounter.serviceorder.entity.EncounterServiceOrderStatus;
+import com.smartclinic.encounter.serviceorder.repository.EncounterServiceOrderRepository;
+import com.smartclinic.encounter.serviceorder.dto.EncounterServiceOrderRequest;
+import com.smartclinic.encounter.serviceorder.service.EncounterServiceOrderService;
 import com.smartclinic.encounter.service.EncounterWorkflowService;
 import com.smartclinic.queue.entity.QueueItem;
 import com.smartclinic.queue.entity.QueueStatus;
@@ -47,7 +49,8 @@ public class ConsultationController {
     private final QueueItemService queueItemService;
     private final VisitRepository visitRepository;
     private final EncounterRepository encounterRepository;
-    private final EncounterServiceRepository encounterServiceRepository;
+    private final EncounterServiceOrderRepository encounterServiceOrderRepository;
+    private final EncounterServiceOrderService encounterServiceOrderService;
     private final ServiceCatalogRepository serviceCatalogRepository;
     private final VisitService visitService;
     private final EncounterWorkflowService encounterWorkflowService;
@@ -115,7 +118,7 @@ public class ConsultationController {
             return "redirect:/consultation/encounters/" + id + "/detail";
         }
 
-        List<EncounterService> orderedServices = encounterServiceRepository.findByEncounterId(id);
+        List<EncounterServiceOrder> orderedServices = encounterServiceOrderRepository.findByEncounterId(id);
         List<ServiceCatalog> availableServices = serviceCatalogRepository.findByActiveTrue();
 
         model.addAttribute("encounter", encounter);
@@ -131,39 +134,44 @@ public class ConsultationController {
             @PathVariable Long id,
             @RequestParam Long serviceId,
             @RequestParam(defaultValue = "1") int quantity,
-            @RequestParam(defaultValue = "") String note
+            @RequestParam(defaultValue = "") String note,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
     ) {
-        Encounter encounter = encounterRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Encounter ID"));
+        try {
+            EncounterServiceOrderRequest request = new EncounterServiceOrderRequest();
+            request.setServiceCatalogId(serviceId);
+            request.setQuantity(quantity);
+            request.setNote(note);
 
-        ServiceCatalog service = serviceCatalogRepository.findById(serviceId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Service Catalog ID"));
-
-        EncounterService order = new EncounterService();
-        order.setEncounter(encounter);
-        order.setServiceCatalog(service);
-        order.setQuantity(quantity);
-        order.setUnitPrice(service.getPrice());
-        order.setNote(note);
-        order.setStatus(EncounterServiceStatus.ORDERED);
-        encounterServiceRepository.save(order);
-
+            encounterServiceOrderService.add(id, request);
+            redirectAttributes.addFlashAttribute("success", "Service ordered successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/consultation/encounters/" + id;
     }
 
     @PostMapping("/encounters/{id}/complete")
     public String completeConsultation(
             @PathVariable Long id,
-            @ModelAttribute("encounter") Encounter encounterData
+            @ModelAttribute("encounter") Encounter encounterData,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
     ) {
-        EncounterUpdateRequest request = new EncounterUpdateRequest();
-        request.setChiefComplaint(encounterData.getChiefComplaint());
-        request.setDiagnosis(encounterData.getDiagnosis());
-        request.setClinicalNote(encounterData.getClinicalNote());
-        encounterWorkflowService.update(id, request);
-        encounterWorkflowService.complete(id);
-
-        return "redirect:/consultation/encounters/" + id + "/detail";
+        try {
+            EncounterUpdateRequest request = new EncounterUpdateRequest();
+            request.setChiefComplaint(encounterData.getChiefComplaint());
+            request.setDiagnosis(encounterData.getDiagnosis());
+            request.setClinicalNote(encounterData.getClinicalNote());
+            encounterWorkflowService.update(id, request);
+            encounterWorkflowService.complete(id);
+            redirectAttributes.addFlashAttribute("success", "Consultation completed successfully.");
+            return "redirect:/consultation/encounters/" + id + "/detail";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/consultation/encounters/" + id;
+        }
     }
 
     @GetMapping("/encounters/{id}/detail")
@@ -171,7 +179,7 @@ public class ConsultationController {
         Encounter encounter = encounterRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Encounter ID"));
 
-        List<EncounterService> orderedServices = encounterServiceRepository.findByEncounterId(id);
+        List<EncounterServiceOrder> orderedServices = encounterServiceOrderRepository.findByEncounterId(id);
 
         model.addAttribute("encounter", encounter);
         model.addAttribute("patient", encounter.getVisit().getPatient());
