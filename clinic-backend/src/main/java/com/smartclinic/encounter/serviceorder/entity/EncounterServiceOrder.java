@@ -26,7 +26,7 @@ public class EncounterServiceOrder extends BaseEntity {
     private Encounter encounter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_catalog_id", nullable = false)
+    @JoinColumn(name = "service_id", nullable = false)
     private ServiceCatalog serviceCatalog;
 
     @Column(name = "quantity", nullable = false)
