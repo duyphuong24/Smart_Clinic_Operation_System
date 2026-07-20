@@ -6,8 +6,14 @@ import com.smartclinic.desktop.api.AppointmentApiClient;
 import com.smartclinic.desktop.api.AuthApiClient;
 import com.smartclinic.desktop.api.DoctorApiClient;
 import com.smartclinic.desktop.api.PatientApiClient;
+import com.smartclinic.desktop.api.InvoiceApiClient;
+import com.smartclinic.desktop.api.PaymentApiClient;
 import com.smartclinic.desktop.api.QueueApiClient;
+import com.smartclinic.desktop.api.ReportApiClient;
 import com.smartclinic.desktop.api.RoomApiClient;
+import com.smartclinic.desktop.service.BillingDesktopService;
+import com.smartclinic.desktop.service.PaymentDesktopService;
+import com.smartclinic.desktop.service.ReportDesktopService;
 import com.smartclinic.desktop.controller.HomeController;
 import com.smartclinic.desktop.controller.InvoiceDetailController;
 import com.smartclinic.desktop.controller.LoginController;
@@ -39,6 +45,9 @@ public class AppContext {
     private final AppointmentDesktopService appointmentDesktopService;
     private final PatientDesktopService patientDesktopService;
     private final QueueDesktopService queueDesktopService;
+    private final BillingDesktopService billingDesktopService;
+    private final PaymentDesktopService paymentDesktopService;
+    private final ReportDesktopService reportDesktopService;
     private final NavigationService navigationService;
     private SceneNavigator sceneNavigator;
 
@@ -57,6 +66,10 @@ public class AppContext {
         DoctorApiClient doctorApiClient = new DoctorApiClient(apiClient);
         RoomApiClient roomApiClient = new RoomApiClient(apiClient);
 
+        InvoiceApiClient invoiceApiClient = new InvoiceApiClient(apiClient);
+        PaymentApiClient paymentApiClient = new PaymentApiClient(apiClient);
+        ReportApiClient reportApiClient = new ReportApiClient(apiClient);
+
         this.authService = new AuthService(authApiClient, sessionManager);
         this.appointmentDesktopService = new AppointmentDesktopService(appointmentApiClient, queueApiClient);
         this.patientDesktopService = new PatientDesktopService(patientApiClient);
@@ -66,6 +79,9 @@ public class AppContext {
                 roomApiClient,
                 patientDesktopService
         );
+        this.billingDesktopService = new BillingDesktopService(invoiceApiClient);
+        this.paymentDesktopService = new PaymentDesktopService(paymentApiClient);
+        this.reportDesktopService = new ReportDesktopService(reportApiClient);
 
         ViewLoader viewLoader = new ViewLoader(this);
         this.navigationService = new NavigationService(viewLoader, sessionManager);
@@ -83,10 +99,10 @@ public class AppContext {
             return new MainShellController(sessionManager, authService, sceneNavigator, navigationService);
         }
         if (controllerClass == HomeController.class) {
-            return new HomeController(sessionManager, navigationService);
+            return new HomeController(sessionManager, navigationService, appointmentDesktopService, queueDesktopService, patientDesktopService);
         }
         if (controllerClass == TodayAppointmentsController.class) {
-            return new TodayAppointmentsController(appointmentDesktopService);
+            return new TodayAppointmentsController(appointmentDesktopService, queueDesktopService);
         }
         if (controllerClass == PatientSearchController.class) {
             return new PatientSearchController(patientDesktopService);
@@ -98,13 +114,10 @@ public class AppContext {
             return new QueueBoardController(queueDesktopService, sessionManager);
         }
         if (controllerClass == PendingInvoicesController.class) {
-            return new PendingInvoicesController();
+            return new PendingInvoicesController(billingDesktopService, paymentDesktopService);
         }
-        if (controllerClass == InvoiceDetailController.class) {
-            return new InvoiceDetailController();
-        }
-        if (controllerClass == PaymentController.class) {
-            return new PaymentController();
+        if (controllerClass == com.smartclinic.desktop.controller.FinancialReportsController.class) {
+            return new com.smartclinic.desktop.controller.FinancialReportsController(reportDesktopService);
         }
 
         try {

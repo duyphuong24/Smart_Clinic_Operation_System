@@ -39,4 +39,14 @@ public class AppointmentDesktopService {
         return queueApiClient.checkIn(request)
                 .thenApply(ApiResponse::getData);
     }
+
+    public CompletableFuture<AppointmentResponse> create(Object request) {
+        return appointmentApiClient.create(request)
+                .thenApply(ApiResponse::getData);
+    }
+
+    public CompletableFuture<AppointmentResponse> cancel(Long id, String reason) {
+        return appointmentApiClient.cancel(id, reason)
+                .thenApply(ApiResponse::getData);
+    }
 }

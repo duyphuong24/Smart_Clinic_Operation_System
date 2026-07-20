@@ -60,6 +60,22 @@ public class ApiClient {
         return sendWithRetry(requestSupplier, responseType, authenticated);
     }
 
+    public <T> CompletableFuture<ApiResponse<T>> put(
+            String path,
+            Object body,
+            TypeReference<ApiResponse<T>> responseType,
+            boolean authenticated
+    ) {
+        Supplier<HttpRequest> requestSupplier = () -> {
+            String json = toJson(body);
+            HttpRequest.Builder builder = baseRequest(path)
+                    .PUT(HttpRequest.BodyPublishers.ofString(json));
+            addAuthorization(builder, authenticated);
+            return builder.build();
+        };
+        return sendWithRetry(requestSupplier, responseType, authenticated);
+    }
+
     public <T> CompletableFuture<ApiResponse<T>> patch(
             String path,
             TypeReference<ApiResponse<T>> responseType,
@@ -68,6 +84,22 @@ public class ApiClient {
         Supplier<HttpRequest> requestSupplier = () -> {
             HttpRequest.Builder builder = baseRequest(path)
                     .method("PATCH", HttpRequest.BodyPublishers.noBody());
+            addAuthorization(builder, authenticated);
+            return builder.build();
+        };
+        return sendWithRetry(requestSupplier, responseType, authenticated);
+    }
+
+    public <T> CompletableFuture<ApiResponse<T>> patch(
+            String path,
+            Object body,
+            TypeReference<ApiResponse<T>> responseType,
+            boolean authenticated
+    ) {
+        Supplier<HttpRequest> requestSupplier = () -> {
+            String json = toJson(body);
+            HttpRequest.Builder builder = baseRequest(path)
+                    .method("PATCH", HttpRequest.BodyPublishers.ofString(json));
             addAuthorization(builder, authenticated);
             return builder.build();
         };

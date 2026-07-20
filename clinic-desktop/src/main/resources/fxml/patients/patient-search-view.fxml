@@ -14,14 +14,16 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox spacing="16.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.PatientSearchController">
-    <Label styleClass="page-heading" text="Patient Search" />
-    <Label styleClass="page-description" text="Search patients by code, full name, or phone number for appointment and check-in workflows." wrapText="true" />
+    <Label styleClass="page-heading" text="Patient Registry" />
+    <Label styleClass="page-description" text="View, search, register, and manage patient profiles." wrapText="true" />
 
     <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
         <TextField fx:id="keywordField" promptText="Search by patient code, name, or phone..." HBox.hgrow="ALWAYS" />
         <Button fx:id="searchButton" onAction="#onSearch" styleClass="btn-premium" text="Search" />
         <Button fx:id="resetButton" onAction="#onReset" styleClass="btn-secondary" text="Reset" />
+        <Region HBox.hgrow="ALWAYS" />
         <ProgressIndicator fx:id="loadingIndicator" managed="false" maxHeight="24.0" maxWidth="24.0" visible="false" />
+        <Button fx:id="registerButton" onAction="#onRegisterPatient" styleClass="btn-primary" text="+ Register Patient" />
     </HBox>
 
     <SplitPane dividerPositions="0.68" VBox.vgrow="ALWAYS">
@@ -35,37 +37,45 @@
                 <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Status" />
             </columns>
             <placeholder>
-                <Label fx:id="emptyLabel" styleClass="empty-state-label" text="No patients found. Try another keyword or reset the search." />
+                <Label fx:id="emptyLabel" styleClass="empty-state-label" text="No patients found. Try another keyword or register a new patient." />
             </placeholder>
         </TableView>
 
-        <VBox fx:id="detailPanel" spacing="10.0" styleClass="detail-panel">
-            <padding>
-                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
-            </padding>
-            <Label styleClass="detail-panel-title" text="Patient Detail" />
-            <Label fx:id="detailPlaceholder" styleClass="detail-placeholder" text="Select a patient to view profile details." wrapText="true" />
-            <Label fx:id="detailNameLabel" styleClass="detail-name" text="-" />
-            <Label fx:id="detailCodeLabel" styleClass="detail-code" text="-" />
-            <Label fx:id="detailStatusLabel" text="-" />
-            <Label fx:id="archivedWarningLabel" managed="false" styleClass="archived-warning" text="Archived patients should not be used for new appointment booking." visible="false" wrapText="true" />
-            <Label styleClass="detail-field-label" text="Gender" />
-            <Label fx:id="detailGenderLabel" styleClass="detail-field-value" text="-" />
-            <Label styleClass="detail-field-label" text="Date of Birth" />
-            <Label fx:id="detailDobLabel" styleClass="detail-field-value" text="-" />
-            <Label styleClass="detail-field-label" text="Phone" />
-            <Label fx:id="detailPhoneLabel" styleClass="detail-field-value" text="-" />
-            <Label styleClass="detail-field-label" text="Email" />
-            <Label fx:id="detailEmailLabel" styleClass="detail-field-value" text="-" />
-            <Label styleClass="detail-field-label" text="Identity Number" />
-            <Label fx:id="detailIdentityLabel" styleClass="detail-field-value" text="-" />
-            <Label styleClass="detail-field-label" text="Address" />
-            <Label fx:id="detailAddressLabel" styleClass="detail-field-value" text="-" wrapText="true" />
-            <Label styleClass="detail-field-label" text="Emergency Contact" />
-            <Label fx:id="detailEmergencyLabel" styleClass="detail-field-value" text="-" wrapText="true" />
-            <Label styleClass="detail-field-label" text="Allergy Note" />
-            <Label fx:id="detailAllergyLabel" styleClass="detail-field-value" text="-" wrapText="true" />
-        </VBox>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+            <content>
+                <VBox fx:id="detailPanel" spacing="10.0" styleClass="detail-panel">
+                    <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                    </padding>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="detail-panel-title" text="Patient Detail" HBox.hgrow="ALWAYS" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="editButton" disable="true" onAction="#onEditPatient" styleClass="btn-secondary" text="Edit Profile" />
+                    </HBox>
+                    <Label fx:id="detailPlaceholder" styleClass="detail-placeholder" text="Select a patient to view profile details." wrapText="true" />
+                    <Label fx:id="detailNameLabel" styleClass="detail-name" text="-" />
+                    <Label fx:id="detailCodeLabel" styleClass="detail-code" text="-" />
+                    <Label fx:id="detailStatusLabel" text="-" />
+                    <Label fx:id="archivedWarningLabel" managed="false" styleClass="archived-warning" text="Archived patients should not be used for new appointment booking." visible="false" wrapText="true" />
+                    <Label styleClass="detail-field-label" text="Gender" />
+                    <Label fx:id="detailGenderLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Date of Birth" />
+                    <Label fx:id="detailDobLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Phone" />
+                    <Label fx:id="detailPhoneLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Email" />
+                    <Label fx:id="detailEmailLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Identity Number" />
+                    <Label fx:id="detailIdentityLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Address" />
+                    <Label fx:id="detailAddressLabel" styleClass="detail-field-value" text="-" wrapText="true" />
+                    <Label styleClass="detail-field-label" text="Emergency Contact" />
+                    <Label fx:id="detailEmergencyLabel" styleClass="detail-field-value" text="-" wrapText="true" />
+                    <Label styleClass="detail-field-label" text="Allergy Note" />
+                    <Label fx:id="detailAllergyLabel" styleClass="detail-field-value" text="-" wrapText="true" />
+                </VBox>
+            </content>
+        </ScrollPane>
     </SplitPane>
 
     <HBox alignment="CENTER_LEFT" spacing="12.0">

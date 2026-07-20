@@ -64,6 +64,7 @@ public class MainShellController {
         userNameLabel.setText(sessionManager.getFullName());
         userRoleLabel.setText(RoleUtil.primaryRoleLabel(sessionManager.getRoles()));
         navbarUserLabel.setText(sessionManager.getUserName());
+        navigationService.setRouteChangeListener(this::navigateTo);
         buildSidebarMenu();
         navigateTo(DesktopRoute.HOME);
     }

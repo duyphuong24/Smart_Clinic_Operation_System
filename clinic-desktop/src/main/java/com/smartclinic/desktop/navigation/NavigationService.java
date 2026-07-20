@@ -16,6 +16,20 @@ public class NavigationService {
         this.sessionManager = sessionManager;
     }
 
+    private java.util.function.Consumer<DesktopRoute> routeChangeListener;
+
+    public void setRouteChangeListener(java.util.function.Consumer<DesktopRoute> routeChangeListener) {
+        this.routeChangeListener = routeChangeListener;
+    }
+
+    public void navigateTo(DesktopRoute route) {
+        if (routeChangeListener != null) {
+            routeChangeListener.accept(route);
+        } else {
+            navigate(route);
+        }
+    }
+
     public NavigationResult navigate(DesktopRoute route) {
         if (!canAccess(route)) {
             return NavigationResult.denied(route);

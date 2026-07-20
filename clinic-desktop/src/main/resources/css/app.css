@@ -622,3 +622,47 @@
     -fx-background-color: rgba(239, 68, 68, 0.12);
     -fx-text-fill: #b91c1c;
 }
+
+/* Dashboard KPI & Stat Cards */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(0, 0, 0, 0.08);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 16 20;
+    -fx-spacing: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.03), 10, 0.1, 0, 2);
+}
+
+.stat-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6b7280;
+}
+
+.stat-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1f2937;
+}
+
+.stat-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #9ca3af;
+}
+
+.action-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(0, 0, 0, 0.08);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 16 20;
+    -fx-spacing: 8;
+}
+
+.action-card:hover {
+    -fx-border-color: #0072ff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 114, 255, 0.12), 12, 0.2, 0, 4);
+}

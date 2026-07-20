@@ -5,6 +5,7 @@ import com.smartclinic.desktop.dto.PatientResponse;
 import com.smartclinic.desktop.navigation.NavigationAware;
 import com.smartclinic.desktop.service.PatientDesktopService;
 import com.smartclinic.desktop.util.AlertUtil;
+import com.smartclinic.desktop.util.PatientFormDialog;
 import com.smartclinic.desktop.util.PatientUiUtil;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -36,6 +37,12 @@ public class PatientSearchController implements NavigationAware {
 
     @FXML
     private Button resetButton;
+
+    @FXML
+    private Button registerButton;
+
+    @FXML
+    private Button editButton;
 
     @FXML
     private Button previousButton;
@@ -153,6 +160,32 @@ public class PatientSearchController implements NavigationAware {
     }
 
     @FXML
+    private void onRegisterPatient() {
+        var owner = registerButton.getScene() == null ? null : registerButton.getScene().getWindow();
+        PatientFormDialog.showCreate(patientService, owner)
+                .ifPresent(created -> {
+                    AlertUtil.showInfo("Register Patient", "Patient " + created.getFullName() + " registered successfully (" + created.getPatientCode() + ").");
+                    search(currentPage);
+                });
+    }
+
+    @FXML
+    private void onEditPatient() {
+        PatientResponse selected = patientTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertUtil.showWarning("Edit Patient", "Please select a patient to edit.");
+            return;
+        }
+
+        var owner = editButton.getScene() == null ? null : editButton.getScene().getWindow();
+        PatientFormDialog.showEdit(patientService, selected, owner)
+                .ifPresent(updated -> {
+                    AlertUtil.showInfo("Edit Patient", "Patient record updated successfully.");
+                    search(currentPage);
+                });
+    }
+
+    @FXML
     private void onPreviousPage() {
         if (currentPage > 0) {
             search(currentPage - 1);
@@ -249,6 +282,10 @@ public class PatientSearchController implements NavigationAware {
             return;
         }
 
+        if (editButton != null) {
+            editButton.setDisable(false);
+        }
+
         detailPlaceholder.setVisible(false);
         detailPlaceholder.setManaged(false);
         detailNameLabel.setText(patient.getFullName());
@@ -273,6 +310,10 @@ public class PatientSearchController implements NavigationAware {
     }
 
     private void clearDetailPanel() {
+        if (editButton != null) {
+            editButton.setDisable(true);
+        }
+
         detailPlaceholder.setVisible(true);
         detailPlaceholder.setManaged(true);
         detailNameLabel.setText("-");
@@ -311,6 +352,12 @@ public class PatientSearchController implements NavigationAware {
         loadingIndicator.setManaged(loading);
         searchButton.setDisable(loading);
         resetButton.setDisable(loading);
+        if (registerButton != null) {
+            registerButton.setDisable(loading);
+        }
+        if (editButton != null) {
+            editButton.setDisable(loading || patientTable.getSelectionModel().getSelectedItem() == null);
+        }
         previousButton.setDisable(loading || currentPage <= 0 || totalPages <= 1);
         nextButton.setDisable(loading || totalPages <= 1 || currentPage + 1 >= totalPages);
         keywordField.setDisable(loading);
