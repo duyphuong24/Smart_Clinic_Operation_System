@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      th:replace="~{layout/main :: layout('Appointments', ~{::content_fragment})}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:replace="~{layout/main :: layout('Appointments', ~{::content_fragment})}">
+
 <body>
     <div th:fragment="content_fragment">
         <!-- Link to Module-Specific CSS -->
@@ -11,13 +11,8 @@
             <!-- Header Section -->
             <div class="mb-4">
                 <h3 class="fw-bold m-0 text-white">Book Appointment</h3>
-                <p class="text-secondary m-0 text-sm">Schedule a consultation slot for a patient with their preferred doctor.</p>
-            </div>
-
-            <!-- Error Alert -->
-            <div th:if="${errorMessage != null}" class="alert-custom alert-danger-custom mb-4">
-                <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                <span th:text="${errorMessage}">Error Message</span>
+                <p class="text-secondary m-0 text-sm">Schedule a consultation slot for a patient with their preferred
+                    doctor.</p>
             </div>
 
             <!-- Form -->
@@ -26,30 +21,37 @@
                     <!-- Patient Selection -->
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="patientId" class="form-label">Select Patient <span class="text-danger">*</span></label>
+                            <label for="patientId" class="form-label">Select Patient <span
+                                    class="text-danger">*</span></label>
                             <div class="input-glow-wrapper">
-                                <select id="patientId" th:field="*{patientId}" class="form-control-custom select-custom-arrow" required>
+                                <select id="patientId" th:field="*{patientId}"
+                                    class="form-control-custom select-custom-arrow" required>
                                     <option value="" disabled selected>Choose Patient</option>
-                                    <option th:each="pt : ${patients}" 
-                                            th:value="${pt.id}" th:text="${pt.fullName} + ' (' + ${pt.patientCode} + ' - ' + ${pt.phone} + ')'"></option>
+                                    <option th:each="pt : ${patients}" th:value="${pt.id}"
+                                        th:text="${pt.fullName} + ' (' + ${pt.patientCode} + ' - ' + ${pt.phone} + ')'">
+                                    </option>
                                 </select>
                             </div>
-                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('patientId')}" th:errors="*{patientId}">Patient Error</div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('patientId')}"
+                                th:errors="*{patientId}">Patient Error</div>
                         </div>
                     </div>
 
                     <!-- Doctor Selection -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="doctorId" class="form-label">Select Doctor <span class="text-danger">*</span></label>
+                            <label for="doctorId" class="form-label">Select Doctor <span
+                                    class="text-danger">*</span></label>
                             <div class="input-glow-wrapper">
-                                <select id="doctorId" th:field="*{doctorId}" class="form-control-custom select-custom-arrow" required>
+                                <select id="doctorId" th:field="*{doctorId}"
+                                    class="form-control-custom select-custom-arrow" required>
                                     <option value="" disabled selected>Choose Doctor</option>
-                                    <option th:each="doc : ${doctors}" 
-                                            th:value="${doc.id}" th:text="${doc.fullName} + ' (' + ${doc.specialtyName} + ')'"></option>
+                                    <option th:each="doc : ${doctors}" th:value="${doc.id}"
+                                        th:text="${doc.fullName} + ' (' + ${doc.specialtyName} + ')'"></option>
                                 </select>
                             </div>
-                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('doctorId')}" th:errors="*{doctorId}">Doctor Error</div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('doctorId')}"
+                                th:errors="*{doctorId}">Doctor Error</div>
                         </div>
                     </div>
 
@@ -58,10 +60,11 @@
                         <div class="form-group">
                             <label for="roomId" class="form-label">Select Room</label>
                             <div class="input-glow-wrapper">
-                                <select id="roomId" th:field="*{roomId}" class="form-control-custom select-custom-arrow">
+                                <select id="roomId" th:field="*{roomId}"
+                                    class="form-control-custom select-custom-arrow">
                                     <option value="" selected>No Room (Uses Doctor's Default)</option>
-                                    <option th:each="room : ${rooms}" 
-                                            th:value="${room.id}" th:text="${room.name} + ' (' + ${room.roomCode} + ')'"></option>
+                                    <option th:each="room : ${rooms}" th:value="${room.id}"
+                                        th:text="${room.name} + ' (' + ${room.roomCode} + ')'"></option>
                                 </select>
                             </div>
                         </div>
@@ -70,36 +73,44 @@
                     <!-- Scheduled Start -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="scheduledStart" class="form-label">Scheduled Start <span class="text-danger">*</span></label>
+                            <label for="scheduledStart" class="form-label">Scheduled Start <span
+                                    class="text-danger">*</span></label>
                             <div class="input-glow-wrapper">
-                                <input type="datetime-local" id="scheduledStart" th:field="*{scheduledStart}" class="form-control-custom" required>
+                                <input type="datetime-local" id="scheduledStart" th:field="*{scheduledStart}"
+                                    class="form-control-custom" required>
                             </div>
-                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('scheduledStart')}" th:errors="*{scheduledStart}">Start Error</div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('scheduledStart')}"
+                                th:errors="*{scheduledStart}">Start Error</div>
                         </div>
                     </div>
 
                     <!-- Scheduled End -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="scheduledEnd" class="form-label">Scheduled End <span class="text-danger">*</span></label>
+                            <label for="scheduledEnd" class="form-label">Scheduled End <span
+                                    class="text-danger">*</span></label>
                             <div class="input-glow-wrapper">
-                                <input type="datetime-local" id="scheduledEnd" th:field="*{scheduledEnd}" class="form-control-custom" required>
+                                <input type="datetime-local" id="scheduledEnd" th:field="*{scheduledEnd}"
+                                    class="form-control-custom" required>
                             </div>
-                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('scheduledEnd')}" th:errors="*{scheduledEnd}">End Error</div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('scheduledEnd')}"
+                                th:errors="*{scheduledEnd}">End Error</div>
                         </div>
                     </div>
 
                     <!-- Booking Source -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="source" class="form-label">Booking Source <span class="text-danger">*</span></label>
+                            <label for="source" class="form-label">Booking Source <span
+                                    class="text-danger">*</span></label>
                             <div class="input-glow-wrapper">
-                                <select id="source" th:field="*{source}" class="form-control-custom select-custom-arrow" required>
-                                    <option th:each="src : ${sources}" 
-                                            th:value="${src}" th:text="${src}"></option>
+                                <select id="source" th:field="*{source}" class="form-control-custom select-custom-arrow"
+                                    required>
+                                    <option th:each="src : ${sources}" th:value="${src}" th:text="${src}"></option>
                                 </select>
                             </div>
-                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('source')}" th:errors="*{source}">Source Error</div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('source')}"
+                                th:errors="*{source}">Source Error</div>
                         </div>
                     </div>
 
@@ -108,7 +119,8 @@
                         <div class="form-group">
                             <label for="reason" class="form-label">Reason for Visit</label>
                             <div class="input-glow-wrapper">
-                                <input type="text" id="reason" th:field="*{reason}" class="form-control-custom" placeholder="e.g. Regular health check">
+                                <input type="text" id="reason" th:field="*{reason}" class="form-control-custom"
+                                    placeholder="e.g. Regular health check">
                             </div>
                         </div>
                     </div>
@@ -130,25 +142,26 @@
 
 <!-- Script to auto-fill end time + 20 minutes -->
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const startInput = document.getElementById("scheduledStart");
         const endInput = document.getElementById("scheduledEnd");
-        
-        startInput.addEventListener("change", function() {
+
+        startInput.addEventListener("change", function () {
             if (startInput.value) {
                 const startDate = new Date(startInput.value);
                 const endDate = new Date(startDate.getTime() + 20 * 60000); // add 20 minutes
-                
+
                 // Format back to YYYY-MM-DDTHH:MM
                 const year = endDate.getFullYear();
                 const month = String(endDate.getMonth() + 1).padStart(2, '0');
                 const day = String(endDate.getDate()).padStart(2, '0');
                 const hours = String(endDate.getHours()).padStart(2, '0');
                 const minutes = String(endDate.getMinutes()).padStart(2, '0');
-                
+
                 endInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
             }
         });
     });
 </script>
+
 </html>

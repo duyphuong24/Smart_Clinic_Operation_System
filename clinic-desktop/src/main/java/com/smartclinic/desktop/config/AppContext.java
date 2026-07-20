@@ -46,6 +46,7 @@ public class AppContext {
         this.sessionManager = new SessionManager();
         HttpClient httpClient = HttpClient.newHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.findAndRegisterModules();
         ApiClient apiClient = new ApiClient(httpClient, objectMapper, sessionManager, resolveBaseUrl());
 

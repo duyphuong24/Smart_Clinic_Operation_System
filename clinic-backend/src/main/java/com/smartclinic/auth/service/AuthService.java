@@ -52,6 +52,7 @@ public class AuthService {
         this.refreshTokenValidSeconds = refreshTokenValidSeconds;
     }
 
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
