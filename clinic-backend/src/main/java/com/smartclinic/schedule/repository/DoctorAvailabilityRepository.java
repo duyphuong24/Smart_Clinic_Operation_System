@@ -19,8 +19,8 @@ public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvaila
               and a.active = true
               and a.doctor.active = true
               and a.room.active = true
-              and a.startTime <= :startTime
-              and a.endTime >= :endTime
+              and a.startTime <= cast(:startTime as time)
+              and a.endTime >= cast(:endTime as time)
             """)
     boolean existsActiveAvailabilityCovering(
             @Param("doctorId") Long doctorId,
