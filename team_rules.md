@@ -10,6 +10,7 @@ This document defines the team working rules for the Smart Clinic Operations Sys
 - Do not push directly to `main` unless you are the leader handling an approved integration.
 - Do not commit code that does not compile.
 - Do not change shared database schema, entity relationships, enum status flow, or API contracts without informing the leader.
+- When the project or a feature has a new bug, blocker, or missing requirement, add a new issue to the issue list before starting the fix.
 - Keep business logic in the service layer. Controllers should only receive input, call services, and return views/responses.
 - JavaFX controllers should only handle UI events. They must not contain business logic or call HTTP clients directly.
 
@@ -141,42 +142,35 @@ Rules:
 
 ## 4. Pull Request Rules
 
-Pull request title format:
+Pull Request rules and template are defined in [.github/pull_request_template.md](.github/pull_request_template.md).
+
+- All PRs must follow the automated template provided in `.github/pull_request_template.md`.
+- PR titles must follow: `[TYPE] Short description` (e.g. `[FEAT] Add authentication and RBAC`, `[FIX] Prevent duplicate appointment slots`).
+- Link related issues in the PR description (e.g., `Closes #12`).
+- Ensure all unit & integration tests pass (`mvn test`) before requesting merge.
+
+## 5. Issue Tracking Rules
+
+Use `docs/issues.md` as the local source of truth for project issues.
+
+When a project bug, feature bug, blocker, or missing requirement is found:
+
+- Add a new issue entry to `docs/issues.md` before creating the fix branch.
+- Use the next available issue number in the current issue list.
+- Do not reuse old issue numbers, even if an old issue was closed or superseded.
+- Write the issue title, description, acceptance criteria, and labels clearly enough for another member to implement or review.
+- Use the new issue number in the branch name and PR description when the work is tied to that issue.
+
+Example:
 
 ```text
-[TYPE] Short description
+Existing last issue: Issue 26
+New production bug: Issue 27
+Branch: bugfix/27-fix-appointment-checkin-status
+Commit: fix(queue): prevent check-in from invalid appointment status
 ```
 
-Examples:
-
-```text
-[FEAT] Add authentication and RBAC
-[FEAT] Add patient management pages
-[FIX] Prevent duplicate appointment slots
-[DOCS] Update API contract
-```
-
-Pull request description template:
-
-```markdown
-## Summary
-- Describe what changed.
-
-## Test
-- Describe how this was tested.
-
-## Notes
-- Mention anything reviewers should know.
-```
-
-PR rules:
-
-- Open PR into `main` unless the leader creates another integration branch.
-- The leader should review business logic, schema changes, API changes, and security changes before merge.
-- Resolve merge conflicts locally before requesting final review.
-- Attach screenshots for UI changes when possible.
-
-## 5. Git Workflow
+## 6. Git Workflow
 
 Before starting work:
 
@@ -208,7 +202,7 @@ git push origin feature/03-patient-management
 
 Then create a pull request into `main`.
 
-## 6. Package Naming Rules
+## 7. Package Naming Rules
 
 Java packages must be lowercase.
 
@@ -248,7 +242,7 @@ com.smartclinic.appointment.repository
 com.smartclinic.appointment.dto
 ```
 
-## 7. Java Class Naming Rules
+## 8. Java Class Naming Rules
 
 Entity:
 
@@ -324,7 +318,7 @@ AppointmentValidator
 QueueValidator
 ```
 
-## 8. REST API Naming Rules
+## 9. REST API Naming Rules
 
 REST API prefix:
 
@@ -358,7 +352,7 @@ PATCH /api/v1/queue-items/{id}/complete
 POST  /api/v1/invoices/{id}/payments
 ```
 
-## 9. Database Naming Rules
+## 10. Database Naming Rules
 
 Table names use snake_case and plural names:
 
@@ -417,7 +411,7 @@ uq_appointments_code
 uq_queue_items_date_number
 ```
 
-## 10. Files That Must Not Be Committed
+## 11. Files That Must Not Be Committed
 
 Do not commit generated files or local secrets:
 
@@ -437,7 +431,7 @@ Only commit example environment files, such as:
 .envi_example
 ```
 
-## 11. Minimum Checks Before Merge
+## 12. Minimum Checks Before Merge
 
 Before opening or merging a PR, run at least:
 

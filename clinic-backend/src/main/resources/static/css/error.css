@@ -1,0 +1,30 @@
+/* ==========================================================================
+   Error Module specific styles
+   ========================================================================== */
+
+.error-panel {
+    max-width: 650px !important;
+    margin: 50px auto !important;
+}
+
+.error-icon-box {
+    width: 90px !important;
+    height: 90px !important;
+    border: 1px solid var(--border-card) !important;
+}
+
+.error-icon-symbol {
+    font-size: 2.8rem !important;
+}
+
+.error-desc-text {
+    font-size: 1.05rem !important;
+}
+
+.error-details-box {
+    background: rgba(255,255,255,0.02) !important;
+    border: 1px solid var(--border-card) !important;
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+    color: var(--text-primary) !important;
+}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Doctors', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/doctor.css}" rel="stylesheet">
+
+        <div class="row g-4">
+            <!-- Left Side: Doctor Info Summary -->
+            <div class="col-lg-4">
+                <div class="glass-panel p-4 h-100">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary rounded-circle mb-3 doctor-avatar-box">
+                            <i class="fa-solid fa-user-doctor text-primary doctor-avatar-icon"></i>
+                        </div>
+                        <h4 class="fw-bold text-white mb-1" th:text="${doctor.fullName}">Dr. Nguyen Van B</h4>
+                        <span class="badge bg-secondary font-monospace px-3 py-2 text-badge-sz" th:text="${doctor.employeeCode}">EMP-001</span>
+                    </div>
+
+                    <!-- Personal Information List -->
+                    <div class="d-flex flex-column gap-3 pt-3 border-top-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary text-sm">Specialty</span>
+                            <span class="text-white fw-semibold" th:text="${doctor.specialtyName}">General Medicine</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary text-sm">License No</span>
+                            <span class="text-white fw-semibold" th:text="${doctor.licenseNo}">LIC-12345</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary text-sm">Consult Fee</span>
+                            <span class="text-white fw-semibold" th:text="${#numbers.formatDecimal(doctor.consultationFee, 1, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary text-sm">Default Room</span>
+                            <span class="text-white fw-semibold" th:text="${doctor.defaultRoomCode != null && !doctor.defaultRoomCode.isEmpty() ? doctor.defaultRoomCode : '-'}">ROOM-101</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-secondary text-sm">Status</span>
+                            <span class="badge doctor-status-badge" th:classappend="${doctor.active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${doctor.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <span class="d-block text-secondary mb-1 text-sm">Biography</span>
+                            <p class="text-white m-0 text-sm" th:text="${doctor.bio != null && !doctor.bio.isEmpty() ? doctor.bio : 'No biography provided.'}">Biography text placeholder</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Availability Schedules -->
+            <div class="col-lg-8">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h4 class="fw-bold m-0 text-white"><i class="fa-solid fa-clock me-2 text-primary"></i>Working Schedules</h4>
+                        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/doctors/{id}/availability/new(id=${doctor.id})}" class="btn btn-premium d-flex align-items-center gap-2 btn-premium-custom">
+                            <i class="fa-solid fa-calendar-plus"></i>
+                            <span>Add Schedule</span>
+                        </a>
+                    </div>
+
+                    <!-- Availability Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle text-white m-0 doctor-table">
+                            <thead>
+                                <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                                    <th class="ps-3 py-3 w-25">Day of Week</th>
+                                    <th class="w-25">Time Slot</th>
+                                    <th class="w-20">Duration</th>
+                                    <th class="w-15">Room</th>
+                                    <th class="pe-3 text-end w-15" sec:authorize="hasRole('ROLE_ADMIN')">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="avail : ${availabilities}" class="glass-panel doctor-table-row">
+                                    <td class="ps-3 py-3">
+                                        <span class="fw-semibold text-white">
+                                            <span th:if="${avail.dayOfWeek == 1}">Monday</span>
+                                            <span th:if="${avail.dayOfWeek == 2}">Tuesday</span>
+                                            <span th:if="${avail.dayOfWeek == 3}">Wednesday</span>
+                                            <span th:if="${avail.dayOfWeek == 4}">Thursday</span>
+                                            <span th:if="${avail.dayOfWeek == 5}">Friday</span>
+                                            <span th:if="${avail.dayOfWeek == 6}">Saturday</span>
+                                            <span th:if="${avail.dayOfWeek == 7}">Sunday</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${avail.startTime} + ' - ' + ${avail.endTime}">08:00 - 12:00</span>
+                                    </td>
+                                    <td th:text="${avail.slotMinutes} + ' mins'">20 mins</td>
+                                    <td th:text="${avail.roomCode}">ROOM-101</td>
+                                    <td class="pe-3 text-end" sec:authorize="hasRole('ROLE_ADMIN')">
+                                        <form th:action="@{/admin/doctors/{id}/availability/{availId}/deactivate(id=${doctor.id}, availId=${avail.id})}" method="post" onsubmit="return confirm('Are you sure you want to deactivate this schedule?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger doctor-action-btn" title="Deactivate Schedule">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <!-- Empty State -->
+                                <tr th:if="${#lists.isEmpty(availabilities)}">
+                                    <td colspan="5" class="text-center py-5 text-secondary">
+                                        <i class="fa-solid fa-calendar-times mb-3 empty-state-icon-lg"></i>
+                                        <p class="m-0">No active availability schedule configured for this doctor.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="col-12 mt-4">
+                <div class="d-flex align-items-center justify-content-between pt-3 border-top-card">
+                    <a th:href="@{/admin/doctors}" class="btn btn-outline-secondary px-4 py-2 btn-cancel-custom">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Back to Doctors
+                    </a>
+                    <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/doctors/{id}/edit(id=${doctor.id})}" class="btn btn-premium px-4 py-2 btn-premium-custom">
+                        <i class="fa-solid fa-user-pen me-2"></i>Edit Doctor Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

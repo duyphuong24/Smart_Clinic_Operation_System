@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.PatientSearchController">
+    <Label styleClass="page-heading" text="Patient Registry" />
+    <Label styleClass="page-description" text="View, search, register, and manage patient profiles." wrapText="true" />
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
+        <TextField fx:id="keywordField" promptText="Search by patient code, name, or phone..." HBox.hgrow="ALWAYS" />
+        <Button fx:id="searchButton" onAction="#onSearch" styleClass="btn-premium" text="Search" />
+        <Button fx:id="resetButton" onAction="#onReset" styleClass="btn-secondary" text="Reset" />
+        <Region HBox.hgrow="ALWAYS" />
+        <ProgressIndicator fx:id="loadingIndicator" managed="false" maxHeight="24.0" maxWidth="24.0" visible="false" />
+        <Button fx:id="registerButton" onAction="#onRegisterPatient" styleClass="btn-primary" text="+ Register Patient" />
+    </HBox>
+
+    <SplitPane dividerPositions="0.68" VBox.vgrow="ALWAYS">
+        <TableView fx:id="patientTable" styleClass="data-table">
+            <columns>
+                <TableColumn fx:id="codeColumn" prefWidth="110.0" text="Code" />
+                <TableColumn fx:id="nameColumn" prefWidth="200.0" text="Full Name" />
+                <TableColumn fx:id="genderColumn" prefWidth="90.0" text="Gender" />
+                <TableColumn fx:id="dobColumn" prefWidth="110.0" text="Date of Birth" />
+                <TableColumn fx:id="phoneColumn" prefWidth="120.0" text="Phone" />
+                <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Status" />
+            </columns>
+            <placeholder>
+                <Label fx:id="emptyLabel" styleClass="empty-state-label" text="No patients found. Try another keyword or register a new patient." />
+            </placeholder>
+        </TableView>
+
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+            <content>
+                <VBox fx:id="detailPanel" spacing="10.0" styleClass="detail-panel">
+                    <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                    </padding>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="detail-panel-title" text="Patient Detail" HBox.hgrow="ALWAYS" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="editButton" disable="true" onAction="#onEditPatient" styleClass="btn-secondary" text="Edit Profile" />
+                    </HBox>
+                    <Label fx:id="detailPlaceholder" styleClass="detail-placeholder" text="Select a patient to view profile details." wrapText="true" />
+                    <Label fx:id="detailNameLabel" styleClass="detail-name" text="-" />
+                    <Label fx:id="detailCodeLabel" styleClass="detail-code" text="-" />
+                    <Label fx:id="detailStatusLabel" text="-" />
+                    <Label fx:id="archivedWarningLabel" managed="false" styleClass="archived-warning" text="Archived patients should not be used for new appointment booking." visible="false" wrapText="true" />
+                    <Label styleClass="detail-field-label" text="Gender" />
+                    <Label fx:id="detailGenderLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Date of Birth" />
+                    <Label fx:id="detailDobLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Phone" />
+                    <Label fx:id="detailPhoneLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Email" />
+                    <Label fx:id="detailEmailLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Identity Number" />
+                    <Label fx:id="detailIdentityLabel" styleClass="detail-field-value" text="-" />
+                    <Label styleClass="detail-field-label" text="Address" />
+                    <Label fx:id="detailAddressLabel" styleClass="detail-field-value" text="-" wrapText="true" />
+                    <Label styleClass="detail-field-label" text="Emergency Contact" />
+                    <Label fx:id="detailEmergencyLabel" styleClass="detail-field-value" text="-" wrapText="true" />
+                    <Label styleClass="detail-field-label" text="Allergy Note" />
+                    <Label fx:id="detailAllergyLabel" styleClass="detail-field-value" text="-" wrapText="true" />
+                </VBox>
+            </content>
+        </ScrollPane>
+    </SplitPane>
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <Label fx:id="summaryLabel" styleClass="page-status" text="0 patient(s) found" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="previousButton" disable="true" onAction="#onPreviousPage" styleClass="btn-secondary" text="Previous" />
+        <Label fx:id="pageLabel" styleClass="page-status" text="" />
+        <Button fx:id="nextButton" disable="true" onAction="#onNextPage" styleClass="btn-secondary" text="Next" />
+    </HBox>
+</VBox>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Consultation', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/encounter.css}" rel="stylesheet">
+
+        <div class="glass-panel p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold m-0 text-white">Consultation Desk</h3>
+                    <p class="text-secondary m-0 text-sm">Patients currently in service and ready for clinical encounter workflow.</p>
+                </div>
+                <a th:href="@{/queue}" class="btn btn-outline-primary px-3 btn-cancel-custom">
+                    <i class="fa-solid fa-users-rectangle me-2"></i>Queue Board
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0 encounter-table">
+                    <thead>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-15">Queue No</th>
+                            <th class="w-30">Patient</th>
+                            <th class="w-25">Doctor</th>
+                            <th class="w-15">Room</th>
+                            <th class="w-15">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${queueItems}" class="glass-panel encounter-table-row">
+                            <td class="ps-3 py-3">
+                                <span class="badge bg-secondary font-monospace px-3 py-2 queue-number-badge" th:text="${item.queueNumber}">1</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white d-block" th:text="${item.patientName}">Patient</span>
+                                <span class="text-secondary font-monospace queue-patient-code" th:text="${item.patientCode}">PT-00001</span>
+                            </td>
+                            <td th:text="${item.doctorName}">Doctor</td>
+                            <td>
+                                <span class="badge bg-dark-subtle border border-secondary text-secondary" th:text="${item.roomCode != null && !item.roomCode.isEmpty() ? item.roomCode : '-'}">ROOM</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary" th:text="${item.status}">IN_SERVICE</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(queueItems)}">
+                            <td colspan="5" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-stethoscope mb-3 empty-state-icon-lg"></i>
+                                <p class="m-0">No patient is currently in service.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

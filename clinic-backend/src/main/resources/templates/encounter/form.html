@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Consultation', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/encounter.css}" rel="stylesheet">
+
+        <!-- Success/Error Alerts -->
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show mb-4 border-0 text-danger bg-danger-subtle px-3 py-2 text-xs d-flex align-items-center justify-content-between" role="alert" style="border-radius: var(--border-radius-sm);">
+            <div>
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                <span th:text="${error}">Error Message</span>
+            </div>
+            <button type="button" class="btn-close shadow-none py-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+        <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show mb-4 border-0 text-success bg-success-subtle px-3 py-2 text-xs d-flex align-items-center justify-content-between" role="alert" style="border-radius: var(--border-radius-sm);">
+            <div>
+                <i class="fa-solid fa-circle-check me-2"></i>
+                <span th:text="${success}">Success Message</span>
+            </div>
+            <button type="button" class="btn-close shadow-none py-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Side: Patient Info & Diagnostics -->
+            <div class="col-lg-6">
+                <!-- Patient Card -->
+                <div class="glass-panel p-4 mb-4">
+                    <h5 class="fw-bold mb-3 text-primary border-bottom pb-2 border-bottom-card-imp">
+                        <i class="fa-solid fa-hospital-user me-2"></i>Patient Profile
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <span class="text-secondary d-block text-badge-sz">Patient Name</span>
+                            <span class="text-white fw-bold" th:text="${patient.fullName}">Nguyen Van A</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-secondary d-block text-badge-sz">Patient Code</span>
+                            <span class="badge bg-secondary font-monospace px-2 py-1" th:text="${patient.patientCode}">PT-00001</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-secondary d-block text-badge-sz">Gender / DOB</span>
+                            <span class="text-white fw-semibold" th:text="${patient.gender} + ' | ' + ${patient.dateOfBirth}">MALE | 01-01-2000</span>
+                        </div>
+                        <div class="col-md-6" th:if="${patient.allergyNote != null && !patient.allergyNote.isEmpty()}">
+                            <span class="text-danger d-block text-badge-sz fw-semibold"><i class="fa-solid fa-circle-exclamation me-1"></i>Allergies Warning</span>
+                            <span class="text-danger-emphasis fw-bold" th:text="${patient.allergyNote}">Penicillin allergy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diagnostic Form -->
+                <div class="glass-panel p-4">
+                    <h5 class="fw-bold mb-3 text-primary border-bottom pb-2 border-bottom-card-imp">
+                        <i class="fa-solid fa-file-medical me-2"></i>Consultation Encounter
+                    </h5>
+                    
+                    <form th:action="@{/consultation/encounters/{id}/complete(id=${encounter.id})}" th:object="${encounter}" method="post">
+                        <!-- Chief Complaint -->
+                        <div class="form-group mb-3">
+                            <label for="chiefComplaint" class="form-label">Chief Complaint <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <textarea id="chiefComplaint" th:field="*{chiefComplaint}" class="form-control-custom" rows="3" placeholder="Symptoms reported by patient..." required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Diagnosis -->
+                        <div class="form-group mb-3">
+                            <label for="diagnosis" class="form-label">Diagnosis <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <textarea id="diagnosis" th:field="*{diagnosis}" class="form-control-custom" rows="3" placeholder="Doctor's diagnosis..." required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Note -->
+                        <div class="form-group mb-3">
+                            <label for="clinicalNote" class="form-label">Clinical Notes / Recommendations</label>
+                            <div class="input-glow-wrapper">
+                                <textarea id="clinicalNote" th:field="*{clinicalNote}" class="form-control-custom" rows="4" placeholder="Treatment plans, prescriptions, lifestyle advices..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between mt-4 pt-3 encounter-actions-border">
+                            <a th:href="@{/consultation}" class="btn btn-outline-secondary px-4 py-2 btn-cancel-custom">
+                                Back to Queue
+                            </a>
+                            <button type="submit" class="btn btn-success px-4 py-2 btn-premium-custom">
+                                <i class="fa-solid fa-check-double me-2"></i>Complete Consult
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Side: Service Orders -->
+            <div class="col-lg-6">
+                <!-- Add Service Order Card -->
+                <div class="glass-panel p-4 mb-4">
+                    <h5 class="fw-bold mb-3 text-primary border-bottom pb-2 border-bottom-card-imp">
+                        <i class="fa-solid fa-file-invoice-dollar me-2"></i>Add Service / Lab Orders
+                    </h5>
+                    
+                    <form th:action="@{/consultation/encounters/{id}/services(id=${encounter.id})}" method="post" class="row g-3 align-items-end">
+                        <div class="col-md-7">
+                            <label for="serviceId" class="form-label mb-2">Service Catalog Item</label>
+                            <div class="input-glow-wrapper">
+                                <select id="serviceId" name="serviceId" class="form-control-custom select-custom-arrow" required>
+                                    <option value="" disabled selected>Select Service</option>
+                                    <option th:each="svc : ${availableServices}" 
+                                            th:value="${svc.id}" th:text="${svc.name} + ' (' + ${#numbers.formatDecimal(svc.price, 1, 'COMMA', 0, 'POINT')} + ' ₫)'"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <label for="quantity" class="form-label mb-2">Quantity</label>
+                            <div class="input-glow-wrapper">
+                                <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control-custom" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <button type="submit" class="btn btn-premium w-100 py-3 btn-cancel-custom fw-semibold">
+                                <i class="fa-solid fa-plus me-1"></i>Order
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- List Ordered Services -->
+                <div class="glass-panel p-4">
+                    <h5 class="fw-bold mb-3 text-primary border-bottom pb-2 border-bottom-card-imp">
+                        <i class="fa-solid fa-list-check me-2"></i>Ordered Services
+                    </h5>
+                    
+                    <div class="table-responsive">
+                        <table class="table align-middle text-white m-0 encounter-table">
+                            <thead>
+                                <tr class="border-bottom-card-imp text-secondary text-xs text-uppercase">
+                                    <th class="ps-2 py-2 w-40">Service Name</th>
+                                    <th class="w-25">Unit Price</th>
+                                    <th class="w-15">Qty</th>
+                                    <th class="pe-2 text-end w-20">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="order : ${orderedServices}" class="encounter-table-row">
+                                    <td class="ps-2 py-2 fw-semibold text-white" th:text="${order.serviceCatalog.name}">General Consultation</td>
+                                    <td th:text="${#numbers.formatDecimal(order.unitPrice, 1, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</td>
+                                    <td th:text="${order.quantity}">1</td>
+                                    <td class="pe-2 text-end fw-semibold text-primary" th:text="${#numbers.formatDecimal(order.unitPrice * order.quantity, 1, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</td>
+                                </tr>
+                                <!-- Empty state -->
+                                <tr th:if="${#lists.isEmpty(orderedServices)}">
+                                    <td colspan="4" class="text-center py-4 text-secondary">
+                                        No services ordered for this encounter yet.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

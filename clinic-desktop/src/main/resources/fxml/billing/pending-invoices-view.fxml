@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.PendingInvoicesController">
+    <HBox alignment="CENTER_LEFT">
+        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label styleClass="page-heading" text="Pending Invoices &amp; Billing" />
+            <Label styleClass="page-description" text="Review issued invoices, process payments, and manage billing records." wrapText="true" />
+        </VBox>
+        <ProgressIndicator fx:id="loadingIndicator" managed="false" maxHeight="24.0" maxWidth="24.0" visible="false" />
+        <Button onAction="#onRefresh" styleClass="btn-secondary" text="Refresh" />
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
+        <Label styleClass="form-label" text="STATUS:" />
+        <ComboBox fx:id="statusFilterCombo" prefWidth="160.0" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="summaryLabel" styleClass="page-status" text="0 invoice(s) listed" />
+    </HBox>
+
+    <TableView fx:id="invoiceTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="numberColumn" prefWidth="130.0" text="Invoice #" />
+            <TableColumn fx:id="patientColumn" prefWidth="220.0" text="Patient" />
+            <TableColumn fx:id="visitColumn" prefWidth="120.0" text="Visit / Code" />
+            <TableColumn fx:id="amountColumn" prefWidth="130.0" text="Total Amount" />
+            <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Status" />
+            <TableColumn fx:id="issuedAtColumn" prefWidth="140.0" text="Issued At" />
+            <TableColumn fx:id="actionsColumn" prefWidth="160.0" text="Actions" />
+        </columns>
+        <placeholder>
+            <Label fx:id="emptyLabel" styleClass="empty-state-label" text="No invoices found." />
+        </placeholder>
+    </TableView>
+</VBox>

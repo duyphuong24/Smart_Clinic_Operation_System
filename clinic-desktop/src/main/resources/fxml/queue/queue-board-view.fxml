@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.QueueBoardController">
+    <Label styleClass="page-heading" text="Queue Board" />
+    <Label styleClass="page-description" text="Monitor waiting patients and update queue status for the selected day." wrapText="true" />
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
+        <Label styleClass="form-label" text="DATE" />
+        <DatePicker fx:id="datePicker" prefWidth="160.0" />
+        <Button fx:id="todayButton" onAction="#onToday" styleClass="btn-secondary" text="Today" />
+        <Region HBox.hgrow="ALWAYS" />
+        <ProgressIndicator fx:id="loadingIndicator" managed="false" maxHeight="24.0" maxWidth="24.0" visible="false" />
+        <Button fx:id="refreshButton" onAction="#onRefresh" styleClass="btn-secondary" text="Refresh" />
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
+        <Label styleClass="form-label" text="DOCTOR" />
+        <ComboBox fx:id="doctorFilterCombo" prefWidth="320.0" />
+    </HBox>
+
+    <TableView fx:id="queueTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="numberColumn" prefWidth="70.0" text="No" />
+            <TableColumn fx:id="patientColumn" prefWidth="240.0" text="Patient" />
+            <TableColumn fx:id="doctorColumn" prefWidth="180.0" text="Doctor" />
+            <TableColumn fx:id="roomColumn" prefWidth="90.0" text="Room" />
+            <TableColumn fx:id="priorityColumn" prefWidth="110.0" text="Priority" />
+            <TableColumn fx:id="statusColumn" prefWidth="130.0" text="Status" />
+            <TableColumn fx:id="actionsColumn" prefWidth="260.0" text="Actions" />
+        </columns>
+        <placeholder>
+            <Label fx:id="emptyLabel" styleClass="empty-state-label" text="No patients in the active queue currently." />
+        </placeholder>
+    </TableView>
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <Label fx:id="summaryLabel" styleClass="page-status" text="0 patient(s) in active queue" />
+    </HBox>
+</VBox>

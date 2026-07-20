@@ -1,0 +1,32 @@
+/* ==========================================================================
+   Encounter Module (Consultation & Visit Details) specific styles
+   ========================================================================== */
+
+.encounter-table {
+    border-collapse: separate !important;
+    border-spacing: 0 4px !important;
+}
+
+.encounter-table-row {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border: 1px solid var(--border-card) !important;
+    margin-bottom: 8px !important;
+}
+
+.encounter-detail-panel {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.encounter-label-width {
+    width: 120px;
+    display: inline-block;
+}
+
+.encounter-heading-border {
+    border-color: var(--border-card) !important;
+}
+
+.encounter-actions-border {
+    border-top: 1px solid var(--border-card) !important;
+}

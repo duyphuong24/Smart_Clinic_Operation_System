@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Master Data', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/masterdata.css}" rel="stylesheet">
+
+        <div class="glass-panel p-4 masterdata-form-panel">
+            <!-- Header Section -->
+            <div class="mb-4">
+                <h3 class="fw-bold m-0 text-white" th:text="${isEdit} ? 'Edit Specialty' : 'Add Specialty'">Add Specialty</h3>
+                <p class="text-secondary m-0 text-sm">Define medical specialties for doctor profiling.</p>
+            </div>
+
+            <!-- Form -->
+            <form th:action="${isEdit} ? @{/admin/specialties/{id}/edit(id=${specialtyId})} : @{/admin/specialties/new}" th:object="${specialty}" method="post">
+                <div class="row g-4">
+                    <!-- Specialty Name -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Specialty Name <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" id="name" th:field="*{name}" class="form-control-custom" placeholder="e.g. Pediatrics" required>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="description" class="form-label">Description</label>
+                            <div class="input-glow-wrapper">
+                                <textarea id="description" th:field="*{description}" class="form-control-custom" rows="4" placeholder="Brief details about this specialty..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active status (Only during edit or creation) -->
+                    <div class="col-12" th:if="${isEdit}">
+                        <div class="form-check form-switch p-0 d-flex align-items-center gap-3">
+                            <label class="form-label m-0 cursor-pointer" for="active">Active Status</label>
+                            <input class="form-check-input ms-0 masterdata-checkbox" type="checkbox" id="active" th:field="*{active}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top-card">
+                    <a th:href="@{/admin/specialties}" class="btn btn-outline-secondary px-4 py-2 btn-cancel-custom">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-premium px-4 py-2 btn-premium-custom">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Specialty
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

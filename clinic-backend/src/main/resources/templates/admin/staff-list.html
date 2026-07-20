@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Staff', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/masterdata.css}" rel="stylesheet">
+
+        <div class="glass-panel p-4">
+            <!-- Header Section -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold m-0 text-white">Staff Administration</h3>
+                    <p class="text-secondary m-0 text-sm">Manage employee records, allocate roles, and view login accounts.</p>
+                </div>
+                <a th:href="@{/admin/staff/new}" class="btn btn-premium d-flex align-items-center gap-2 btn-premium-custom">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Add Staff</span>
+                </a>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0 masterdata-table">
+                    <thead>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-15">Emp Code</th>
+                            <th class="w-25">Full Name</th>
+                            <th class="w-20">Username</th>
+                            <th class="w-15">Staff Type</th>
+                            <th class="w-15">Hired Date</th>
+                            <th class="w-10">Status</th>
+                            <th class="pe-3 text-end w-10">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="st : ${staffList}" class="glass-panel masterdata-table-row">
+                            <td class="ps-3 py-3">
+                                <span class="badge bg-secondary font-monospace px-2 py-2 text-badge-sz" th:text="${st.employeeCode}">EMP-001</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white" th:text="${st.fullName}">System Admin</span>
+                            </td>
+                            <td class="font-monospace text-xs" th:text="${st.userName}">admin</td>
+                            <td>
+                                <span class="badge bg-dark-subtle border border-secondary text-secondary" th:text="${st.staffType}">MANAGER</span>
+                            </td>
+                            <td th:text="${st.hiredDate != null ? #temporals.format(st.hiredDate, 'dd-MM-yyyy') : '-'}">01-01-2026</td>
+                            <td>
+                                <span class="badge masterdata-status-badge" th:classappend="${st.status.name() == 'ACTIVE' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${st.status}">ACTIVE</span>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a th:href="@{/admin/staff/{id}/edit(id=${st.id})}" class="btn btn-sm btn-outline-warning masterdata-action-btn" title="Edit Staff Profile">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <form th:if="${st.status.name() == 'ACTIVE'}" th:action="@{/admin/staff/{id}/deactivate(id=${st.id})}" method="post" onsubmit="return confirm('Are you sure you want to deactivate this staff member?');" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger masterdata-action-btn" title="Deactivate Staff">
+                                            <i class="fa-solid fa-user-slash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(staffList)}">
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-folder-open mb-3 empty-state-icon-lg"></i>
+                                <p class="m-0">No staff members found.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

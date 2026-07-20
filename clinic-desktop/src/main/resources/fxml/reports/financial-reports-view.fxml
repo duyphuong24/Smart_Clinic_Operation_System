@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.FinancialReportsController">
+    <!-- Header Section -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+            <Label styleClass="page-heading" text="Financial Reports &amp; Analytics" />
+            <Label styleClass="page-description" text="Real-time revenue metrics, completed visit counts, and clinic operation statistics." wrapText="true" />
+        </VBox>
+        <ProgressIndicator fx:id="loadingIndicator" managed="false" maxHeight="24.0" maxWidth="24.0" visible="false" />
+        <Button onAction="#onRefresh" styleClass="btn-secondary" text="Refresh Metrics" />
+    </HBox>
+
+    <!-- KPI Stat Cards Row -->
+    <HBox spacing="16.0">
+        <!-- Card 1: Today Revenue -->
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="stat-title" text="TODAY'S TOTAL REVENUE" />
+            <Label fx:id="revenueValueLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #10b981;" text="0.00" />
+            <Label styleClass="stat-subtitle" text="Payments received today" />
+        </VBox>
+
+        <!-- Card 2: Completed Visits -->
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="stat-title" text="COMPLETED VISITS" />
+            <Label fx:id="completedVisitsLabel" styleClass="stat-value" text="0" />
+            <Label styleClass="stat-subtitle" text="Fully completed medical encounters" />
+        </VBox>
+
+        <!-- Card 3: Today Appointments -->
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="stat-title" text="TODAY'S APPOINTMENTS" />
+            <Label fx:id="todayApptsLabel" styleClass="stat-value" text="0" />
+            <Label styleClass="stat-subtitle" text="Total scheduled bookings" />
+        </VBox>
+
+        <!-- Card 4: Active Queue -->
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label styleClass="stat-title" text="ACTIVE QUEUE" />
+            <Label fx:id="activeQueueLabel" styleClass="stat-value" text="0" />
+            <Label styleClass="stat-subtitle" text="Patients waiting / in consultation" />
+        </VBox>
+    </HBox>
+
+    <!-- Financial Information Panel -->
+    <VBox spacing="12.0" styleClass="detail-panel">
+        <padding>
+            <?import javafx.geometry.Insets?>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        </padding>
+        <Label text="FINANCIAL OVERVIEW SUMMARY" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;" />
+        <Label styleClass="info-label" text="Data is aggregated in real-time from settled invoice transactions and completed patient encounters. Use this dashboard to monitor daily clinic revenue performance." wrapText="true" />
+    </VBox>
+</VBox>

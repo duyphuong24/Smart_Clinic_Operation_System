@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Doctors', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/doctor.css}" rel="stylesheet">
+
+        <div class="glass-panel p-4">
+            <!-- Header Section -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold m-0 text-white">Doctor Profiles</h3>
+                    <p class="text-secondary m-0 text-sm">View and manage doctor records, fees, and working hours.</p>
+                </div>
+                <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/doctors/new}" class="btn btn-premium d-flex align-items-center gap-2 btn-premium-custom">
+                    <i class="fa-solid fa-user-doctor"></i>
+                    <span>Add Doctor</span>
+                </a>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0 doctor-table">
+                    <thead>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-15">Emp Code</th>
+                            <th class="w-25">Full Name</th>
+                            <th class="w-20">Specialty</th>
+                            <th class="w-15">License No</th>
+                            <th class="w-15">Fee (VND)</th>
+                            <th class="w-10">Status</th>
+                            <th class="pe-3 text-end w-10">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="doc : ${doctors}" class="glass-panel doctor-table-row">
+                            <td class="ps-3 py-3">
+                                <span class="badge bg-secondary font-monospace px-2 py-2 text-badge-sz" th:text="${doc.employeeCode}">EMP-001</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white" th:text="${doc.fullName}">Dr. Nguyen Van B</span>
+                            </td>
+                            <td th:text="${doc.specialtyName}">General Medicine</td>
+                            <td th:text="${doc.licenseNo}">LIC-12345</td>
+                            <td th:text="${#numbers.formatDecimal(doc.consultationFee, 1, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</td>
+                            <td>
+                                <span class="badge doctor-status-badge" th:classappend="${doc.active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${doc.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a th:href="@{/admin/doctors/{id}(id=${doc.id})}" class="btn btn-sm btn-outline-info doctor-action-btn" title="View Availability & Schedule">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                    </a>
+                                    <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/doctors/{id}/edit(id=${doc.id})}" class="btn btn-sm btn-outline-warning doctor-action-btn" title="Edit Doctor Profile">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(doctors)}">
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-folder-open mb-3 empty-state-icon-lg"></i>
+                                <p class="m-0">No doctor profiles found.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

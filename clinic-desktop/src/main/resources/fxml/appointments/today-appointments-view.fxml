@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.TodayAppointmentsController">
+    <Label styleClass="page-heading" text="Today Appointments" />
+    <Label styleClass="page-description" text="Schedule bookings and check in patients into today's queue." wrapText="true" />
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
+        <Label styleClass="form-label" text="DATE" />
+        <DatePicker fx:id="datePicker" prefWidth="160.0" />
+        <Button fx:id="todayButton" onAction="#onToday" styleClass="btn-secondary" text="Today" />
+        <Region HBox.hgrow="ALWAYS" />
+        <ProgressIndicator fx:id="loadingIndicator" managed="false" maxHeight="24.0" maxWidth="24.0" visible="false" />
+        <Button fx:id="bookAppointmentButton" onAction="#onBookAppointment" styleClass="btn-primary" text="+ Book Appointment" />
+        <Button fx:id="refreshButton" onAction="#onRefresh" styleClass="btn-secondary" text="Refresh" />
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
+        <Label styleClass="form-label" text="STATUS" />
+        <ComboBox fx:id="statusFilterCombo" prefWidth="180.0" />
+        <Label styleClass="form-label" text="SEARCH">
+            <HBox.margin>
+                <Insets left="12.0" />
+            </HBox.margin>
+        </Label>
+        <TextField fx:id="keywordField" promptText="Patient, doctor, or appointment code" HBox.hgrow="ALWAYS" />
+        <Button onAction="#onApplyFilters" styleClass="btn-secondary" text="Apply" />
+    </HBox>
+
+    <TableView fx:id="appointmentTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="codeColumn" prefWidth="110.0" text="Appt Code" />
+            <TableColumn fx:id="patientColumn" prefWidth="200.0" text="Patient" />
+            <TableColumn fx:id="doctorColumn" prefWidth="160.0" text="Doctor" />
+            <TableColumn fx:id="roomColumn" prefWidth="80.0" text="Room" />
+            <TableColumn fx:id="timeColumn" prefWidth="120.0" text="Time Slot" />
+            <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Status" />
+            <TableColumn fx:id="actionsColumn" prefWidth="170.0" text="Actions" />
+        </columns>
+        <placeholder>
+            <Label fx:id="emptyLabel" styleClass="empty-state-label" text="No appointments scheduled for this date." />
+        </placeholder>
+    </TableView>
+
+    <HBox alignment="CENTER_LEFT" spacing="12.0">
+        <Label fx:id="summaryLabel" styleClass="page-status" text="0 appointment(s) shown" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="checkInButton" onAction="#onCheckIn" styleClass="btn-success" text="Check-in Selected" />
+    </HBox>
+</VBox>

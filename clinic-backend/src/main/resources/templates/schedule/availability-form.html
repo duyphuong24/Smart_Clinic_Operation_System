@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Doctors', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/schedule.css}" rel="stylesheet">
+
+        <div class="glass-panel p-4 schedule-form-panel">
+            <!-- Header Section -->
+            <div class="mb-4">
+                <h3 class="fw-bold m-0 text-white">Add Working Schedule</h3>
+                <p class="text-secondary m-0 text-sm">
+                    Configure a new availability slot for <span class="text-white fw-semibold" th:text="${doctor.fullName}">Dr. B</span>.
+                </p>
+            </div>
+
+            <!-- Form -->
+            <form th:action="@{/admin/doctors/{id}/availability/new(id=${doctor.id})}" th:object="${availability}" method="post">
+                <div class="row g-4">
+                    <!-- Day of Week -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="dayOfWeek" class="form-label">Day of Week <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select id="dayOfWeek" th:field="*{dayOfWeek}" class="form-control-custom select-custom-arrow" required>
+                                    <option value="" disabled selected>Select Day</option>
+                                    <option value="1">Monday</option>
+                                    <option value="2">Tuesday</option>
+                                    <option value="3">Wednesday</option>
+                                    <option value="4">Thursday</option>
+                                    <option value="5">Friday</option>
+                                    <option value="6">Saturday</option>
+                                    <option value="7">Sunday</option>
+                                </select>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('dayOfWeek')}" th:errors="*{dayOfWeek}">Day Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Start Time -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="startTime" class="form-label">Start Time <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="time" id="startTime" th:field="*{startTime}" class="form-control-custom" required>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}">Start Time Error</div>
+                        </div>
+                    </div>
+
+                    <!-- End Time -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="endTime" class="form-label">End Time <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="time" id="endTime" th:field="*{endTime}" class="form-control-custom" required>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}">End Time Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Slot Minutes -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="slotMinutes" class="form-label">Slot Duration (Minutes) <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="number" id="slotMinutes" th:field="*{slotMinutes}" class="form-control-custom" placeholder="e.g. 20" min="1" required>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('slotMinutes')}" th:errors="*{slotMinutes}">Slot Error</div>
+                        </div>
+                    </div>
+
+                    <!-- Room Selection -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="roomId" class="form-label">Assigned Room <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select id="roomId" th:field="*{roomId}" class="form-control-custom select-custom-arrow" required>
+                                    <option value="" disabled selected>Select Room</option>
+                                    <option th:each="room : ${rooms}" 
+                                            th:value="${room.id}" th:text="${room.name} + ' (' + ${room.roomCode} + ')'"></option>
+                                </select>
+                            </div>
+                            <div class="text-danger mt-1 text-xs" th:if="${#fields.hasErrors('roomId')}" th:errors="*{roomId}">Room Error</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top-card">
+                    <a th:href="@{/admin/doctors/{id}(id=${doctor.id})}" class="btn btn-outline-secondary px-4 py-2 btn-cancel-custom">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-premium px-4 py-2 btn-premium-custom">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save Schedule
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
