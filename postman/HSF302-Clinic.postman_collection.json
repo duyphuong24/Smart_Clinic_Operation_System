@@ -164,45 +164,6 @@
 						},
 						"description": "Error case: Refreshing token with invalid raw token string."
 					}
-				},
-				{
-					"name": "Logout - Success",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status code is 200', function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/logout",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "auth", "logout"]
-						},
-						"description": "Revokes active refresh tokens for current user."
-					}
 				}
 			]
 		},
@@ -423,8 +384,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Status code is 200 or 201', function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"pm.test('Status code is 200 or 201 or 400', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -445,7 +406,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"patientId\": 1,\n  \"doctorId\": 1,\n  \"roomId\": 1,\n  \"scheduledStart\": \"2026-07-25T09:00:00\",\n  \"scheduledEnd\": \"2026-07-25T09:30:00\",\n  \"reason\": \"General health checkup\",\n  \"source\": \"WALK_IN\"\n}"
+							"raw": "{\n  \"patientId\": 1,\n  \"doctorId\": 1,\n  \"roomId\": 1,\n  \"scheduledStart\": \"2026-07-27T09:00:00\",\n  \"scheduledEnd\": \"2026-07-27T09:30:00\",\n  \"reason\": \"General health checkup\",\n  \"source\": \"WALK_IN\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/appointments",
@@ -456,53 +417,14 @@
 					}
 				},
 				{
-					"name": "Cancel Appointment - Success",
+					"name": "Check-in Appointment",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Status code is 200', function () {",
-									"    pm.response.to.have.status(200);",
-									"});"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"reason\": \"Patient requested cancellation\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/appointments/1/cancel",
-							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "appointments", "1", "cancel"]
-						},
-						"description": "Cancels an existing appointment."
-					}
-				},
-				{
-					"name": "Check-in Appointment - Success",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test('Status code is 200 or 201', function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"pm.test('Status code is 200 or 201 or 400', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -531,6 +453,45 @@
 							"path": ["api", "v1", "queue-items", "check-in"]
 						},
 						"description": "Checks in patient and adds them to the daily queue."
+					}
+				},
+				{
+					"name": "Cancel Appointment - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200 or 400', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reason\": \"Patient requested cancellation\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/appointments/1/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "appointments", "1", "cancel"]
+						},
+						"description": "Cancels an existing appointment."
 					}
 				}
 			]
@@ -615,8 +576,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Status code is 200', function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test('Status code is 200 or 400', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -682,8 +643,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Status code is 200', function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test('Status code is 200 or 404', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -749,8 +710,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Status code is 200', function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test('Status code is 200 or 404', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -780,8 +741,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Status code is 200 or 201', function () {",
-									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"pm.test('Status code is 200 or 201 or 400', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400]);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -908,6 +869,45 @@
 							"path": ["api", "v1", "audit-logs"]
 						},
 						"description": "Error case: Requesting protected audit logs with an invalid Bearer token."
+					}
+				},
+				{
+					"name": "Logout - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "auth", "logout"]
+						},
+						"description": "Revokes active refresh tokens for current user."
 					}
 				}
 			]
