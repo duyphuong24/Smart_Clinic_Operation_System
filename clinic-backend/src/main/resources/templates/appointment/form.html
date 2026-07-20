@@ -14,6 +14,12 @@
                 <p class="text-secondary m-0 text-sm">Schedule a consultation slot for a patient with their preferred doctor.</p>
             </div>
 
+            <!-- Error Alert -->
+            <div th:if="${errorMessage != null}" class="alert-custom alert-danger-custom mb-4">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                <span th:text="${errorMessage}">Error Message</span>
+            </div>
+
             <!-- Form -->
             <form th:action="@{/appointments/new}" th:object="${appointment}" method="post">
                 <div class="row g-4">
