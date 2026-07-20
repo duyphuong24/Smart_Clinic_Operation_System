@@ -30,6 +30,7 @@ public class SceneNavigator {
         stage.setTitle("Smart Clinic - Sign In");
         stage.setResizable(false);
         stage.centerOnScreen();
+        stage.show();
     }
 
     public void showMainShell() {
@@ -40,6 +41,7 @@ public class SceneNavigator {
         stage.setMinWidth(1024);
         stage.setMinHeight(680);
         stage.centerOnScreen();
+        stage.show();
     }
 
     private Parent loadView(String resourcePath) {

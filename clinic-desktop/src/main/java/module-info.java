@@ -4,6 +4,7 @@ module com.smartclinic.desktop {
     requires java.net.http;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.datatype.jsr310;
 
     opens com.smartclinic.desktop.app to javafx.fxml;
     opens com.smartclinic.desktop.controller to javafx.fxml;
