@@ -64,6 +64,13 @@ public enum DesktopRoute {
             "/fxml/billing/payment-view.fxml",
             false,
             "ROLE_ADMIN", "ROLE_CASHIER"
+    ),
+    FINANCIAL_REPORTS(
+            "Financial Reports",
+            "Reports / Financial Overview",
+            "/fxml/reports/financial-reports-view.fxml",
+            true,
+            "ROLE_ADMIN", "ROLE_MANAGER"
     );
 
     private final String pageTitle;

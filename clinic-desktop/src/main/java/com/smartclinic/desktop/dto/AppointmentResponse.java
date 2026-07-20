@@ -123,6 +123,10 @@ public class AppointmentResponse {
     }
 
     public boolean isCheckInAllowed() {
-        return "BOOKED".equals(status);
+        return "PENDING".equals(status) || "CONFIRMED".equals(status) || "BOOKED".equals(status);
+    }
+
+    public boolean isCancelAllowed() {
+        return "PENDING".equals(status) || "CONFIRMED".equals(status) || "BOOKED".equals(status);
     }
 }

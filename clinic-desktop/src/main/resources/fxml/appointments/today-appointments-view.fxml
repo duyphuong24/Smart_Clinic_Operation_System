@@ -16,7 +16,7 @@
 
 <VBox spacing="16.0" styleClass="page-card" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.TodayAppointmentsController">
     <Label styleClass="page-heading" text="Today Appointments" />
-    <Label styleClass="page-description" text="View today's booked appointments and check in BOOKED patients into the queue." wrapText="true" />
+    <Label styleClass="page-description" text="Schedule bookings and check in patients into today's queue." wrapText="true" />
 
     <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar-row">
         <Label styleClass="form-label" text="DATE" />
@@ -24,6 +24,7 @@
         <Button fx:id="todayButton" onAction="#onToday" styleClass="btn-secondary" text="Today" />
         <Region HBox.hgrow="ALWAYS" />
         <ProgressIndicator fx:id="loadingIndicator" managed="false" maxHeight="24.0" maxWidth="24.0" visible="false" />
+        <Button fx:id="bookAppointmentButton" onAction="#onBookAppointment" styleClass="btn-primary" text="+ Book Appointment" />
         <Button fx:id="refreshButton" onAction="#onRefresh" styleClass="btn-secondary" text="Refresh" />
     </HBox>
 
@@ -41,12 +42,13 @@
 
     <TableView fx:id="appointmentTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="codeColumn" prefWidth="120.0" text="Appt Code" />
-            <TableColumn fx:id="patientColumn" prefWidth="220.0" text="Patient" />
-            <TableColumn fx:id="doctorColumn" prefWidth="180.0" text="Doctor" />
-            <TableColumn fx:id="roomColumn" prefWidth="90.0" text="Room" />
-            <TableColumn fx:id="timeColumn" prefWidth="130.0" text="Time Slot" />
-            <TableColumn fx:id="statusColumn" prefWidth="140.0" text="Status" />
+            <TableColumn fx:id="codeColumn" prefWidth="110.0" text="Appt Code" />
+            <TableColumn fx:id="patientColumn" prefWidth="200.0" text="Patient" />
+            <TableColumn fx:id="doctorColumn" prefWidth="160.0" text="Doctor" />
+            <TableColumn fx:id="roomColumn" prefWidth="80.0" text="Room" />
+            <TableColumn fx:id="timeColumn" prefWidth="120.0" text="Time Slot" />
+            <TableColumn fx:id="statusColumn" prefWidth="120.0" text="Status" />
+            <TableColumn fx:id="actionsColumn" prefWidth="170.0" text="Actions" />
         </columns>
         <placeholder>
             <Label fx:id="emptyLabel" styleClass="empty-state-label" text="No appointments scheduled for this date." />

@@ -3,16 +3,20 @@ package com.smartclinic.desktop.controller;
 import com.smartclinic.desktop.dto.AppointmentResponse;
 import com.smartclinic.desktop.navigation.NavigationAware;
 import com.smartclinic.desktop.service.AppointmentDesktopService;
+import com.smartclinic.desktop.service.QueueDesktopService;
 import com.smartclinic.desktop.util.AlertUtil;
 import com.smartclinic.desktop.util.AppointmentUiUtil;
+import com.smartclinic.desktop.util.BookAppointmentDialog;
 import com.smartclinic.desktop.util.CheckInDialog;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -22,10 +26,13 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.HBox;
 
 public class TodayAppointmentsController implements NavigationAware {
 
     private final AppointmentDesktopService appointmentService;
+    private final QueueDesktopService queueService;
 
     private final List<AppointmentResponse> loadedAppointments = new ArrayList<>();
 
@@ -60,10 +67,16 @@ public class TodayAppointmentsController implements NavigationAware {
     private TableColumn<AppointmentResponse, String> statusColumn;
 
     @FXML
+    private TableColumn<AppointmentResponse, AppointmentResponse> actionsColumn;
+
+    @FXML
     private Button refreshButton;
 
     @FXML
     private Button checkInButton;
+
+    @FXML
+    private Button bookAppointmentButton;
 
     @FXML
     private Button todayButton;
@@ -77,8 +90,12 @@ public class TodayAppointmentsController implements NavigationAware {
     @FXML
     private Label emptyLabel;
 
-    public TodayAppointmentsController(AppointmentDesktopService appointmentService) {
+    public TodayAppointmentsController(
+            AppointmentDesktopService appointmentService,
+            QueueDesktopService queueService
+    ) {
         this.appointmentService = appointmentService;
+        this.queueService = queueService;
     }
 
     @FXML
@@ -114,6 +131,16 @@ public class TodayAppointmentsController implements NavigationAware {
     }
 
     @FXML
+    private void onBookAppointment() {
+        var owner = bookAppointmentButton.getScene() == null ? null : bookAppointmentButton.getScene().getWindow();
+        BookAppointmentDialog.show(queueService, appointmentService, owner)
+                .ifPresent(created -> {
+                    AlertUtil.showInfo("Book Appointment", "Appointment booked successfully: " + created.getAppointmentCode());
+                    loadAppointments();
+                });
+    }
+
+    @FXML
     private void onCheckIn() {
         AppointmentResponse selected = appointmentTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
@@ -121,7 +148,7 @@ public class TodayAppointmentsController implements NavigationAware {
             return;
         }
         if (!selected.isCheckInAllowed()) {
-            AlertUtil.showWarning("Check-in", "Only BOOKED appointments can be checked in.");
+            AlertUtil.showWarning("Check-in", "Only PENDING/CONFIRMED appointments can be checked in.");
             return;
         }
 
@@ -132,7 +159,8 @@ public class TodayAppointmentsController implements NavigationAware {
     private void configureFilters() {
         statusFilterCombo.setItems(FXCollections.observableArrayList(
                 "ALL",
-                "BOOKED",
+                "PENDING",
+                "CONFIRMED",
                 "CHECKED_IN",
                 "IN_CONSULTATION",
                 "COMPLETED",
@@ -164,6 +192,8 @@ public class TodayAppointmentsController implements NavigationAware {
         statusColumn.setCellValueFactory(data -> Bindings.createStringBinding(
                 () -> data.getValue().getStatus()
         ));
+        actionsColumn.setCellFactory(column -> new ActionsTableCell());
+        actionsColumn.setCellValueFactory(data -> Bindings.createObjectBinding(() -> data.getValue()));
 
         appointmentTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> updateCheckInButton(newSelection)
@@ -224,6 +254,35 @@ public class TodayAppointmentsController implements NavigationAware {
                 }));
     }
 
+    private void performCancel(AppointmentResponse appointment) {
+        TextInputDialog dialog = new TextInputDialog("Cancelled by receptionist request");
+        dialog.setTitle("Cancel Booking");
+        dialog.setHeaderText("Cancel Appointment " + appointment.getAppointmentCode());
+        dialog.setContentText("Reason for cancellation:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isEmpty()) {
+            return;
+        }
+
+        String reason = result.get().trim();
+        if (reason.isBlank()) {
+            reason = "Cancelled by receptionist request";
+        }
+
+        setLoading(true);
+        appointmentService.cancel(appointment.getId(), reason)
+                .whenComplete((cancelled, throwable) -> Platform.runLater(() -> {
+                    setLoading(false);
+                    if (throwable != null) {
+                        AlertUtil.showError("Cancel Failed", throwable);
+                        return;
+                    }
+                    AlertUtil.showInfo("Cancel Successful", "Appointment " + appointment.getAppointmentCode() + " has been cancelled.");
+                    loadAppointments();
+                }));
+    }
+
     private void applyFilters() {
         String statusFilter = statusFilterCombo.getSelectionModel().getSelectedItem();
         List<AppointmentResponse> filtered = AppointmentUiUtil.filter(
@@ -248,6 +307,9 @@ public class TodayAppointmentsController implements NavigationAware {
         refreshButton.setDisable(loading);
         checkInButton.setDisable(loading || appointmentTable.getSelectionModel().getSelectedItem() == null
                 || !appointmentTable.getSelectionModel().getSelectedItem().isCheckInAllowed());
+        if (bookAppointmentButton != null) {
+            bookAppointmentButton.setDisable(loading);
+        }
         todayButton.setDisable(loading);
         datePicker.setDisable(loading);
         statusFilterCombo.setDisable(loading);
@@ -257,6 +319,61 @@ public class TodayAppointmentsController implements NavigationAware {
 
     private String valueOrDash(String value) {
         return value == null || value.isBlank() ? "-" : value;
+    }
+
+    private class ActionsTableCell extends TableCell<AppointmentResponse, AppointmentResponse> {
+
+        private final HBox actionsBox = new HBox(6);
+        private final Button checkInBtn = actionButton("Check-in", "btn-success");
+        private final Button cancelBtn = actionButton("Cancel", "btn-danger-outline");
+
+        private ActionsTableCell() {
+            actionsBox.setAlignment(Pos.CENTER_RIGHT);
+            checkInBtn.setOnAction(event -> {
+                int idx = getIndex();
+                if (getTableView() == null || idx < 0 || idx >= getTableView().getItems().size()) {
+                    return;
+                }
+                AppointmentResponse appt = getTableView().getItems().get(idx);
+                var window = checkInBtn.getScene() != null ? checkInBtn.getScene().getWindow() : null;
+                CheckInDialog.show(appt, window)
+                        .ifPresent(result -> performCheckIn(appt, result.priority()));
+            });
+            cancelBtn.setOnAction(event -> {
+                int idx = getIndex();
+                if (getTableView() == null || idx < 0 || idx >= getTableView().getItems().size()) {
+                    return;
+                }
+                AppointmentResponse appt = getTableView().getItems().get(idx);
+                performCancel(appt);
+            });
+        }
+
+        @Override
+        protected void updateItem(AppointmentResponse appt, boolean empty) {
+            super.updateItem(appt, empty);
+            if (empty || appt == null) {
+                setGraphic(null);
+                return;
+            }
+
+            actionsBox.getChildren().clear();
+            if (appt.isCheckInAllowed()) {
+                actionsBox.getChildren().add(checkInBtn);
+            }
+            if (appt.isCancelAllowed()) {
+                actionsBox.getChildren().add(cancelBtn);
+            }
+
+            setGraphic(actionsBox.getChildren().isEmpty() ? null : actionsBox);
+        }
+
+        private Button actionButton(String text, String styleClass) {
+            Button button = new Button(text);
+            button.getStyleClass().add(styleClass);
+            button.setMinWidth(60);
+            return button;
+        }
     }
 
     private static class StatusTableCell extends TableCell<AppointmentResponse, String> {

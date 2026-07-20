@@ -29,4 +29,14 @@ public class PatientDesktopService {
         return patientApiClient.getById(id)
                 .thenApply(ApiResponse::getData);
     }
+
+    public CompletableFuture<PatientResponse> create(Object request) {
+        return patientApiClient.create(request)
+                .thenApply(ApiResponse::getData);
+    }
+
+    public CompletableFuture<PatientResponse> update(Long id, Object request) {
+        return patientApiClient.update(id, request)
+                .thenApply(ApiResponse::getData);
+    }
 }

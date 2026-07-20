@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="14.0" styleClass="dialog-card" prefWidth="540.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label styleClass="dialog-title" text="Book Appointment" />
+            <Label styleClass="dialog-subtitle" text="Schedule a consultation slot for a patient with their preferred doctor." wrapText="true" />
+        </VBox>
+        <ProgressIndicator fx:id="loadingIndicator" visible="false" prefWidth="24.0" prefHeight="24.0" />
+    </HBox>
+
+    <Label fx:id="errorLabel" styleClass="error-message" text="" visible="false" managed="false" wrapText="true" style="-fx-text-fill: #ff4d4f; -fx-font-weight: bold;" />
+
+    <GridPane hgap="12.0" vgap="12.0">
+        <columnConstraints>
+            <ColumnConstraints minWidth="130.0" prefWidth="130.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="240.0" />
+        </columnConstraints>
+
+        <!-- Patient Filter & Selection -->
+        <Label styleClass="detail-field-label" text="Patient *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <TextField fx:id="patientFilterField" promptText="Filter patient by name/code/phone..." />
+            <ComboBox fx:id="patientCombo" maxWidth="Infinity" promptText="Choose Patient" />
+        </VBox>
+
+        <!-- Doctor -->
+        <Label styleClass="detail-field-label" text="Doctor *" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <ComboBox fx:id="doctorCombo" maxWidth="Infinity" promptText="Choose Doctor" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <!-- Room -->
+        <Label styleClass="detail-field-label" text="Room" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <ComboBox fx:id="roomCombo" maxWidth="Infinity" promptText="No Room (Uses Doctor's Default)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <!-- Scheduled Start -->
+        <Label styleClass="detail-field-label" text="Scheduled Start *" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <DatePicker fx:id="startDatePicker" prefWidth="150.0" />
+            <TextField fx:id="startTimeField" promptText="HH:mm (e.g. 09:00)" prefWidth="130.0" />
+        </HBox>
+
+        <!-- Scheduled End -->
+        <Label styleClass="detail-field-label" text="Scheduled End *" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <HBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+            <DatePicker fx:id="endDatePicker" prefWidth="150.0" />
+            <TextField fx:id="endTimeField" promptText="HH:mm (e.g. 09:20)" prefWidth="130.0" />
+        </HBox>
+
+        <!-- Booking Source -->
+        <Label styleClass="detail-field-label" text="Booking Source *" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <ComboBox fx:id="sourceCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+        <!-- Reason -->
+        <Label styleClass="detail-field-label" text="Reason for Visit" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+        <TextField fx:id="reasonField" promptText="e.g. Regular health check" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+    </GridPane>
+
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Button onAction="#onCancel" styleClass="btn-secondary" text="Cancel" />
+        <Button fx:id="submitButton" defaultButton="true" onAction="#onSubmit" styleClass="btn-primary" text="Book Slot" />
+    </HBox>
+</VBox>

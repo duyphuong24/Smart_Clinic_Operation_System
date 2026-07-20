@@ -89,6 +89,7 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
+        ex.printStackTrace();
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Unexpected system error. Please contact the administrator.",

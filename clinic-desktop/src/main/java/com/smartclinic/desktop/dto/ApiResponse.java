@@ -1,15 +1,26 @@
 package com.smartclinic.desktop.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ApiResponse<T> {
 
     private boolean success;
+    private String error;
     private String message;
     private T data;
     private List<FieldErrorResponse> errors;
     private String timestamp;
     private String path;
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
 
     public boolean isSuccess() {
         return success;

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="14.0" styleClass="dialog-card" prefWidth="580.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <VBox HBox.hgrow="ALWAYS">
+            <Label fx:id="titleLabel" styleClass="dialog-title" text="Register New Patient" />
+            <Label fx:id="subtitleLabel" styleClass="dialog-subtitle" text="Please provide correct information to register or update the patient's record." wrapText="true" />
+        </VBox>
+        <ProgressIndicator fx:id="loadingIndicator" visible="false" prefWidth="24.0" prefHeight="24.0" />
+    </HBox>
+
+    <Label fx:id="errorLabel" styleClass="error-message" text="" visible="false" managed="false" wrapText="true" style="-fx-text-fill: #ff4d4f; -fx-font-weight: bold;" />
+
+    <!-- Section 1: Personal Details -->
+    <Label text="Personal Details" style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 14px;" />
+
+    <GridPane hgap="12.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints minWidth="140.0" prefWidth="140.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="240.0" />
+        </columnConstraints>
+
+        <!-- Full Name -->
+        <Label styleClass="detail-field-label" text="Full Name *" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="fullNameField" promptText="e.g. Nguyen Van A" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <!-- Date of Birth -->
+        <Label styleClass="detail-field-label" text="Date of Birth" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <DatePicker fx:id="dobPicker" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <!-- Gender -->
+        <Label styleClass="detail-field-label" text="Gender" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <ComboBox fx:id="genderCombo" maxWidth="Infinity" promptText="Select Gender" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <!-- Phone -->
+        <Label styleClass="detail-field-label" text="Phone Number" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="phoneField" promptText="e.g. 0901234567" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <!-- Email -->
+        <Label styleClass="detail-field-label" text="Email Address" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="emailField" promptText="e.g. example@mail.com" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <!-- Identity Number -->
+        <Label styleClass="detail-field-label" text="Identity Number" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <TextField fx:id="identityNumberField" promptText="e.g. 012345678912" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+        <!-- Address -->
+        <Label styleClass="detail-field-label" text="Home Address" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+        <TextField fx:id="addressField" promptText="Street name, District, Province..." GridPane.columnIndex="1" GridPane.rowIndex="6" />
+    </GridPane>
+
+    <Separator />
+
+    <!-- Section 2: Emergency & Medical Info -->
+    <Label text="Emergency &amp; Medical Information" style="-fx-font-weight: bold; -fx-text-fill: #4e73df; -fx-font-size: 14px;" />
+
+    <GridPane hgap="12.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints minWidth="140.0" prefWidth="140.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="240.0" />
+        </columnConstraints>
+
+        <!-- Emergency Contact Name -->
+        <Label styleClass="detail-field-label" text="Emergency Contact" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="emergencyNameField" promptText="Relative's name" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <!-- Emergency Contact Phone -->
+        <Label styleClass="detail-field-label" text="Emergency Phone" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="emergencyPhoneField" promptText="e.g. 0909876543" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <!-- Allergy Note -->
+        <Label styleClass="detail-field-label" text="Allergy Note" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextArea fx:id="allergyNoteArea" prefRowCount="2" promptText="Specify any medicine, food, or chemical allergies..." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+    </GridPane>
+
+    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+        <Button onAction="#onCancel" styleClass="btn-secondary" text="Cancel" />
+        <Button fx:id="submitButton" defaultButton="true" onAction="#onSubmit" styleClass="btn-primary" text="Save Record" />
+    </HBox>
+</VBox>

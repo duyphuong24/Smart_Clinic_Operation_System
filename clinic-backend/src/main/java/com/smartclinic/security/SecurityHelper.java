@@ -57,6 +57,25 @@ public class SecurityHelper {
         return doctor != null && doctor.getId().equals(queueItem.getDoctor().getId());
     }
 
+    public boolean canManageQueueItem(Long queueItemId) {
+        String username = getCurrentUsername();
+        if (username == null) {
+            return false;
+        }
+
+        if (hasRole("ROLE_ADMIN") || hasRole("ROLE_RECEPTIONIST")) {
+            return true;
+        }
+
+        QueueItem queueItem = queueItemRepository.findById(queueItemId).orElse(null);
+        if (queueItem == null || queueItem.getDoctor() == null) {
+            return false;
+        }
+
+        Doctor doctor = getDoctorForUsername(username);
+        return doctor != null && doctor.getId().equals(queueItem.getDoctor().getId());
+    }
+
     private String getCurrentUsername() {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             return null;

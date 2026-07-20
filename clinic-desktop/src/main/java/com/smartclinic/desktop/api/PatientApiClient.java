@@ -33,4 +33,22 @@ public class PatientApiClient {
                 true
         );
     }
+
+    public CompletableFuture<ApiResponse<PatientResponse>> create(Object requestBody) {
+        return apiClient.post(
+                "/patients",
+                requestBody,
+                new TypeReference<ApiResponse<PatientResponse>>() {},
+                true
+        );
+    }
+
+    public CompletableFuture<ApiResponse<PatientResponse>> update(Long id, Object requestBody) {
+        return apiClient.put(
+                "/patients/" + id,
+                requestBody,
+                new TypeReference<ApiResponse<PatientResponse>>() {},
+                true
+        );
+    }
 }

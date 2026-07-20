@@ -26,4 +26,22 @@ public class AppointmentApiClient {
                 true
         );
     }
+
+    public CompletableFuture<ApiResponse<AppointmentResponse>> create(Object requestBody) {
+        return apiClient.post(
+                "/appointments",
+                requestBody,
+                new TypeReference<ApiResponse<AppointmentResponse>>() {},
+                true
+        );
+    }
+
+    public CompletableFuture<ApiResponse<AppointmentResponse>> cancel(Long id, String reason) {
+        return apiClient.patch(
+                "/appointments/" + id + "/cancel",
+                new com.smartclinic.desktop.dto.CancelAppointmentRequest(reason),
+                new TypeReference<ApiResponse<AppointmentResponse>>() {},
+                true
+        );
+    }
 }
