@@ -1,7 +1,8 @@
 package com.smartclinic.auth.controller;
 
 import com.smartclinic.appointment.repository.AppointmentRepository;
-import com.smartclinic.encounter.repository.EncounterServiceRepository;
+import com.smartclinic.encounter.serviceorder.repository.EncounterServiceOrderRepository;
+import com.smartclinic.encounter.serviceorder.entity.EncounterServiceOrderStatus;
 import com.smartclinic.queue.repository.QueueItemRepository;
 import com.smartclinic.visit.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class AuthController {
     private final AppointmentRepository appointmentRepository;
     private final QueueItemRepository queueItemRepository;
     private final VisitRepository visitRepository;
-    private final EncounterServiceRepository encounterServiceRepository;
+    private final EncounterServiceOrderRepository encounterServiceOrderRepository;
 
     @GetMapping("/login")
     public String login() {
@@ -58,8 +59,8 @@ public class AuthController {
                 .map(v -> v.getDoctor().getConsultationFee())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal serviceFees = encounterServiceRepository.findAll().stream()
-                .filter(es -> es.getCreatedAt().isAfter(todayStart) && es.getCreatedAt().isBefore(todayEnd) && es.getStatus() == com.smartclinic.encounter.entity.EncounterServiceStatus.ORDERED)
+        BigDecimal serviceFees = encounterServiceOrderRepository.findAll().stream()
+                .filter(es -> es.getCreatedAt().isAfter(todayStart) && es.getCreatedAt().isBefore(todayEnd) && es.getStatus() == EncounterServiceOrderStatus.ORDERED)
                 .map(es -> es.getUnitPrice().multiply(BigDecimal.valueOf(es.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

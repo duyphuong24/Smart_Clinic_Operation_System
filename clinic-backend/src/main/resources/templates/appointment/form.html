@@ -7,6 +7,22 @@
         <!-- Link to Module-Specific CSS -->
         <link th:href="@{/css/appointment.css}" rel="stylesheet">
 
+        <!-- Success/Error Alerts -->
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show mb-4 border-0 text-danger bg-danger-subtle px-3 py-2 text-xs d-flex align-items-center justify-content-between" role="alert" style="border-radius: var(--border-radius-sm);">
+            <div>
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                <span th:text="${error}">Error Message</span>
+            </div>
+            <button type="button" class="btn-close shadow-none py-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+        <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show mb-4 border-0 text-success bg-success-subtle px-3 py-2 text-xs d-flex align-items-center justify-content-between" role="alert" style="border-radius: var(--border-radius-sm);">
+            <div>
+                <i class="fa-solid fa-circle-check me-2"></i>
+                <span th:text="${success}">Success Message</span>
+            </div>
+            <button type="button" class="btn-close shadow-none py-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+        </div>
+
         <div class="glass-panel p-4 appointment-form-panel">
             <!-- Header Section -->
             <div class="mb-4">

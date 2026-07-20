@@ -19,8 +19,8 @@
                 <div>
                     <h3 class="fw-bold m-0 text-white">Consultation Queue</h3>
                     <p class="text-secondary m-0 text-sm">
-                        Logged in as: <span class="text-white fw-semibold" th:text="${doctor.fullName}">Dr. B</span> 
-                        | Specialty: <span class="text-white fw-semibold" th:text="${doctor.specialtyName}">General</span>
+                        Logged in as: <span class="text-white fw-semibold" th:text="${doctor.staff.user.fullName}">Dr. B</span> 
+                        | Specialty: <span class="text-white fw-semibold" th:text="${doctor.specialty.name}">General</span>
                     </p>
                 </div>
             </div>

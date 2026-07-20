@@ -69,7 +69,8 @@ public class AppointmentController {
     public String create(
             @Valid @ModelAttribute("appointment") AppointmentRequest request,
             BindingResult bindingResult,
-            Model model
+            Model model,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("patients", patientService.search("", PageRequest.of(0, 100)).getItems());
@@ -79,28 +80,54 @@ public class AppointmentController {
             model.addAttribute("title", "Appointments");
             return "appointment/form";
         }
-        appointmentService.create(request);
-        return "redirect:/appointments";
+        try {
+            appointmentService.create(request);
+            redirectAttributes.addFlashAttribute("success", "Appointment booked successfully.");
+            return "redirect:/appointments";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            model.addAttribute("error", ex.getMessage());
+            model.addAttribute("patients", patientService.search("", PageRequest.of(0, 100)).getItems());
+            model.addAttribute("doctors", doctorService.findAll());
+            model.addAttribute("rooms", roomService.findAll());
+            model.addAttribute("sources", AppointmentSource.values());
+            model.addAttribute("title", "Appointments");
+            return "appointment/form";
+        }
     }
 
     @PostMapping("/{id}/cancel")
     public String cancel(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "Cancelled by receptionist/patient request") String reason
+            @RequestParam(defaultValue = "Cancelled by receptionist/patient request") String reason,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
     ) {
-        appointmentService.cancel(id, reason);
+        try {
+            appointmentService.cancel(id, reason);
+            redirectAttributes.addFlashAttribute("success", "Appointment cancelled successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/appointments";
     }
 
     @PostMapping("/{id}/check-in")
     public String checkIn(
             @PathVariable Long id,
-            @RequestParam(defaultValue = "NORMAL") QueuePriority priority
+            @RequestParam(defaultValue = "NORMAL") QueuePriority priority,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes
     ) {
-        AppointmentCheckInRequest checkInRequest = new AppointmentCheckInRequest();
-        checkInRequest.setAppointmentId(id);
-        checkInRequest.setPriority(priority);
-        queueItemService.checkIn(checkInRequest);
+        try {
+            AppointmentCheckInRequest checkInRequest = new AppointmentCheckInRequest();
+            checkInRequest.setAppointmentId(id);
+            checkInRequest.setPriority(priority);
+            queueItemService.checkIn(checkInRequest);
+            redirectAttributes.addFlashAttribute("success", "Checked in patient successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
         return "redirect:/appointments";
     }
 }

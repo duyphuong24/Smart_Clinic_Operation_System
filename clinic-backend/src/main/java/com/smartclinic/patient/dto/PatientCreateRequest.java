@@ -20,6 +20,7 @@ public class PatientCreateRequest {
 
     private Gender gender;
 
+    @jakarta.validation.constraints.Pattern(regexp = "^0\\d{9,10}$", message = "Phone number must be 10 or 11 digits and start with 0")
     @Size(max = 30, message = "Phone must be at most 30 characters")
     private String phone;
 
@@ -35,6 +36,7 @@ public class PatientCreateRequest {
     @Size(max = 150, message = "Emergency contact name must be at most 150 characters")
     private String emergencyContactName;
 
+    @jakarta.validation.constraints.Pattern(regexp = "^0\\d{9,10}$", message = "Emergency phone number must be 10 or 11 digits and start with 0")
     @Size(max = 30, message = "Emergency contact phone must be at most 30 characters")
     private String emergencyContactPhone;
 
