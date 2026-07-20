@@ -20,12 +20,15 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"var jsonData = pm.response.json();",
+									"var token = (jsonData.data && (jsonData.data.accessToken || jsonData.data.token)) ? (jsonData.data.accessToken || jsonData.data.token) : '';",
 									"pm.test('Response contains token', function () {",
-									"    pm.expect(jsonData.data.token).to.not.be.empty;",
+									"    pm.expect(token).to.not.be.empty;",
 									"});",
-									"if (jsonData.data && jsonData.data.token) {",
-									"    pm.environment.set('token', jsonData.data.token);",
-									"    pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+									"if (token) {",
+									"    pm.environment.set('token', token);",
+									"    if (jsonData.data.refreshToken) {",
+									"        pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+									"    }",
 									"}"
 								],
 								"type": "text/javascript"
@@ -42,7 +45,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+							"raw": "{\n  \"userName\": \"admin\",\n  \"password\": \"admin123\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/login",
@@ -77,7 +80,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpassword\"\n}"
+							"raw": "{\n  \"userName\": \"admin\",\n  \"password\": \"wrongpassword\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/login",
@@ -96,7 +99,12 @@
 								"exec": [
 									"pm.test('Status code is 200', function () {",
 									"    pm.response.to.have.status(200);",
-									"});"
+									"});",
+									"var jsonData = pm.response.json();",
+									"var token = (jsonData.data && (jsonData.data.accessToken || jsonData.data.token)) ? (jsonData.data.accessToken || jsonData.data.token) : '';",
+									"if (token) {",
+									"    pm.environment.set('token', token);",
+									"}"
 								],
 								"type": "text/javascript"
 							}
@@ -184,6 +192,10 @@
 								"value": "Bearer {{token}}"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/auth/logout",
 							"host": ["{{baseUrl}}"],
@@ -319,7 +331,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"fullName\": \"Nguyen Van Postman\",\n  \"dob\": \"1990-05-15\",\n  \"gender\": \"MALE\",\n  \"phone\": \"0912345678\",\n  \"email\": \"postman.test@clinic.com\",\n  \"address\": \"123 Le Duan, Da Nang\"\n}"
+							"raw": "{\n  \"fullName\": \"Nguyen Van Postman\",\n  \"dateOfBirth\": \"1990-05-15\",\n  \"gender\": \"MALE\",\n  \"phone\": \"0912345678\",\n  \"email\": \"postman.test@clinic.com\",\n  \"address\": \"123 Le Duan, Da Nang\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/patients",
@@ -374,7 +386,7 @@
 			"name": "Appointments",
 			"item": [
 				{
-					"name": "Get Appointments By Date",
+					"name": "Get Appointments",
 					"event": [
 						{
 							"listen": "test",
@@ -397,17 +409,11 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/appointments?date=2026-07-20",
+							"raw": "{{baseUrl}}/api/v1/appointments",
 							"host": ["{{baseUrl}}"],
-							"path": ["api", "v1", "appointments"],
-							"query": [
-								{
-									"key": "date",
-									"value": "2026-07-20"
-								}
-							]
+							"path": ["api", "v1", "appointments"]
 						},
-						"description": "Gets appointments scheduled for a specific date."
+						"description": "Gets appointments list."
 					}
 				},
 				{
@@ -439,7 +445,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"patientId\": 1,\n  \"doctorId\": 1,\n  \"appointmentDate\": \"2026-07-25\",\n  \"timeSlot\": \"09:00 - 09:30\",\n  \"reason\": \"General health checkup\"\n}"
+							"raw": "{\n  \"patientId\": 1,\n  \"doctorId\": 1,\n  \"roomId\": 1,\n  \"scheduledStart\": \"2026-07-25T09:00:00\",\n  \"scheduledEnd\": \"2026-07-25T09:30:00\",\n  \"reason\": \"General health checkup\",\n  \"source\": \"WALK_IN\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/appointments",
@@ -561,6 +567,45 @@
 							"path": ["api", "v1", "queue-items"]
 						},
 						"description": "Gets today's queue items."
+					}
+				},
+				{
+					"name": "Walk-in Queue Creation - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200 or 201', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patientId\": 1,\n  \"doctorId\": 1,\n  \"roomId\": 1,\n  \"priority\": \"NORMAL\",\n  \"reason\": \"Walk-in consultation\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/queue-items/walk-in",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "queue-items", "walk-in"]
+						},
+						"description": "Creates direct walk-in queue item."
 					}
 				},
 				{
@@ -727,12 +772,82 @@
 						},
 						"description": "Gets single invoice by ID."
 					}
+				},
+				{
+					"name": "Record Payment - Success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200 or 201', function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 150000,\n  \"method\": \"CASH\",\n  \"transactionRef\": \"TXN-POSTMAN-123\",\n  \"note\": \"Cash payment from Postman\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/invoices/1/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "invoices", "1", "payments"]
+						},
+						"description": "Records payment for invoice 1."
+					}
 				}
 			]
 		},
 		{
-			"name": "Audit Logs",
+			"name": "Audit & Reports",
 			"item": [
+				{
+					"name": "Get Dashboard Metrics - Success (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reports/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "reports", "dashboard"]
+						},
+						"description": "Fetches financial and operational metrics."
+					}
+				},
 				{
 					"name": "Get Audit Logs - Success (Admin)",
 					"event": [
