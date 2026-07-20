@@ -481,3 +481,21 @@ Align endpoint matchers in SecurityConfig 100% with security-matrix.md, ensuring
 - RECEPTIONIST and other unauthorized roles receive 403 Forbidden on audit logs.
 
 **Labels:** security, backend, priority:high
+
+### Issue 30: Compliance Gap Fixes for HSF302 Requirements
+
+**Title:** Implement missing requirements: Postman Collection, CSS modules, PR Template, Optimistic Locking, Login Attempt Lock, and JaCoCo coverage
+
+**Description:**
+Address the compliance gap items identified against HSF302_Project_Requirements.docx including Postman collection, module CSS files, GitHub PR template, Optimistic Locking (@Version), account lock after 5 failed login attempts, JaCoCo coverage plugin, and desktop test plan.
+
+**Acceptance Criteria:**
+- Postman Collection with ≥20 requests and environment file is created in postman/ directory.
+- Module-specific CSS files are separated in static/css/.
+- GitHub PR template is created under .github/pull_request_template.md.
+- Optimistic locking (@Version) is added to core entities.
+- User entity & auth service support failed login counting and 30-minute lock after 5 failures.
+- JaCoCo plugin is configured in pom.xml.
+- Desktop test plan and demo script are documented.
+
+**Labels:** compliance, backend, frontend, documentation, priority:high

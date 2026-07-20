@@ -49,6 +49,15 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Encounter> findPendingBillings() {
+        return encounterRepository.findAll().stream()
+                .filter(e -> e.getStatus() == EncounterStatus.COMPLETED)
+                .filter(e -> e.getVisit() != null && !invoiceRepository.existsByVisitId(e.getVisit().getId()))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public InvoiceResponse getById(Long id) {
         return InvoiceMapper.toResponse(findInvoice(id));
     }

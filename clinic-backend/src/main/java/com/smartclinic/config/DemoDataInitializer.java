@@ -70,7 +70,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         ensureService("SVC-CBC", "Complete Blood Count Test", ServiceType.LAB_TEST, new BigDecimal("100000"));
         ensureService("SVC-HECG", "Electrocardiogram (ECG)", ServiceType.PROCEDURE, new BigDecimal("200000"));
 
-        ensureStaff(adminUser, "EMP-001", StaffType.MANAGER);
+        ensureStaff(adminUser, "EMP-001", StaffType.ADMINISTRATOR);
         ensureStaff(receptionistUser, "EMP-002", StaffType.RECEPTIONIST);
         Staff docStaff = ensureStaff(doctorUser, "EMP-003", StaffType.DOCTOR);
         ensureStaff(cashierUser, "EMP-004", StaffType.CASHIER);

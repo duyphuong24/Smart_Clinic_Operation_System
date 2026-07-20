@@ -58,4 +58,12 @@ public class Doctor extends BaseEntity {
     @Column(name = "active", nullable = false)
     @Builder.Default
     private boolean active = true;
+
+    public String getFullName() {
+        return staff != null ? staff.getFullName() : null;
+    }
+
+    public String getSpecialtyName() {
+        return specialty != null ? specialty.getName() : null;
+    }
 }

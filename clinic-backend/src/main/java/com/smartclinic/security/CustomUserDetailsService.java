@@ -29,6 +29,15 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
 
+        if (user.getStatus() == UserStatus.LOCKED && user.getLockTime() != null) {
+            if (user.getLockTime().plusMinutes(30).isBefore(java.time.LocalDateTime.now())) {
+                user.setStatus(UserStatus.ACTIVE);
+                user.setFailedLoginAttempts(0);
+                user.setLockTime(null);
+                userRepository.save(user);
+            }
+        }
+
         boolean enabled = user.getStatus() == UserStatus.ACTIVE;
         boolean accountNonLocked = user.getStatus() != UserStatus.LOCKED;
 

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,11 +19,13 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
 
     Optional<QueueItem> findTopByQueueDateOrderByQueueNumberDesc(LocalDate queueDate);
 
+    @EntityGraph(attributePaths = {"patient", "doctor", "doctor.staff", "doctor.staff.user", "room", "appointment"})
     List<QueueItem> findByQueueDateAndStatusNotInOrderByQueueNumberAsc(
             LocalDate queueDate,
             Collection<QueueStatus> excludedStatuses
     );
 
+    @EntityGraph(attributePaths = {"patient", "doctor", "doctor.staff", "doctor.staff.user", "room", "appointment"})
     @Query("""
             select q from QueueItem q
             where q.queueDate = :queueDate

@@ -63,6 +63,7 @@ public class ConsultationController {
 
         if (doctor == null) {
             model.addAttribute("error", "Your user account is not linked to any active Doctor profile.");
+            model.addAttribute("queueItems", List.of());
             model.addAttribute("title", "Consultation Queue");
             return "encounter/queue";
         }

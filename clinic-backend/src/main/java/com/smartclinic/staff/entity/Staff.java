@@ -51,4 +51,8 @@ public class Staff extends BaseEntity {
     @Column(name = "status", nullable = false, length = 30)
     @Builder.Default
     private StaffStatus status = StaffStatus.ACTIVE;
+
+    public String getFullName() {
+        return user != null ? user.getFullName() : null;
+    }
 }
