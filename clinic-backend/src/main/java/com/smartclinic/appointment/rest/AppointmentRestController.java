@@ -66,4 +66,12 @@ public class AppointmentRestController {
     ) {
         return ApiResponse.success("Appointment cancelled", appointmentService.cancel(id, body.getReason()), request.getRequestURI());
     }
+
+    @PatchMapping("/{id}/no-show")
+    public ApiResponse<AppointmentResponse> markNoShow(
+            @PathVariable Long id,
+            HttpServletRequest request
+    ) {
+        return ApiResponse.success("Appointment marked as no-show", appointmentService.markNoShow(id), request.getRequestURI());
+    }
 }

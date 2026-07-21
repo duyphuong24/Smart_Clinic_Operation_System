@@ -3,12 +3,17 @@ package com.smartclinic.patient.service;
 import com.smartclinic.common.api.PageResponse;
 import com.smartclinic.common.exception.ResourceNotFoundException;
 import com.smartclinic.patient.dto.PatientCreateRequest;
+import com.smartclinic.patient.dto.PatientMedicalHistoryResponse;
 import com.smartclinic.patient.dto.PatientResponse;
 import com.smartclinic.patient.dto.PatientUpdateRequest;
 import com.smartclinic.patient.entity.Patient;
 import com.smartclinic.patient.entity.PatientStatus;
 import com.smartclinic.patient.mapper.PatientMapper;
 import com.smartclinic.patient.repository.PatientRepository;
+import com.smartclinic.visit.dto.VisitResponse;
+import com.smartclinic.visit.mapper.VisitMapper;
+import com.smartclinic.visit.repository.VisitRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +27,7 @@ public class PatientServiceImpl implements PatientService {
     private static final String PATIENT_CODE_PREFIX = "PAT-";
 
     private final PatientRepository patientRepository;
+    private final VisitRepository visitRepository;
 
     @Override
     @Transactional
@@ -58,6 +64,29 @@ public class PatientServiceImpl implements PatientService {
                 page.getTotalElements(),
                 page.getTotalPages()
         );
+    }
+
+    @Override
+    @Transactional
+    public void deactivate(Long id) {
+        Patient patient = findPatient(id);
+        patient.setStatus(PatientStatus.ARCHIVED);
+        patientRepository.save(patient);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PatientMedicalHistoryResponse getMedicalHistory(Long id) {
+        Patient patient = findPatient(id);
+        List<VisitResponse> visits = visitRepository.findByPatientIdOrderByIdDesc(id).stream()
+                .map(VisitMapper::toResponse)
+                .toList();
+
+        return PatientMedicalHistoryResponse.builder()
+                .patient(PatientMapper.toResponse(patient))
+                .totalVisits(visits.size())
+                .visits(visits)
+                .build();
     }
 
     private Patient findPatient(Long id) {

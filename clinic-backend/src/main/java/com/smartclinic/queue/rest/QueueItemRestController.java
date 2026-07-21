@@ -71,4 +71,18 @@ public class QueueItemRestController {
     public ApiResponse<QueueItemResponse> skip(@PathVariable Long id, HttpServletRequest request) {
         return ApiResponse.success("Queue item skipped", queueItemService.skip(id), request.getRequestURI());
     }
+
+    @PatchMapping("/{id}/transfer")
+    public ApiResponse<QueueItemResponse> transfer(
+            @PathVariable Long id,
+            @Valid @RequestBody com.smartclinic.queue.dto.QueueTransferRequest body,
+            HttpServletRequest request
+    ) {
+        return ApiResponse.success("Queue item transferred", queueItemService.transferQueueItem(id, body), request.getRequestURI());
+    }
+
+    @PostMapping("/{id}/re-queue")
+    public ApiResponse<QueueItemResponse> reQueue(@PathVariable Long id, HttpServletRequest request) {
+        return ApiResponse.success("Queue item re-queued", queueItemService.reQueueItem(id), request.getRequestURI());
+    }
 }

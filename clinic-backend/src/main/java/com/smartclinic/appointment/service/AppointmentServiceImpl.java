@@ -130,6 +130,17 @@ public class AppointmentServiceImpl implements AppointmentService {
         return AppointmentMapper.toResponse(appointmentRepository.save(appointment));
     }
 
+    @Override
+    public AppointmentResponse markNoShow(Long id) {
+        Appointment appointment = findAppointment(id);
+        if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+            throw new BadRequestException("Only BOOKED appointment can be marked as NO_SHOW");
+        }
+        appointment.setStatus(AppointmentStatus.NO_SHOW);
+        return AppointmentMapper.toResponse(appointmentRepository.save(appointment));
+    }
+
+
     private Appointment findAppointment(Long id) {
         return appointmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));

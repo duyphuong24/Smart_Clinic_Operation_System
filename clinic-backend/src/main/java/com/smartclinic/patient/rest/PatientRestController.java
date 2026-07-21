@@ -3,6 +3,7 @@ package com.smartclinic.patient.rest;
 import com.smartclinic.common.api.ApiResponse;
 import com.smartclinic.common.api.PageResponse;
 import com.smartclinic.patient.dto.PatientCreateRequest;
+import com.smartclinic.patient.dto.PatientMedicalHistoryResponse;
 import com.smartclinic.patient.dto.PatientResponse;
 import com.smartclinic.patient.dto.PatientUpdateRequest;
 import com.smartclinic.patient.service.PatientService;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,6 +49,11 @@ public class PatientRestController {
         return ApiResponse.success("Patient loaded", patientService.getById(id), request.getRequestURI());
     }
 
+    @GetMapping("/{id}/medical-history")
+    public ApiResponse<PatientMedicalHistoryResponse> getMedicalHistory(@PathVariable Long id, HttpServletRequest request) {
+        return ApiResponse.success("Patient medical history loaded", patientService.getMedicalHistory(id), request.getRequestURI());
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<PatientResponse> create(
@@ -63,5 +70,11 @@ public class PatientRestController {
             HttpServletRequest request
     ) {
         return ApiResponse.success("Patient updated", patientService.update(id, updateRequest), request.getRequestURI());
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deactivate(@PathVariable Long id, HttpServletRequest request) {
+        patientService.deactivate(id);
+        return ApiResponse.success("Patient deactivated", request.getRequestURI());
     }
 }

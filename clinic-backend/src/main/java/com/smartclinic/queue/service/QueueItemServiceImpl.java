@@ -144,6 +144,40 @@ public class QueueItemServiceImpl implements QueueItemService {
         return QueueItemMapper.toResponse(queueItemRepository.save(item));
     }
 
+    @Override
+    @Transactional
+    public QueueItemResponse transferQueueItem(Long id, QueueTransferRequest request) {
+        QueueItem item = findQueueItem(id);
+        if (item.getStatus() != QueueStatus.WAITING && item.getStatus() != QueueStatus.CALLED) {
+            throw new BadRequestException("Only WAITING or CALLED queue item can be transferred");
+        }
+        Doctor targetDoctor = findActiveDoctor(request.getTargetDoctorId());
+        Room targetRoom = request.getTargetRoomId() != null
+                ? findActiveRoom(request.getTargetRoomId())
+                : findDoctorDefaultRoom(targetDoctor);
+
+        int nextNumber = generateQueueNumber(item.getQueueDate());
+
+        item.setDoctor(targetDoctor);
+        item.setRoom(targetRoom);
+        item.setQueueNumber(nextNumber);
+        item.setStatus(QueueStatus.WAITING);
+
+        return QueueItemMapper.toResponse(queueItemRepository.save(item));
+    }
+
+    @Override
+    @Transactional
+    public QueueItemResponse reQueueItem(Long id) {
+        QueueItem item = findQueueItem(id);
+        if (item.getStatus() != QueueStatus.SKIPPED) {
+            throw new BadRequestException("Only SKIPPED queue item can be re-queued");
+        }
+        item.setStatus(QueueStatus.WAITING);
+        return QueueItemMapper.toResponse(queueItemRepository.save(item));
+    }
+
+
     private QueueItem findQueueItem(Long id) {
         return queueItemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Queue item not found"));
