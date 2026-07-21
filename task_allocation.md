@@ -1,51 +1,34 @@
-# Smart Clinic Operations System - Team Task Allocation
+# Smart Clinic Operations System - Task Allocation
 
-## 1. Project Goal
+## 1. Mục tiêu dự án
 
-Smart Clinic Operations System is a Spring Boot, Thymeleaf, and JavaFX project for clinic operations. The project focuses on one complete workflow instead of isolated CRUD screens.
+Smart Clinic Operations System là hệ thống quản lý vận hành phòng khám, gồm:
 
-Core workflow:
+- Web app: Spring Boot + Thymeleaf + Spring Security + SQL Server.
+- Desktop app: JavaFX kết nối backend qua REST API.
+- Cùng dùng một database và cùng tuân thủ business workflow của phòng khám.
+
+Luồng nghiệp vụ chính:
 
 ```text
-Login / RBAC
--> Patient registration
--> Doctor schedule
--> Appointment booking
--> Patient check-in
--> Queue management
--> Doctor consultation
--> Invoice generation
--> Payment recording
--> Basic dashboard / demo report
+Patient Registration
+-> Doctor Schedule
+-> Appointment Booking
+-> Patient Check-in
+-> Queue Management
+-> Doctor Consultation
+-> Invoice Generation
+-> Payment
+-> Dashboard / Report
+-> Audit Log
 ```
 
-Current project structure:
+Nguyên tắc chia việc: chia theo workflow và ownership, không chia kiểu mỗi người vài CRUD rời rạc.
+
+## 2. Kiến trúc thống nhất
 
 ```text
-smart-clinic-operations-system
-|-- clinic-backend
-|-- clinic-desktop
-|-- docs
-|-- task_allocation.md
-`-- team_rules.md
-```
-
-Important MVP decision: `AuditLog` is not part of the one-week critical path. It is optional after the core workflow is stable.
-
-## 1.1 Current Truth On Dev
-
-As of the latest integration on `dev` (up to issue #30):
-- **Completed Core Workflows (Backend):** Patient CRUD, Doctor/Specialty/Room master data, Doctor Schedule availability validation, Appointment booking/rescheduling/cancellation, Patient check-in, Queue Item generation and doctor call/skip flow, Visit & Encounter creation, Service catalog & order billing, Invoice generation, and Payment processing.
-- **Reporting & Audit Log:** Audit Log is fully implemented with `@PreAuthorize` role security (`ADMIN`, `MANAGER`).
-- **JavaFX Desktop App:** Authentication, login, async `ApiClient` HTTP foundation, and 12-case Test Plan completed (`docs/TestPlan_Desktop.md`).
-- **Lecturer Requirement Compliance (Issue #30):** 100% compliant with `HSF302_Project_Requirements.docx`. Added Postman Collection (21 requests in `postman/`), module-specific CSS files (`static/css/`), GitHub PR template (`.github/pull_request_template.md`), Optimistic Locking (`@Version` on `BaseEntity`), Failed Login Counter (30-min account lock after 5 attempts), JaCoCo code coverage plugin, and full presentation demo script (`docs/demo-script.md`).
-
-## 2. Architecture Rule
-
-The project has two presentation layers:
-
-```text
-Thymeleaf MVC Controller
+Thymeleaf Web Controller
         |
         v
 Service Layer + Business Rules
@@ -63,166 +46,73 @@ REST API Controller
 JavaFX Desktop Client
 ```
 
-Rules:
+Quy tắc bắt buộc:
 
-- Controllers do not contain business logic.
-- REST controllers and Thymeleaf controllers call the same service layer.
-- JavaFX controllers only handle UI events.
-- JavaFX services call API clients.
-- API clients call Spring Boot REST endpoints.
-- Business validation belongs in backend services.
+- Web controller và REST controller chỉ nhận request, validate input cơ bản, gọi service và trả response.
+- Toàn bộ business logic nằm trong service layer.
+- JavaFX controller chỉ xử lý event UI, không gọi HTTP client trực tiếp.
+- JavaFX service/client gọi REST API do backend cung cấp.
+- Không tạo entity, enum, status flow tùy ý nếu chưa được leader chốt.
 
-## 3. Team Members
+## 3. Thành viên và vai trò
 
-| Member | Name | Main Role | Main Responsibility |
+| Member | Họ tên | Vai trò chính | Trọng tâm |
 | --- | --- | --- | --- |
-| Member 1 - Leader | Nguyễn Duy Phương | Backend Core + Architecture + JavaFX REST Integration | Security, database, API contract, appointment, queue, integration review |
-| Member 2 | Trịnh Hoàng Thiên Bảo | Thymeleaf Web Portal | Web layout, patient/doctor/schedule/appointment/encounter/dashboard UI |
+| Member 1 - Leader | Nguyễn Duy Phương | Backend Core + Architecture + REST Integration | Security, database, appointment, queue, API contract, JavaFX REST integration |
+| Member 2 | Trịnh Hoàng Thiên Bảo | Thymeleaf Web Portal | Patient UI, doctor/admin UI, appointment UI, encounter UI, dashboard |
 | Member 3 | Nguyễn Hữu Tài | JavaFX UI + Billing/Payment | JavaFX screens, cashier workflow, invoice/payment backend/UI |
 
-Boundary decision:
+Ghi chú quan trọng: phần REST integration trong JavaFX do Member 1 - Nguyễn Duy Phương phụ trách. Member 3 làm JavaFX UI, controller, FXML, flow màn hình và phối hợp với Member 1 để nối API.
 
-- Member 1 owns REST integration in JavaFX.
-- Member 3 owns JavaFX UI/FXML/controllers and payment workflow screens.
-- Member 3 should call JavaFX service interfaces, not raw HTTP clients directly.
+## 4. Tech stack cần bám theo yêu cầu môn học
 
-## 4. Tech Stack
+- Java 17+
+- Spring Boot 3.x
+- Maven
+- Spring MVC
+- Spring Data JPA + Hibernate 6.x
+- Thymeleaf 3.x + Thymeleaf Security Extras
+- Spring Security + BCrypt
+- JavaFX 17+ + FXML + Scene Builder
+- SQL Server 2019/2022
+- Postman Collection + Environment
+- JUnit 5, Mockito, REST Assured hoặc MockMvc
+- Git/GitHub: issue, branch, pull request, conventional commit
 
-- Java 21 currently configured; requirement allows Java 17+.
-- Spring Boot 3.3.x.
-- Maven.
-- Spring MVC.
-- Spring Data JPA + Hibernate 6.x.
-- Thymeleaf + Thymeleaf Security Extras.
-- Spring Security + BCrypt.
-- JavaFX 21 currently configured; requirement allows JavaFX 17+.
-- SQL Server 2019/2022.
-- Postman for REST API testing.
-- JUnit 5 and Mockito where useful.
+Không nên dùng PostgreSQL cho bản nộp chính nếu requirement môn yêu cầu SQL Server.
 
-The project uses SQL Server local and `application.properties`. Do not convert config to `application.yml`.
+## 5. Module ownership tổng quan
 
-## 5. Current Package Structure
-
-Backend uses domain-based packages under:
-
-```text
-clinic-backend/src/main/java/com/smartclinic
-```
-
-Main packages:
-
-```text
-auth
-security
-user
-staff
-doctor
-specialty
-room
-patient
-schedule
-appointment
-queue
-visit
-encounter
-servicecatalog
-billing
-payment
-report
-common
-config
-```
-
-Package responsibility rules:
-
-| Package | Responsibility |
-| --- | --- |
-| `auth` | Login, logout, authentication request/response, authentication use cases. It should not own user profile CRUD. |
-| `security` | Spring Security infrastructure such as `SecurityConfig`, `UserDetailsService`, principals, password encoder, and security helpers. It should not contain clinic business logic. |
-| `user` | Account and role management: `User`, `Role`, user-role mapping, account status, admin user CRUD. |
-| `staff` | Employee profile shared by receptionist, cashier, manager, and doctor. |
-| `doctor` | Doctor-specific profile such as license number, specialty, default room, consultation fee. |
-| `specialty` | Specialty CRUD. |
-| `room` | Room CRUD. |
-Main business modules use this internal structure:
-
-```text
-controller
-rest
-service
-repository
-entity
-dto
-mapper
-validation
-```
-
-Example:
-
-```text
-com.smartclinic.appointment.controller
-com.smartclinic.appointment.rest
-com.smartclinic.appointment.service
-com.smartclinic.appointment.repository
-com.smartclinic.appointment.entity
-com.smartclinic.appointment.dto
-com.smartclinic.appointment.mapper
-com.smartclinic.appointment.validation
-```
-
-Desktop uses packages under:
-
-```text
-clinic-desktop/src/main/java/com/smartclinic/desktop
-```
-
-Main packages:
-
-```text
-app
-controller
-service
-api
-dto
-session
-navigation
-config
-util
-```
-
-## 6. Module Ownership Summary
-
-| Module | Member 1 - Leader | Member 2 - Web | Member 3 - Desktop/Billing |
+| Module | Member 1 - Nguyễn Duy Phương | Member 2 - Trịnh Hoàng Thiên Bảo | Member 3 - Nguyễn Hữu Tài |
 | --- | --- | --- | --- |
-| Project foundation | Main | Support | Support |
-| Database design | Main | Review | Review |
-| Status flow | Main | Follow | Follow |
-| Security/RBAC | Main | Role-based menu | Login UI support |
-| Patient | Backend/API | Web UI | Patient search UI |
+| Project setup | Main | Support | Support |
+| Database schema | Main | Review | Review |
+| Security/RBAC | Main | Role-based menu | Desktop login UI support |
+| Patient | Backend/API | Web UI | JavaFX search UI |
 | Doctor/Specialty/Room | Backend | Web UI | No |
-| Doctor schedule | Backend validation | Web UI | No |
+| Doctor Schedule | Backend validation | Web UI | No |
 | Appointment | Backend rules/API | Web UI | JavaFX screen |
-| Check-in | Backend core/API | Web action | JavaFX check-in UI |
+| Check-in | Backend core/API | Web button/page | JavaFX screen |
 | Queue | Backend core/API | Web queue board | JavaFX queue board |
-| Visit/Encounter | Backend support | Main consultation UI | No |
-| Service catalog | Backend | Web support | Use in billing |
-| Billing | Review/integration | Web support | Main backend/UI |
-| Payment | Review/integration | Web support | Main backend/UI |
-| JavaFX REST integration | Main | No | UI/service interface support |
-| Basic report/dashboard | Query support | Main UI | No |
-| Testing | Core/API tests | Web manual tests | JavaFX/manual tests |
-| README/demo | Main | Screenshots | Screenshots |
+| Encounter | Backend support | Main Web UI | No |
+| Service Catalog | Backend | Web UI | Use in invoice flow |
+| Billing | Architecture review | Web support | Main backend/UI |
+| Payment | Architecture review | Web support | Main backend/UI |
+| JavaFX REST Integration | Main | No | UI support |
+| Report | Query support | Main UI | No |
+| Audit Log | Backend core | Viewer UI | Trigger actions |
+| Testing | Core tests/API tests | Web manual tests | JavaFX/manual tests |
+| README/Demo | Main | Screenshots | Screenshots |
 
-## 7. Member 1 - Nguyễn Duy Phương: Leader Tasks
+## 6. Member 1 - Nguyễn Duy Phương: Leader tasks
 
-### 7.1 Ownership
+### 6.1 Ownership chính
 
-Leader owns these project-wide decisions:
+Leader giữ các phần quyết định chất lượng và khả năng tích hợp:
 
 - Architecture.
 - Database schema.
-- Entity relationships.
+- Entity relationship.
 - Enum/status flow.
 - Security/RBAC.
 - Service business rules.
@@ -231,113 +121,153 @@ Leader owns these project-wide decisions:
 - Integration review.
 - Demo flow.
 
-### 7.2 First Tasks To Unblock Team
+### 6.2 Việc cần làm đầu tiên để unblock team
 
-These tasks should be completed or drafted before members implement deeply:
+Các task này nên làm trước để Bảo và Tài có thể bắt đầu mà không bị chờ:
 
-- [X] Create Spring Boot Maven project.
-- [X] Configure SQL Server in `application.properties`.
-- [X] Create domain-based package structure under `com.smartclinic`.
-- [X] Define naming rules in `team_rules.md`.
-- [X] Draft team task allocation.
-- [X] Draft database design in `docs/database-design.md`.
-- [X] Draft status flow in `docs/status-flow.md`.
-- [X] Create `BaseEntity` with `id`, `createdAt`, and `updatedAt`.
-- [X] Create common API response format.
-- [X] Create global exception handling for REST and web.
-- [X] Create Spring Security skeleton.
-- [X] Seed demo accounts by role.
-- [X] Draft API contract in `docs/api-contract.md`.
-- [X] Create sample health endpoint for JavaFX connectivity test.
+- [X] Tạo project Spring Boot Maven chuẩn.
+- [X] Cấu hình SQL Server trong `application.properties`.
+- [X] Tạo package structure chuẩn theo requirement.
+- [X] Chốt naming convention: entity, DTO, request/response, service interface.
+- [ ] Chốt core entities và relationships.
+- [ ] Chốt enum status flow cho appointment, queue, encounter, invoice, payment.
+- [ ] Tạo base entity có `id`, `createdAt`, `updatedAt`, `@Version`, `isActive` nếu cần.
+- [ ] Tạo global exception handling cho web và REST API.
+- [ ] Tạo common API response format.
+- [ ] Tạo Spring Security skeleton.
+- [ ] Seed demo accounts theo role.
+- [ ] Tạo API contract markdown hoặc Postman draft cho JavaFX.
+- [ ] Tạo sample endpoint để Member 3 test JavaFX UI flow.
 
-Recommended `BaseEntity` decision:
+### 6.3 Backend foundation
 
-```text
-BaseEntity: id, createdAt, updatedAt
-```
-
-Do not put `active` or `version` in `BaseEntity`; status/active rules differ per entity and optimistic locking is out of MVP scope.
-
-### 7.3 Backend Foundation Status
-
-Current foundation status:
-
-- [X] Maven `pom.xml` configured.
-- [X] SQL Server driver configured.
-- [X] Spring Data JPA dependency configured.
-- [X] Thymeleaf dependency configured.
-- [X] Spring Security dependency configured.
-- [X] Validation dependency configured.
-- [X] Static resource folders created.
-- [X] Domain-based package structure created.
-- [X] Backend test compiles with current skeleton.
-
-Current backend package style is domain-based, not global layered. Do not create a second global structure such as `controller/service/repository/entity` at the root. CRUD modules such as `user`, `staff`, `specialty`, and `room` should also follow the standard business module subpackages. Technical modules such as `auth` and `security` only create subpackages that match their real responsibilities.
-
-### 7.4 Security/RBAC
-
-Roles:
+- [ ] Configure Maven `pom.xml`.
+- [ ] Configure SQL Server driver.
+- [ ] Configure Spring Data JPA.
+- [ ] Configure Thymeleaf.
+- [ ] Configure Spring Security.
+- [ ] Configure validation dependency.
+- [ ] Configure static resources.
+- [ ] Create package structure:
 
 ```text
-ROLE_ADMIN
-ROLE_RECEPTIONIST
-ROLE_DOCTOR
-ROLE_CASHIER
-ROLE_MANAGER
+src/main/java/com/hsf302/smartclinic
+├── config
+├── controller
+├── restcontroller
+├── service
+│   ├── interfaces
+│   └── impl
+├── repository
+├── entity
+├── dto
+├── exception
+├── security
+└── util
 ```
 
-Tasks:
+### 6.4 Security/RBAC
 
-- [X] Implement `User`, `Role`, `Staff`, and `Doctor` relationship.
-- [X] Configure login/logout with Spring Security.
-- [X] Configure BCrypt password encoder.
-- [ ] Configure role-based web URL access.
-- [ ] Configure role-based REST API access.
-- [X] Add access denied page.
-- [X] Seed demo users for all roles.
+Roles nên dùng cho domain phòng khám:
 
-Access summary:
+- `ROLE_ADMIN`
+- `ROLE_RECEPTIONIST`
+- `ROLE_DOCTOR`
+- `ROLE_CASHIER`
+- `ROLE_MANAGER`
 
-| Role | Permission |
-| --- | --- |
-| `ADMIN` | Full system access |
-| `RECEPTIONIST` | Patient, appointment, check-in, queue |
-| `DOCTOR` | Queue, consultation, encounter |
-| `CASHIER` | Invoice and payment |
-| `MANAGER` | Dashboard and reports |
+Task:
 
-### 7.5 Appointment and Queue Backend
+- [ ] Implement `User`, `Role`, `Staff`, `Doctor` relationship.
+- [ ] Login/logout bằng Spring Security.
+- [ ] BCrypt password.
+- [ ] Role-based URL access cho web.
+- [ ] Role-based URL access cho REST API.
+- [ ] Method security ở service nếu cần.
+- [ ] Access denied page.
+- [ ] Seed demo accounts:
+  - admin
+  - receptionist
+  - doctor
+  - cashier
+  - manager
 
-Appointment tasks:
+Rule:
 
-- [X] Create appointment.
-- [X] View appointments by date.
-- [X] View today appointments.
-- [X] Reschedule appointment.
-- [X] Cancel appointment.
-- [X] Validate doctor availability.
-- [X] Prevent duplicate doctor slot in service layer.
-- [X] Prevent invalid status transition.
+- `ADMIN`: full access.
+- `RECEPTIONIST`: patient, appointment, check-in, queue.
+- `DOCTOR`: queue, consultation, encounter.
+- `CASHIER`: invoice, payment.
+- `MANAGER`: dashboard, reports.
 
-Queue tasks:
+### 6.5 Appointment business logic
 
-- [X] Check in appointment.
-- [X] Create queue item after check-in.
-- [X] Create walk-in queue item.
-- [X] Generate queue number.
-- [X] View today's queue.
-- [X] Filter queue by doctor.
-- [X] Doctor calls next patient.
-- [X] Update queue status.
+Task:
 
-Rules:
+- [ ] Create appointment.
+- [ ] View appointments by date.
+- [ ] View today appointments.
+- [ ] Reschedule appointment.
+- [ ] Cancel appointment.
+- [ ] Validate doctor availability.
+- [ ] Prevent duplicate doctor slot.
+- [ ] Prevent invalid status transition.
 
-- Only `BOOKED` appointment can be checked in.
-- One appointment can create only one queue item.
-- Queue number is unique per day.
-- Completed/skipped queue items do not appear in active queue.
+Status:
 
-### 7.6 REST API Contract and JavaFX Integration
+```text
+BOOKED
+-> CHECKED_IN
+-> IN_CONSULTATION
+-> COMPLETED
+
+BOOKED -> CANCELLED
+BOOKED -> NO_SHOW
+```
+
+Business rules:
+
+- [ ] Cannot book outside doctor working hours.
+- [ ] Cannot book duplicate slot for same doctor.
+- [ ] Cannot check in cancelled appointment.
+- [ ] Cannot cancel appointment after consultation starts.
+- [ ] Cannot reschedule completed appointment.
+
+### 6.6 Check-in and queue
+
+Task:
+
+- [ ] Check in appointment.
+- [ ] Create queue item after check-in.
+- [ ] Create walk-in queue item.
+- [ ] Generate queue number.
+- [ ] View today queue.
+- [ ] Filter queue by doctor.
+- [ ] Doctor calls next patient.
+- [ ] Update queue status.
+
+Status:
+
+```text
+WAITING
+-> CALLED
+-> IN_SERVICE
+-> DONE
+
+WAITING -> SKIPPED
+```
+
+Business rules:
+
+- [ ] Only `BOOKED` appointment can be checked in.
+- [ ] One appointment can only be checked in once.
+- [ ] Queue number is unique per day.
+- [ ] Doctor can only call assigned patients.
+- [ ] `DONE` and `SKIPPED` queue items should not appear in active queue.
+
+### 6.7 REST API contract and JavaFX integration
+
+Leader giữ phần này để JavaFX không bị lệch contract.
 
 Base prefix:
 
@@ -345,69 +275,121 @@ Base prefix:
 /api/v1
 ```
 
-Minimum API draft for MVP:
+Auth:
 
 ```text
-GET  /api/v1/health
 POST /api/v1/auth/login
 POST /api/v1/auth/logout
+```
 
+Patient:
+
+```text
 GET  /api/v1/patients/search?keyword=
 GET  /api/v1/patients/{id}
 POST /api/v1/patients
+```
 
-GET   /api/v1/appointments/today
-GET   /api/v1/appointments?date=
-POST  /api/v1/appointments
-PUT   /api/v1/appointments/{id}/reschedule
+Appointment:
+
+```text
+GET  /api/v1/appointments/today
+GET  /api/v1/appointments?date=
+POST /api/v1/appointments
+PUT  /api/v1/appointments/{id}/reschedule
 PATCH /api/v1/appointments/{id}/cancel
 PATCH /api/v1/appointments/{id}/check-in
+```
 
-GET   /api/v1/queue-items/today
-GET   /api/v1/queue-items/today?doctorId=
-PATCH /api/v1/queue-items/{id}/call
-PATCH /api/v1/queue-items/{id}/skip
-PATCH /api/v1/queue-items/{id}/complete
+Queue:
 
+```text
+GET   /api/v1/queue/today
+GET   /api/v1/queue/today?doctorId=
+PATCH /api/v1/queue/{id}/call
+PATCH /api/v1/queue/{id}/skip
+PATCH /api/v1/queue/{id}/complete
+```
+
+Invoice/payment:
+
+```text
 GET  /api/v1/invoices/pending
 GET  /api/v1/invoices/{id}
 POST /api/v1/invoices/generate?visitId=
 POST /api/v1/invoices/{id}/payments
 ```
 
-JavaFX REST integration tasks for Member 1:
+JavaFX integration tasks của leader:
 
 - [ ] Define DTOs used by JavaFX.
-- [X] Define API response format.
-- [X] Implement auth session/token/cookie handling strategy.
-- [X] Implement JavaFX API client wrapper.
-- [ ] Implement JavaFX service implementations that call API clients.
-- [ ] Connect Member 3 screens to real APIs.
-- [ ] Map API errors to JavaFX alerts.
+- [ ] Define API response format.
+- [ ] Implement auth session/token/cookie handling strategy.
+- [ ] Implement JavaFX `ApiClient`/HTTP wrapper.
+- [ ] Implement `AuthApiClient`.
+- [ ] Implement `PatientApiClient`.
+- [ ] Implement `AppointmentApiClient`.
+- [ ] Implement `QueueApiClient`.
+- [ ] Implement `InvoiceApiClient`.
+- [ ] Implement `PaymentApiClient`.
+- [ ] Connect Member 3's JavaFX screens to real APIs.
+- [ ] Handle API errors and map them to JavaFX alerts.
 
-## 8. Member 2 - Trịnh Hoàng Thiên Bảo: Web Thymeleaf Tasks
+### 6.8 Deliverables của Member 1
 
-Member 2 owns the web portal used by Admin, Receptionist, Doctor, and Manager.
+- [ ] Backend project runs successfully.
+- [ ] SQL Server connection works.
+- [ ] Login by role works.
+- [ ] Role-based security works.
+- [ ] Core schema is stable.
+- [ ] Appointment booking works with validation.
+- [ ] Check-in creates queue item.
+- [ ] Queue status flow works.
+- [ ] REST APIs are stable.
+- [ ] JavaFX REST integration works.
+- [ ] Demo data is available.
+- [ ] Core business rules have unit tests.
+- [ ] Postman collection has core happy path and error cases.
 
-### 8.1 Layout and Common UI
+## 7. Member 2 - Trịnh Hoàng Thiên Bảo: Web Thymeleaf tasks
 
-- [ ] Create base Thymeleaf layout.
-- [ ] Create header/sidebar.
+### 7.1 Ownership chính
+
+Bảo phụ trách web portal cho Admin, Receptionist, Doctor và Manager.
+
+Modules:
+
+- Thymeleaf layout.
+- Patient web UI.
+- Doctor/Specialty/Room web UI.
+- Doctor schedule web UI.
+- Appointment web UI.
+- Encounter/consultation web UI.
+- Dashboard/report UI.
+- Audit log viewer.
+
+### 7.2 Thymeleaf layout
+
+- [ ] Create base layout.
+- [ ] Create header.
+- [ ] Create sidebar.
 - [ ] Create role-based menu.
 - [ ] Create breadcrumb.
 - [ ] Create flash message component.
 - [ ] Create form error display.
 - [ ] Create common table style.
-- [ ] Create 403 and 404 pages.
+- [ ] Create 403 page.
+- [ ] Create 404 page.
 
 Rules:
 
 - No inline CSS.
 - Common CSS goes to `static/css/custom.css`.
 - Module CSS goes to `static/css/<module>.css`.
+- Use Bootstrap 5.
 - Use Thymeleaf fragments.
 
-### 8.2 Patient Web UI
+### 7.3 Patient web UI
 
 - [ ] Patient list page.
 - [ ] Patient search/filter.
@@ -416,17 +398,60 @@ Rules:
 - [ ] Patient detail page.
 - [ ] Patient visit history section.
 
-### 8.3 Doctor, Specialty, Room, Schedule Web UI
+Fields:
 
-- [ ] Specialty list/create/update pages.
-- [ ] Room list/create/update pages.
-- [ ] Doctor list/create/update/detail pages.
-- [ ] Doctor availability list/create/update pages.
-- [ ] Activate/deactivate availability action.
+- Patient code.
+- Full name.
+- Date of birth.
+- Gender.
+- Phone.
+- Email.
+- Address.
+- Emergency contact name.
+- Emergency contact phone.
+- Allergy note.
+- Status.
 
-Schedule validation is handled by Member 1 service layer.
+### 7.4 Doctor, specialty, room web UI
 
-### 8.4 Appointment and Queue Web UI
+- [ ] Specialty list page.
+- [ ] Specialty create/update form.
+- [ ] Doctor list page.
+- [ ] Doctor create/update form.
+- [ ] Doctor detail page.
+- [ ] Room list page.
+- [ ] Room create/update form.
+
+Doctor fields:
+
+- Full name.
+- Specialty.
+- License number.
+- Consultation fee.
+- Room.
+- Status.
+- Bio.
+
+### 7.5 Doctor schedule web UI
+
+- [ ] Doctor availability list.
+- [ ] Create doctor availability form.
+- [ ] Update doctor availability form.
+- [ ] Activate/deactivate availability.
+
+Fields:
+
+- Doctor.
+- Day of week.
+- Start time.
+- End time.
+- Slot duration.
+- Room.
+- Active status.
+
+Note: Bảo làm UI và controller gọi service. Validate lịch đúng/sai nằm trong service của Member 1.
+
+### 7.6 Appointment web UI
 
 - [ ] Today appointments page.
 - [ ] Appointment list by date.
@@ -434,64 +459,111 @@ Schedule validation is handled by Member 1 service layer.
 - [ ] Appointment detail page.
 - [ ] Reschedule appointment form.
 - [ ] Cancel appointment action.
-- [ ] Check-in action.
-- [ ] Queue board page.
-- [ ] Queue filter by doctor/room.
+- [ ] Check-in button.
 
-Check-in UI calls backend service/API only. Do not implement check-in rules in templates.
+Note: Check-in button chỉ gọi service/API đã có, không viết logic check-in trong template/controller.
 
-### 8.5 Encounter and Dashboard UI
+### 7.7 Encounter/consultation web UI
 
 - [ ] Doctor queue page.
 - [ ] Start consultation action.
 - [ ] Encounter form.
-- [ ] Chief complaint, diagnosis, clinical note inputs.
+- [ ] Chief complaint input.
+- [ ] Diagnosis input.
+- [ ] Clinical note input.
 - [ ] Add service order section.
 - [ ] Complete encounter action.
 - [ ] Completed encounter detail page.
-- [ ] Manager dashboard page.
-- [ ] Today appointments, waiting queue, completed visits, today revenue cards.
-- [ ] Top services and doctor performance tables.
 
-### 8.6 Member 2 Deliverables
+Rules:
+
+- [ ] Only doctor can start consultation.
+- [ ] Only assigned doctor can complete encounter.
+- [ ] Completed encounter is read-only.
+- [ ] Encounter must be completed before invoice generation.
+
+### 7.8 Dashboard/report UI
+
+- [ ] Manager dashboard page.
+- [ ] Today appointments card.
+- [ ] Waiting queue count card.
+- [ ] Completed visits card.
+- [ ] Today revenue card.
+- [ ] Top services table.
+- [ ] Doctor performance table.
+
+Optional:
+
+- [ ] Chart.js chart.
+- [ ] Export CSV.
+
+### 7.9 Audit log viewer
+
+- [ ] Audit log list page.
+- [ ] Filter by action.
+- [ ] Filter by date.
+- [ ] Show actor.
+- [ ] Show entity type.
+- [ ] Show entity ID.
+- [ ] Show created time.
+
+### 7.10 Deliverables của Member 2
 
 - [ ] Web layout looks professional.
 - [ ] Patient pages work.
 - [ ] Doctor/specialty/room pages work.
 - [ ] Doctor schedule pages work.
 - [ ] Appointment pages work.
-- [ ] Queue board works.
 - [ ] Doctor consultation pages work.
-- [ ] Dashboard displays MVP metrics.
+- [ ] Dashboard displays clinic metrics.
+- [ ] Audit log page displays critical actions.
 - [ ] Web UI is ready for demo.
 
-## 9. Member 3 - Nguyễn Hữu Tài: JavaFX UI + Billing/Payment Tasks
+## 8. Member 3 - Nguyễn Hữu Tài: JavaFX UI + Billing/Payment tasks
 
-Member 3 owns JavaFX desktop UI and billing/payment workflow. Member 1 owns the actual REST integration.
+### 8.1 Ownership chính
 
-### 9.1 JavaFX Structure
+Tài phụ trách JavaFX desktop UI và billing/payment workflow. REST integration trong JavaFX sẽ do Member 1 nối chính.
 
-Use current package structure:
+Modules:
+
+- JavaFX FXML screens.
+- JavaFX controller event handling.
+- Scene navigation.
+- Front desk UI flow.
+- Queue desktop screen.
+- Billing backend support.
+- Payment backend/UI.
+- Invoice UI.
+
+### 8.2 JavaFX UI structure
+
+Suggested structure:
 
 ```text
-com.smartclinic.desktop.app
-com.smartclinic.desktop.controller
-com.smartclinic.desktop.service
-com.smartclinic.desktop.api
-com.smartclinic.desktop.dto
-com.smartclinic.desktop.session
-com.smartclinic.desktop.navigation
-com.smartclinic.desktop.config
-com.smartclinic.desktop.util
+desktop-client
+├── controller
+│   ├── LoginController.java
+│   ├── TodayAppointmentController.java
+│   ├── PatientSearchController.java
+│   ├── WalkInController.java
+│   ├── QueueBoardController.java
+│   ├── PendingInvoiceController.java
+│   └── PaymentController.java
+├── service
+│   ├── interfaces
+│   └── impl
+├── client
+│   └── api clients implemented/integrated by Member 1
+├── model
+├── util
+└── resources
+    ├── fxml
+    ├── css
+    └── images
 ```
 
-Required flow:
-
-```text
-FXML Controller -> Desktop Service -> API Client -> Backend REST API
-```
-
-### 9.2 JavaFX Screens
+### 8.3 JavaFX screens
 
 - [ ] Login screen.
 - [ ] Main layout/navigation.
@@ -504,114 +576,176 @@ FXML Controller -> Desktop Service -> API Client -> Backend REST API
 - [ ] Invoice detail screen.
 - [ ] Payment screen.
 
-### 9.3 Billing and Payment
+Rules:
 
-Invoice MVP status flow:
+- FXML controller only handles UI event and updates view.
+- Use JavaFX `Task` or `Service` when calling backend through service layer to avoid UI freeze.
+- Show `ProgressIndicator` when loading.
+- Use JavaFX Alert/Dialog for success/error/confirm.
+- CSS in `resources/css`, no inline style.
+- Highlight invalid fields using CSS class.
+
+### 8.4 REST integration boundary
+
+Member 3 does:
+
+- [ ] Prepare FXML screens.
+- [ ] Prepare controller methods.
+- [ ] Prepare UI table columns.
+- [ ] Prepare form validation at UI level.
+- [ ] Call JavaFX service interfaces.
+- [ ] Coordinate with Member 1 on required DTO fields.
+
+Member 1 does:
+
+- [ ] Implement actual HTTP client.
+- [ ] Implement auth handling.
+- [ ] Implement API request/response mapping.
+- [ ] Connect UI service implementation to REST API.
+- [ ] Handle API error response mapping.
+
+This boundary avoids duplicate REST clients and keeps API contract controlled by leader.
+
+### 8.5 Billing module
+
+Billing flow:
 
 ```text
-ISSUED -> PAID
-ISSUED -> CANCELLED
+Completed Encounter
+-> Generate Invoice
+-> Add Invoice Items
+-> Calculate Total
+-> Issue Invoice
+-> Pay Invoice
 ```
 
-Payment MVP statuses:
+Invoice status:
 
 ```text
-SUCCESS
-FAILED
+DRAFT
+-> ISSUED
+-> PAID
+
+DRAFT / ISSUED -> CANCELLED
 ```
 
 Tasks:
 
+- [ ] Implement invoice entity/repository/service with leader review.
 - [ ] Generate invoice from completed visit.
-- [ ] Add consultation fee and encounter services.
+- [ ] Add consultation fee.
+- [ ] Add encounter service orders.
 - [ ] Calculate subtotal and total.
 - [ ] Prevent duplicate invoice for same visit.
 - [ ] Prevent editing paid invoice.
+- [ ] Provide pending invoice data for JavaFX screen.
+
+### 8.6 Payment module
+
+Payment methods:
+
+- `CASH`
+- `BANK_TRANSFER`
+- `CARD`
+- `MOMO_MOCK`
+
+Tasks:
+
 - [ ] View pending invoices.
 - [ ] View invoice detail.
 - [ ] Record payment.
-- [ ] Mark invoice as `PAID` on successful payment.
+- [ ] Store payment method.
+- [ ] Store payment transaction.
+- [ ] Mark invoice as `PAID`.
 - [ ] Display payment result in JavaFX.
 
 Business rules:
 
-- Only `ISSUED` invoice can be paid.
-- Payment amount must equal invoice total in MVP.
-- Paid invoice cannot be modified.
-- One invoice has one successful full payment in MVP.
+- [ ] Only `ISSUED` invoice can be paid.
+- [ ] Payment amount must equal invoice total.
+- [ ] Paid invoice cannot be modified.
+- [ ] One invoice has one successful full payment in MVP.
 
-### 9.4 Member 3 Deliverables
+### 8.7 Deliverables của Member 3
 
 - [ ] JavaFX app opens successfully.
-- [ ] Login screen is complete.
-- [ ] Today appointments screen is complete.
+- [ ] JavaFX login screen is complete.
+- [ ] Today appointment screen is complete.
 - [ ] Patient search screen is complete.
 - [ ] Check-in UI flow is complete.
 - [ ] Queue board desktop screen is complete.
+- [ ] Invoice generation works.
 - [ ] Pending invoice screen works.
 - [ ] Payment screen works.
-- [ ] JavaFX app is ready for demo after REST connection.
+- [ ] Paid invoice updates correctly.
+- [ ] JavaFX app is ready for demo after Member 1 connects REST.
 
-## 10. Core Entities and Relationships
+## 9. Core entities cần chốt sớm
 
-MVP entities:
+Leader nên chốt các entity này trước khi mọi người code:
+
+- `User`
+- `Role`
+- `Staff`
+- `Patient`
+- `Doctor`
+- `Specialty`
+- `Room`
+- `DoctorAvailability`
+- `Appointment`
+- `QueueItem`
+- `Visit`
+- `Encounter`
+- `ServiceCatalog`
+- `EncounterService`
+- `Invoice`
+- `InvoiceItem`
+- `Payment`
+- `AuditLog`
+
+Relationship gợi ý:
 
 ```text
-User
-Role
-Staff
-Doctor
-Specialty
-Room
-Patient
-DoctorAvailability
-Appointment
-QueueItem
-Visit
-Encounter
-ServiceCatalog
-EncounterService
-Invoice
-InvoiceItem
-Payment
+User N-N Role
+User 1-0..1 Staff
+Staff 1-0..1 Doctor
+Doctor N-1 Specialty
+Doctor N-1 Room
+
+Patient 1-N Appointment
+Doctor 1-N Appointment
+Appointment 0..1-1 QueueItem
+
+Patient 1-N Visit
+Appointment 0..1-1 Visit
+QueueItem 1-0..1 Visit
+Visit 1-1 Encounter
+
+Encounter 1-N EncounterService
+ServiceCatalog 1-N EncounterService
+
+Visit 1-0..1 Invoice
+Invoice 1-N InvoiceItem
+Invoice 1-N Payment
+
+User 1-N AuditLog
 ```
 
-Excluded from MVP critical path:
-
-```text
-AuditLog
-Prescription
-MedicineInventory
-Insurance
-Notification
-Refund
-PDF invoice
-Advanced reports
-```
-
-Relationship baseline is documented in `docs/database-design.md`.
-
-Status flows are documented in `docs/status-flow.md`.
-
-## 11. Milestones
+## 10. Milestones đề xuất
 
 ### Milestone 1 - Foundation
 
 Owner: Member 1, support by all.
 
-- [X] Backend project setup.
-- [X] SQL Server config.
-- [X] Package structure.
-- [X] JavaFX skeleton.
-- [X] Team rules.
-- [X] Database design draft.
-- [X] Status flow draft.
-- [X] Security skeleton.
-- [X] Seed data.
-- [X] API contract draft.
+- [ ] Spring Boot project setup.
+- [ ] SQL Server setup.
+- [ ] Security skeleton.
+- [ ] Seed data.
 - [ ] Base web layout.
+- [ ] JavaFX skeleton.
+- [ ] API contract draft.
 
-### Milestone 2 - Clinic Master Data
+### Milestone 2 - Clinic master data
 
 Owner: Member 1 + Member 2.
 
@@ -621,19 +755,19 @@ Owner: Member 1 + Member 2.
 - [ ] Room.
 - [ ] Doctor availability.
 
-### Milestone 3 - Appointment and Queue
+### Milestone 3 - Appointment and queue
 
 Owner: all members.
 
 - [ ] Appointment booking.
 - [ ] Appointment validation.
 - [ ] Check-in.
-- [ ] Walk-in queue item.
+- [ ] Walk-in visit.
 - [ ] Queue board.
 - [ ] JavaFX appointment screen.
 - [ ] JavaFX queue screen.
 
-### Milestone 4 - Consultation and Billing
+### Milestone 4 - Consultation and billing
 
 Owner: Member 2 + Member 3, reviewed by Member 1.
 
@@ -642,11 +776,12 @@ Owner: Member 2 + Member 3, reviewed by Member 1.
 - [ ] Invoice.
 - [ ] Payment.
 
-### Milestone 5 - Reports, Testing, Demo
+### Milestone 5 - Reports, audit, testing, demo
 
 Owner: all members.
 
-- [ ] Basic dashboard.
+- [ ] Dashboard.
+- [ ] Audit log.
 - [ ] Business rule tests.
 - [ ] Postman collection.
 - [ ] Desktop test plan.
@@ -654,18 +789,17 @@ Owner: all members.
 - [ ] Screenshots.
 - [ ] Demo script.
 
-## 12. One-Week Execution Plan
+## 11. One-week execution plan
 
 ### Day 1 - Foundation
 
 Member 1:
 
-- [ ] BaseEntity.
-- [ ] Common API response.
-- [ ] Global exception handling.
+- [ ] Backend project setup.
+- [ ] SQL Server config.
 - [ ] Security skeleton.
 - [ ] User/Role seed data.
-- [ ] API contract draft.
+- [ ] API response/error format.
 
 Member 2:
 
@@ -675,11 +809,11 @@ Member 2:
 
 Member 3:
 
-- [ ] JavaFX navigation.
+- [ ] JavaFX project setup.
+- [ ] FXML structure.
 - [ ] Login screen mock.
-- [ ] Service interface skeleton for screens.
 
-### Day 2 - Master Data
+### Day 2 - Master data
 
 Member 1:
 
@@ -697,6 +831,7 @@ Member 2:
 
 Member 3:
 
+- [ ] JavaFX navigation.
 - [ ] Patient search UI.
 - [ ] Today appointment UI mock.
 
@@ -706,9 +841,9 @@ Member 1:
 
 - [ ] Appointment create logic.
 - [ ] Appointment reschedule/cancel.
-- [ ] Duplicate doctor slot validation.
-- [ ] Doctor availability validation.
-- [ ] Appointment REST endpoints.
+- [ ] Prevent duplicate doctor slot.
+- [ ] Validate doctor availability.
+- [ ] REST endpoints for appointment.
 
 Member 2:
 
@@ -723,7 +858,7 @@ Member 3:
 - [ ] TableView and filters.
 - [ ] Check-in button UI.
 
-### Day 4 - Check-in and Queue
+### Day 4 - Check-in and queue
 
 Member 1:
 
@@ -736,7 +871,7 @@ Member 1:
 Member 2:
 
 - [ ] Queue web board.
-- [ ] Check-in action on web.
+- [ ] Check-in button on web.
 - [ ] Queue filter by doctor/room.
 
 Member 3:
@@ -745,7 +880,7 @@ Member 3:
 - [ ] JavaFX queue board.
 - [ ] Loading/error states.
 
-### Day 5 - Consultation and Billing
+### Day 5 - Consultation and billing
 
 Member 1:
 
@@ -767,10 +902,11 @@ Member 3:
 - [ ] Payment backend/UI.
 - [ ] Pending invoices screen.
 
-### Day 6 - Reports and Polish
+### Day 6 - Reports, audit, polish
 
 Member 1:
 
+- [ ] Audit log backend.
 - [ ] Core business rule tests.
 - [ ] Security tests.
 - [ ] Integration review.
@@ -779,6 +915,7 @@ Member 1:
 Member 2:
 
 - [ ] Dashboard UI.
+- [ ] Audit log viewer.
 - [ ] UI polish.
 - [ ] Form validation display.
 
@@ -789,7 +926,7 @@ Member 3:
 - [ ] Error dialog polish.
 - [ ] Desktop test cases.
 
-### Day 7 - Final Integration and Demo
+### Day 7 - Final integration and demo
 
 All:
 
@@ -801,7 +938,9 @@ All:
 - [ ] Prepare demo script.
 - [ ] Final code review.
 
-## 13. MVP Must-Have Features
+## 12. MVP must-have
+
+Nếu thiếu thời gian, phải ưu tiên các phần này:
 
 - [ ] Login/RBAC.
 - [ ] Patient management.
@@ -816,14 +955,14 @@ All:
 - [ ] Payment recording.
 - [ ] JavaFX check-in/queue.
 - [ ] Basic dashboard.
+- [ ] Basic audit log.
 - [ ] Postman collection with at least 20 requests.
 - [ ] Desktop test plan with at least 10 test cases.
 
-## 14. Optional Features
+## 13. Optional features
 
-Only implement these if the MVP is already stable:
+Chỉ làm nếu MVP đã ổn:
 
-- [Partial] Audit log (foundation is merged but not fully wired to all modules).
 - [ ] Prescription.
 - [ ] Medicine inventory.
 - [ ] Notification.
@@ -833,29 +972,78 @@ Only implement these if the MVP is already stable:
 - [ ] WebSocket real-time queue.
 - [ ] Multi-branch clinic.
 - [ ] Insurance claim.
-- [ ] Refund workflow.
 
-## 15. Definition of Done
+## 14. Đánh giá: project đã ổn để triển khai chưa?
 
-A task is done only when:
+Kết luận: ý tưởng và cách chia workflow đã ổn để bắt đầu triển khai, nhưng chưa nên để từng member code tự do ngay. Cần leader chốt foundation trước, nếu không khi ghép web, backend và JavaFX rất dễ vỡ ở entity, enum, API contract và security.
 
-- [ ] Entity/repository is implemented if needed.
-- [ ] Service interface and implementation are completed.
-- [ ] Business rules are validated in service.
-- [ ] Controller/API is implemented.
-- [ ] DTO/request/response is used correctly.
+Điểm mạnh hiện tại:
+
+- Domain phòng khám phù hợp requirement môn học.
+- Có cả web Thymeleaf và JavaFX desktop.
+- Có workflow end-to-end rõ ràng, không chỉ CRUD.
+- Có đủ nghiệp vụ để demo tốt: appointment, queue, encounter, invoice, payment.
+- Có phân vai theo ownership hợp lý.
+
+Điểm cần chỉnh trước khi triển khai:
+
+- Đổi database target sang SQL Server để khớp requirement.
+- Chốt package structure theo yêu cầu môn học.
+- Chốt API prefix `/api/v1`.
+- Chốt entity relationship trước khi chia code.
+- Chốt enum status flow trước khi làm UI.
+- Chốt common response/error format để JavaFX dễ xử lý.
+- Chốt role names và security matrix.
+- Tạo seed data sớm để các member test cùng một dữ liệu.
+- Tạo Postman collection từ đầu, không đợi cuối kỳ.
+- Tách rõ JavaFX UI và JavaFX REST integration như đã phân công.
+
+## 15. Leader checklist trước khi giao task cho team
+
+Leader nên hoàn thành hoặc ít nhất draft các mục này đầu tiên:
+
+- [ ] Create repository structure.
+- [ ] Add Spring Boot Maven project.
+- [ ] Add SQL Server connection config.
+- [ ] Add base entity and audit fields.
+- [ ] Add global exception handling.
+- [ ] Add common API response.
+- [ ] Add security skeleton.
+- [ ] Add seed users and roles.
+- [ ] Create initial ERD or entity relationship document.
+- [ ] Create enum status document.
+- [ ] Create API contract document.
+- [ ] Create sample Thymeleaf layout entry point for Member 2.
+- [ ] Create JavaFX skeleton/API client interface for Member 3.
+- [ ] Create GitHub issues for each member.
+- [ ] Create branch naming convention.
+- [ ] Create PR checklist.
+
+Sau checklist này, Bảo và Tài có thể làm song song mà ít bị block.
+
+## 16. Definition of Done
+
+Một task chỉ được xem là xong khi:
+
+- [ ] Entity/repository implemented if needed.
+- [ ] Service interface and implementation completed.
+- [ ] Business rules validated in service.
+- [ ] Controller/API implemented.
+- [ ] DTO/request/response used correctly.
 - [ ] Error handling works.
-- [ ] Role permission is checked when applicable.
-- [ ] UI is connected if required.
-- [ ] Manual test is completed.
+- [ ] Role permission checked.
+- [ ] UI connected if required.
+- [ ] Manual test completed.
 - [ ] Demo data works.
 - [ ] No inline CSS in Thymeleaf.
 - [ ] JavaFX controller does not contain business logic.
 
-## 16. Final Demo Flow
+## 17. Final demo flow
+
+Demo nên đi theo luồng này:
 
 1. Admin logs in.
-2. Admin creates specialty, room, doctor, and schedule.
+2. Admin creates specialty, room, doctor and schedule.
 3. Receptionist logs in.
 4. Receptionist creates/searches patient.
 5. Receptionist books appointment.
@@ -870,13 +1058,14 @@ A task is done only when:
 14. Cashier generates invoice.
 15. Cashier records payment.
 16. Manager views dashboard.
+17. Admin views audit logs.
 
-## 17. Git Workflow
+## 18. Git workflow
 
 Branches:
 
-- `main`: stable branch.
-- `dev`: team integration branch.
+- `main`: stable final version.
+- `develop`: integration branch.
 - `feature/<issue-id>-<short-name>`: feature work.
 - `bugfix/<issue-id>-<short-name>`: bug fix.
 
@@ -891,9 +1080,4 @@ style(css): polish patient table
 chore(pom): add sql server dependency
 ```
 
-Rules:
-
-- Pull latest `dev` before starting a feature branch.
-- Feature branches should target `dev`.
-- `main` should receive stable work only after integration testing.
-- Do not commit `.env`, `.idea`, `target`, or local secret files.
+Mỗi member nên có ít nhất 3 feature/bugfix branches để đúng tinh thần làm nhóm với GitHub.
