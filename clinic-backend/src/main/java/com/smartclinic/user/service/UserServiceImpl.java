@@ -1,6 +1,6 @@
 package com.smartclinic.user.service;
 
-import com.smartclinic.common.dto.PageResponse;
+import com.smartclinic.common.api.PageResponse;
 import com.smartclinic.common.exception.BadRequestException;
 import com.smartclinic.common.exception.DuplicateResourceException;
 import com.smartclinic.common.exception.ResourceNotFoundException;

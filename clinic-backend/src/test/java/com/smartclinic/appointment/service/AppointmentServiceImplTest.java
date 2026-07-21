@@ -53,6 +53,9 @@ class AppointmentServiceImplTest {
     @Mock
     private DoctorAvailabilityRepository availabilityRepository;
 
+    @Mock
+    private com.smartclinic.notification.service.NotificationService notificationService;
+
     @InjectMocks
     private AppointmentServiceImpl service;
 

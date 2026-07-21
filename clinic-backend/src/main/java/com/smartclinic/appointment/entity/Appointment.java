@@ -72,4 +72,8 @@ public class Appointment extends BaseEntity {
 
     @Column(name = "cancelled_reason", columnDefinition = "nvarchar(max)")
     private String cancelledReason;
+
+    @Column(name = "reminder_sent")
+    @Builder.Default
+    private boolean reminderSent = false;
 }

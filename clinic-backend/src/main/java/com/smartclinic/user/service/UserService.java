@@ -1,6 +1,6 @@
 package com.smartclinic.user.service;
 
-import com.smartclinic.common.dto.PageResponse;
+import com.smartclinic.common.api.PageResponse;
 import com.smartclinic.user.dto.ResetPasswordRequest;
 import com.smartclinic.user.dto.UserCreateRequest;
 import com.smartclinic.user.dto.UserResponse;

@@ -51,4 +51,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("end") LocalDateTime end,
             @Param("statuses") Collection<AppointmentStatus> statuses
     );
+
+    @Query("""
+            select a from Appointment a
+            where a.status = com.smartclinic.appointment.entity.AppointmentStatus.BOOKED
+              and (a.reminderSent = false or a.reminderSent is null)
+              and a.scheduledStart >= :start
+              and a.scheduledStart <= :end
+            """)
+    List<Appointment> findAppointmentsForReminder(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 }

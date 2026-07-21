@@ -53,6 +53,12 @@ class AuthIntegrationTest {
 
     @Test
     void testFailedLoginAttemptsLockAccountAfter5Times() throws Exception {
+        User initAdmin = userRepository.findByUserName("admin").orElseThrow();
+        initAdmin.setStatus(UserStatus.ACTIVE);
+        initAdmin.setFailedLoginAttempts(0);
+        initAdmin.setLockTime(null);
+        userRepository.save(initAdmin);
+
         LoginRequest invalidLogin = new LoginRequest();
         invalidLogin.setUserName("admin");
         invalidLogin.setPassword("wrongpassword");

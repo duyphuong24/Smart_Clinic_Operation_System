@@ -15,6 +15,7 @@ import com.smartclinic.patient.entity.PatientStatus;
 import com.smartclinic.patient.repository.PatientRepository;
 import com.smartclinic.queue.dto.AppointmentCheckInRequest;
 import com.smartclinic.queue.dto.QueueItemResponse;
+import com.smartclinic.queue.dto.QueueTransferRequest;
 import com.smartclinic.queue.dto.WalkInQueueRequest;
 import com.smartclinic.queue.entity.QueueItem;
 import com.smartclinic.queue.entity.QueuePriority;

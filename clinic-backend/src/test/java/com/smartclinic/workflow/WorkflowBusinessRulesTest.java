@@ -57,7 +57,7 @@ class WorkflowBusinessRulesTest {
         DoctorAvailabilityRepository availabilityRepository = mock(DoctorAvailabilityRepository.class);
 
         AppointmentServiceImpl appointmentService = new AppointmentServiceImpl(
-                appointmentRepository, patientRepository, doctorRepository, mock(com.smartclinic.masterdata.repository.RoomRepository.class), availabilityRepository
+                appointmentRepository, patientRepository, doctorRepository, mock(com.smartclinic.masterdata.repository.RoomRepository.class), availabilityRepository, mock(com.smartclinic.notification.service.NotificationService.class)
         );
 
         Patient patient = new Patient();
