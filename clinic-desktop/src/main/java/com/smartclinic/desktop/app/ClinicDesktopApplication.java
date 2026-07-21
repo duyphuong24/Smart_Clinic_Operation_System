@@ -1,15 +1,20 @@
 package com.smartclinic.desktop.app;
 
-import com.smartclinic.desktop.config.AppContext;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class ClinicDesktopApplication extends Application {
 
     @Override
-    public void start(Stage stage) {
-        AppContext appContext = new AppContext();
-        appContext.bindStage(stage);
-        appContext.getSceneNavigator().showLogin();
+    public void start(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(
+                ClinicDesktopApplication.class.getResource("/fxml/hello-view.fxml")
+        );
+        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        stage.setTitle("Smart Clinic Operations System");
+        stage.setScene(scene);
+        stage.show();
     }
 }
