@@ -42,7 +42,10 @@ public class DoctorScheduleBoardController {
     @PostMapping("/schedule/board/save")
     public String saveShift(@Valid @ModelAttribute("newShift") DoctorAvailabilityRequest request) {
         DoctorAvailabilityResponse response = doctorAvailabilityService.create(request);
-        auditLogService.record("CREATE_SHIFT", "DOCTOR_AVAILABILITY", response.getId(), "Assigned doctor shift for " + response.getDoctorName() + " on day " + response.getDayOfWeek());
+        Long id = (response != null) ? response.getId() : null;
+        String doctorName = (response != null) ? response.getDoctorName() : "Doctor";
+        Integer dayOfWeek = (response != null) ? response.getDayOfWeek() : request.getDayOfWeek();
+        auditLogService.record("CREATE_SHIFT", "DOCTOR_AVAILABILITY", id, "Assigned doctor shift for " + doctorName + " on day " + dayOfWeek);
         return "redirect:/schedule/board";
     }
 
