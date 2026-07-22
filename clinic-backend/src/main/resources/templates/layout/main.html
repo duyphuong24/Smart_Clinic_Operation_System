@@ -73,11 +73,18 @@
                     <span>Specialties & Rooms</span>
                 </a>
 
-                <!-- Staff Profiles (Admin Only) -->
-                <a sec:authorize="hasRole('ROLE_ADMIN')" 
-                   th:href="@{/admin/staff}" th:classappend="${title == 'Staff' ? 'active' : ''}" class="menu-item-link">
-                    <i class="fa-solid fa-id-card"></i>
-                    <span>Staff profiles</span>
+                <!-- Reports & Analytics (Admin, Manager) -->
+                <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')" 
+                   th:href="@{/reports}" th:classappend="${title == 'Reports & Analytics' ? 'active' : ''}" class="menu-item-link">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Reports & Analytics</span>
+                </a>
+
+                <!-- Audit Logs (Admin, Manager) -->
+                <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')" 
+                   th:href="@{/audit-logs}" th:classappend="${title == 'Audit Logs' ? 'active' : ''}" class="menu-item-link">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Audit Logs</span>
                 </a>
             </nav>
             
