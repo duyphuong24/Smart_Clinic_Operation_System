@@ -1,14 +1,15 @@
 -- ===============================================================================
--- SMART CLINIC OPERATION SYSTEM - COMPLETE SEED DATA SCRIPT (MS SQL SERVER)
--- Database: HSF302_SmartClinic
--- Usage: Run in SQL Server Management Studio (SSMS) or IntelliJ Database Tool
--- Passwords:
---   - 'admin' / 'admin123'
+-- SMART CLINIC OPERATIONS SYSTEM - COMPLETE SEED DATA SCRIPT (MS SQL SERVER)
+-- Database Target: HSF302_SmartClinic (hoặc đổi tên theo database của bạn)
+-- Usage: Run in SQL Server Management Studio (SSMS) or DBeaver / Database Tool
+--
+-- Demo Passwords:
+--   - 'admin'        / 'admin123'
 --   - 'receptionist' / 'receptionist123'
---   - 'doctor' / 'doctor123'
---   - 'cashier' / 'cashier123'
---   - 'manager' / 'manager123'
---   - 'doctor1', 'doctor2', 'receptionist1', 'cashier1', 'manager1' / 'password123'
+--   - 'doctor'       / 'doctor123'
+--   - 'cashier'      / 'cashier123'
+--   - 'manager'      / 'manager123'
+--   - Tất cả tài khoản khác: 'password123'
 -- ===============================================================================
 
 USE [HSF302_SmartClinic];
@@ -16,7 +17,7 @@ GO
 
 SET NOCOUNT ON;
 
-PRINT N'Starting Comprehensive Data Seeding for Smart Clinic...';
+PRINT N'Starting 100% Comprehensive Data Seeding for Smart Clinic Operations System...';
 
 -- 1. SEED ROLES
 IF NOT EXISTS (SELECT 1 FROM roles WHERE name = 'ADMIN') INSERT INTO roles (name) VALUES ('ADMIN');
@@ -24,6 +25,7 @@ IF NOT EXISTS (SELECT 1 FROM roles WHERE name = 'RECEPTIONIST') INSERT INTO role
 IF NOT EXISTS (SELECT 1 FROM roles WHERE name = 'DOCTOR') INSERT INTO roles (name) VALUES ('DOCTOR');
 IF NOT EXISTS (SELECT 1 FROM roles WHERE name = 'CASHIER') INSERT INTO roles (name) VALUES ('CASHIER');
 IF NOT EXISTS (SELECT 1 FROM roles WHERE name = 'MANAGER') INSERT INTO roles (name) VALUES ('MANAGER');
+IF NOT EXISTS (SELECT 1 FROM roles WHERE name = 'PATIENT') INSERT INTO roles (name) VALUES ('PATIENT');
 
 -- BCrypt Hash for 'admin123' / 'password123': $2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO
 
@@ -38,21 +40,25 @@ IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'receptionist')
 
 IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'doctor')
     INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
-    VALUES ('doctor', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Lê Hoàng Nam', 'ACTIVE', 0, GETDATE(), GETDATE());
-
-IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'doctor2')
-    INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
-    VALUES ('doctor2', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Phạm Minh Anh', 'ACTIVE', 0, GETDATE(), GETDATE());
+    VALUES ('doctor', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Nguyễn Văn An', 'ACTIVE', 0, GETDATE(), GETDATE());
 
 IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'cashier')
     INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
-    VALUES ('cashier', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'Vũ Thu Ngân', 'ACTIVE', 0, GETDATE(), GETDATE());
+    VALUES ('cashier', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'Lê Hoàng Thu Ngân', 'ACTIVE', 0, GETDATE(), GETDATE());
 
 IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'manager')
     INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
-    VALUES ('manager', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'Đỗ Quản Lý', 'ACTIVE', 0, GETDATE(), GETDATE());
+    VALUES ('manager', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'Phạm Minh Quản Lý', 'ACTIVE', 0, GETDATE(), GETDATE());
 
--- 3. MAP USER ROLES
+IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'doctor2')
+    INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
+    VALUES ('doctor2', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Lê Thị Bích', 'ACTIVE', 0, GETDATE(), GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'doctor3')
+    INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
+    VALUES ('doctor3', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Phạm Hoàng Cường', 'ACTIVE', 0, GETDATE(), GETDATE());
+
+-- 3. SEED USER_ROLES
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'admin' AND r.name = 'ADMIN'
 AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
@@ -70,6 +76,10 @@ SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'doctor2' AND r.name
 AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
 
 INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'doctor3' AND r.name = 'DOCTOR'
+AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
+
+INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'cashier' AND r.name = 'CASHIER'
 AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
 
@@ -77,101 +87,135 @@ INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'manager' AND r.name = 'MANAGER'
 AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
 
--- 4. SEED ROOMS
-IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-101')
-    INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-101', N'Phòng Khám Nội 101', N'Tầng 1', 1);
-IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-102')
-    INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-102', N'Phòng Khám Tim Mạch 102', N'Tầng 1', 1);
-IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-201')
-    INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-201', N'Phòng Xét Nghiệm & Chẩn Đoán 201', N'Tầng 2', 1);
+-- 4. SEED STAFF
+IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000001')
+    INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
+    SELECT id, 'EMP-000001', 'DOCTOR', '2023-01-15', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor';
+
+IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000002')
+    INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
+    SELECT id, 'EMP-000002', 'DOCTOR', '2023-03-20', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor2';
+
+IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000003')
+    INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
+    SELECT id, 'EMP-000003', 'DOCTOR', '2023-06-01', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor3';
+
+IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000004')
+    INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
+    SELECT id, 'EMP-000004', 'RECEPTIONIST', '2023-02-10', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'receptionist';
+
+IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000005')
+    INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
+    SELECT id, 'EMP-000005', 'CASHIER', '2023-04-05', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'cashier';
 
 -- 5. SEED SPECIALTIES
-IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Nội Tổng Quát')
-    INSERT INTO specialties (name, description, active) VALUES (N'Nội Tổng Quát', N'Khám và điều trị các bệnh lý nội khoa chung', 1);
-IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Tim Mạch')
-    INSERT INTO specialties (name, description, active) VALUES (N'Tim Mạch', N'Khám và chẩn đoán bệnh lý tim mạch, huyết áp', 1);
-IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Nhi Khoa')
-    INSERT INTO specialties (name, description, active) VALUES (N'Nhi Khoa', N'Khám và chăm sóc sức khỏe trẻ em', 1);
+IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Nội tổng quát')
+    INSERT INTO specialties (name, description, active) VALUES (N'Nội tổng quát', N'Khám và điều trị các bệnh lý nội khoa thông thường', 1);
 
--- 6. SEED SERVICE CATALOG
-IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SVC-CONS')
-    INSERT INTO service_catalog (service_code, name, type, price, active, version, created_at, updated_at) VALUES ('SVC-CONS', N'Tiền Khám Bệnh Tổng Quát', 'CONSULTATION', 150000.00, 1, 0, GETDATE(), GETDATE());
-IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SVC-CBC')
-    INSERT INTO service_catalog (service_code, name, type, price, active, version, created_at, updated_at) VALUES ('SVC-CBC', N'Xét Nghiệm Công Thức Máu (CBC)', 'LAB_TEST', 120000.00, 1, 0, GETDATE(), GETDATE());
-IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SVC-XPUL')
-    INSERT INTO service_catalog (service_code, name, type, price, active, version, created_at, updated_at) VALUES ('SVC-XPUL', N'Chụp X-Quang Phổi Thẳng', 'PROCEDURE', 250000.00, 1, 0, GETDATE(), GETDATE());
-IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SVC-HECG')
-    INSERT INTO service_catalog (service_code, name, type, price, active, version, created_at, updated_at) VALUES ('SVC-HECG', N'Đo Điện Tâm Đồ (ECG)', 'PROCEDURE', 200000.00, 1, 0, GETDATE(), GETDATE());
-IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SVC-USG')
-    INSERT INTO service_catalog (service_code, name, type, price, active, version, created_at, updated_at) VALUES ('SVC-USG', N'Siêu Âm Bụng Tổng Quát', 'PROCEDURE', 180000.00, 1, 0, GETDATE(), GETDATE());
+IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Nhi khoa')
+    INSERT INTO specialties (name, description, active) VALUES (N'Nhi khoa', N'Chăm sóc sức khỏe và khám chữa bệnh cho trẻ em', 1);
 
--- 7. SEED STAFF
-IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-001')
-    INSERT INTO staff (user_id, employee_code, staff_type, status, hired_date, version, created_at, updated_at)
-    SELECT id, 'EMP-001', 'ADMINISTRATOR', 'ACTIVE', '2025-01-01', 0, GETDATE(), GETDATE() FROM users WHERE user_name = 'admin';
+IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Tai Mũi Họng')
+    INSERT INTO specialties (name, description, active) VALUES (N'Tai Mũi Họng', N'Chẩn đoán và điều trị bệnh lý đường hô hấp trên', 1);
 
-IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-002')
-    INSERT INTO staff (user_id, employee_code, staff_type, status, hired_date, version, created_at, updated_at)
-    SELECT id, 'EMP-002', 'RECEPTIONIST', 'ACTIVE', '2025-01-15', 0, GETDATE(), GETDATE() FROM users WHERE user_name = 'receptionist';
+IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Tim mạch')
+    INSERT INTO specialties (name, description, active) VALUES (N'Tim mạch', N'Khám chuyên sâu các bệnh lý tim mạch và huyết áp', 1);
 
-IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-003')
-    INSERT INTO staff (user_id, employee_code, staff_type, status, hired_date, version, created_at, updated_at)
-    SELECT id, 'EMP-003', 'DOCTOR', 'ACTIVE', '2025-02-01', 0, GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor';
+IF NOT EXISTS (SELECT 1 FROM specialties WHERE name = N'Răng Hàm Mặt')
+    INSERT INTO specialties (name, description, active) VALUES (N'Răng Hàm Mặt', N'Chăm sóc nha khoa và phẫu thuật răng hàm mặt', 1);
 
-IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-004')
-    INSERT INTO staff (user_id, employee_code, staff_type, status, hired_date, version, created_at, updated_at)
-    SELECT id, 'EMP-004', 'DOCTOR', 'ACTIVE', '2025-02-01', 0, GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor2';
+-- 6. SEED ROOMS
+IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-101')
+    INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-101', N'Phòng khám Nội 101', N'Tầng 1', 1);
 
-IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-005')
-    INSERT INTO staff (user_id, employee_code, staff_type, status, hired_date, version, created_at, updated_at)
-    SELECT id, 'EMP-005', 'CASHIER', 'ACTIVE', '2025-02-10', 0, GETDATE(), GETDATE() FROM users WHERE user_name = 'cashier';
+IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-102')
+    INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-102', N'Phòng khám Nhi 102', N'Tầng 1', 1);
 
--- 8. SEED DOCTORS
-IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-10001')
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, bio, active, version, created_at, updated_at)
-    SELECT s.id, sp.id, rm.id, 'LIC-10001', 150000.00, N'Bác sĩ Chuyên khoa I Nội Tổng Quát hơn 10 năm kinh nghiệm.', 1, 0, GETDATE(), GETDATE()
-    FROM staff s, specialties sp, rooms rm
-    WHERE s.employee_code = 'EMP-003' AND sp.name = N'Nội Tổng Quát' AND rm.room_code = 'ROOM-101';
+IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-201')
+    INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-201', N'Phòng Tai Mũi Họng 201', N'Tầng 2', 1);
 
-IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-10002')
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, bio, active, version, created_at, updated_at)
-    SELECT s.id, sp.id, rm.id, 'LIC-10002', 200000.00, N'Bác sĩ Chuyên khoa Tim Mạch Bệnh viện Trung Vương.', 1, 0, GETDATE(), GETDATE()
-    FROM staff s, specialties sp, rooms rm
-    WHERE s.employee_code = 'EMP-004' AND sp.name = N'Tim Mạch' AND rm.room_code = 'ROOM-102';
+IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-202')
+    INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-202', N'Phòng Tim Mạch 202', N'Tầng 2', 1);
+
+-- 7. SEED DOCTORS
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_number = 'LIC-001')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_number, consultation_fee, active)
+    SELECT s.id, sp.id, r.id, 'LIC-001', 150000.00, 1
+    FROM staff s, specialties sp, rooms r
+    WHERE s.employee_code = 'EMP-000001' AND sp.name = N'Nội tổng quát' AND r.room_code = 'ROOM-101';
+
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_number = 'LIC-002')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_number, consultation_fee, active)
+    SELECT s.id, sp.id, r.id, 'LIC-002', 200000.00, 1
+    FROM staff s, specialties sp, rooms r
+    WHERE s.employee_code = 'EMP-000002' AND sp.name = N'Nhi khoa' AND r.room_code = 'ROOM-102';
+
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_number = 'LIC-003')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_number, consultation_fee, active)
+    SELECT s.id, sp.id, r.id, 'LIC-003', 180000.00, 1
+    FROM staff s, specialties sp, rooms r
+    WHERE s.employee_code = 'EMP-000003' AND sp.name = N'Tai Mũi Họng' AND r.room_code = 'ROOM-201';
+
+-- 8. SEED DOCTOR_AVAILABILITIES
+IF NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = (SELECT id FROM doctors WHERE license_number = 'LIC-001') AND day_of_week = 1)
+    INSERT INTO doctor_availabilities (doctor_id, day_of_week, start_time, end_time, slot_duration_minutes, max_patients_per_slot, active)
+    SELECT id, 1, '08:00:00', '12:00:00', 30, 4, 1 FROM doctors WHERE license_number = 'LIC-001';
+
+IF NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = (SELECT id FROM doctors WHERE license_number = 'LIC-001') AND day_of_week = 2)
+    INSERT INTO doctor_availabilities (doctor_id, day_of_week, start_time, end_time, slot_duration_minutes, max_patients_per_slot, active)
+    SELECT id, 2, '08:00:00', '12:00:00', 30, 4, 1 FROM doctors WHERE license_number = 'LIC-001';
 
 -- 9. SEED PATIENTS
-IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'BN-20260701-0001')
-    INSERT INTO patients (patient_code, full_name, phone, date_of_birth, gender, address, status, version, created_at, updated_at)
-    VALUES ('BN-20260701-0001', N'Nguyễn Văn An', '0905111222', '1990-05-15', 'MALE', N'123 Nguyễn Văn Linh, Đà Nẵng', 'ACTIVE', 0, GETDATE(), GETDATE());
+IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'PAT-000001')
+    INSERT INTO patients (patient_code, full_name, date_of_birth, gender, phone, email, address, identity_number, emergency_contact_name, emergency_contact_phone, allergy_note, status, created_at, updated_at)
+    VALUES ('PAT-000001', N'Nguyễn Văn Hùng', '1990-05-15', 'MALE', '0901234567', 'hung.nguyen@example.com', N'123 Nguyễn Văn Linh, Đà Nẵng', '048090000001', N'Nguyễn Thị Mai', '0909999888', N'Dị ứng Penicillin', 'ACTIVE', GETDATE(), GETDATE());
 
-IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'BN-20260701-0002')
-    INSERT INTO patients (patient_code, full_name, phone, date_of_birth, gender, address, status, version, created_at, updated_at)
-    VALUES ('BN-20260701-0002', N'Trần Thị Bình', '0914333444', '1985-08-20', 'FEMALE', N'456 Lê Duẩn, Đà Nẵng', 'ACTIVE', 0, GETDATE(), GETDATE());
+IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'PAT-000002')
+    INSERT INTO patients (patient_code, full_name, date_of_birth, gender, phone, email, address, identity_number, emergency_contact_name, emergency_contact_phone, allergy_note, status, created_at, updated_at)
+    VALUES ('PAT-000002', N'Trần Thị Mai', '1995-08-20', 'FEMALE', '0912345678', 'mai.tran@example.com', N'456 Lê Duẩn, Đà Nẵng', '048095000002', N'Trần Văn Bình', '0919999777', N'Không có', 'ACTIVE', GETDATE(), GETDATE());
 
-IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'BN-20260701-0003')
-    INSERT INTO patients (patient_code, full_name, phone, date_of_birth, gender, address, status, version, created_at, updated_at)
-    VALUES ('BN-20260701-0003', N'Lê Hoàng Cường', '0988555666', '1995-12-10', 'MALE', N'789 Điện Biên Phủ, Đà Nẵng', 'ACTIVE', 0, GETDATE(), GETDATE());
+IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'PAT-000003')
+    INSERT INTO patients (patient_code, full_name, date_of_birth, gender, phone, email, address, identity_number, emergency_contact_name, emergency_contact_phone, allergy_note, status, created_at, updated_at)
+    VALUES ('PAT-000003', N'Lê Hoàng Nam', '1985-12-10', 'MALE', '0987654321', 'nam.le@example.com', N'789 Điện Biên Phủ, Đà Nẵng', '048085000003', N'Lê Thị Hương', '0988888666', N'Dị ứng hải sản', 'ACTIVE', GETDATE(), GETDATE());
 
-IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'BN-20260701-0004')
-    INSERT INTO patients (patient_code, full_name, phone, date_of_birth, gender, address, status, version, created_at, updated_at)
-    VALUES ('BN-20260701-0004', N'Phạm Minh Đức', '0977888999', '2000-03-25', 'MALE', N'102 Hùng Vương, Đà Nẵng', 'ACTIVE', 0, GETDATE(), GETDATE());
+-- 10. SEED SERVICE_CATALOG
+IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SRV-001')
+    INSERT INTO service_catalog (service_code, name, type, price, active, created_at, updated_at)
+    VALUES ('SRV-001', N'Khám tổng quát', 'CONSULTATION', 150000.00, 1, GETDATE(), GETDATE());
 
-IF NOT EXISTS (SELECT 1 FROM patients WHERE patient_code = 'BN-20260701-0005')
-    INSERT INTO patients (patient_code, full_name, phone, date_of_birth, gender, address, status, version, created_at, updated_at)
-    VALUES ('BN-20260701-0005', N'Hoàng Thị Hoa', '0933222111', '1992-11-05', 'FEMALE', N'205 Trần Phú, Đà Nẵng', 'ACTIVE', 0, GETDATE(), GETDATE());
+IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SRV-002')
+    INSERT INTO service_catalog (service_code, name, type, price, active, created_at, updated_at)
+    VALUES ('SRV-002', N'Xét nghiệm công thức máu', 'LAB_TEST', 120000.00, 1, GETDATE(), GETDATE());
 
--- 10. SEED APPOINTMENTS FOR TODAY
-IF NOT EXISTS (SELECT 1 FROM appointments WHERE reason = N'Khám sức khỏe tổng quát định kỳ')
-    INSERT INTO appointments (appointment_code, patient_id, doctor_id, room_id, scheduled_start, scheduled_end, source, status, reason, created_at, updated_at)
-    SELECT 'APT-20260720-001', p.id, d.id, rm.id, DATEADD(hour, 9, CAST(CAST(GETDATE() AS DATE) AS DATETIME)), DATEADD(hour, 10, CAST(CAST(GETDATE() AS DATE) AS DATETIME)), 'RECEPTIONIST', 'BOOKED', N'Khám sức khỏe tổng quát định kỳ', GETDATE(), GETDATE()
-    FROM patients p, doctors d, staff s, rooms rm 
-    WHERE p.patient_code = 'BN-20260701-0001' AND d.staff_id = s.id AND s.employee_code = 'EMP-003' AND rm.room_code = 'ROOM-101';
+IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SRV-003')
+    INSERT INTO service_catalog (service_code, name, type, price, active, created_at, updated_at)
+    VALUES ('SRV-003', N'Chụp X-Quang ngực thẳng', 'IMAGING', 200000.00, 1, GETDATE(), GETDATE());
 
-IF NOT EXISTS (SELECT 1 FROM appointments WHERE reason = N'Tái khám tim mạch và đo huyết áp')
-    INSERT INTO appointments (appointment_code, patient_id, doctor_id, room_id, scheduled_start, scheduled_end, source, status, reason, created_at, updated_at)
-    SELECT 'APT-20260720-002', p.id, d.id, rm.id, DATEADD(hour, 10, CAST(CAST(GETDATE() AS DATE) AS DATETIME)), DATEADD(hour, 11, CAST(CAST(GETDATE() AS DATE) AS DATETIME)), 'RECEPTIONIST', 'BOOKED', N'Tái khám tim mạch và đo huyết áp', GETDATE(), GETDATE()
-    FROM patients p, doctors d, staff s, rooms rm
-    WHERE p.patient_code = 'BN-20260701-0002' AND d.staff_id = s.id AND s.employee_code = 'EMP-004' AND rm.room_code = 'ROOM-102';
+IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SRV-004')
+    INSERT INTO service_catalog (service_code, name, type, price, active, created_at, updated_at)
+    VALUES ('SRV-004', N'Siêu âm ổ bụng tổng quát', 'IMAGING', 250000.00, 1, GETDATE(), GETDATE());
 
-PRINT N'Successfully seeded fake data covering ALL roles and features for Smart Clinic System!';
+IF NOT EXISTS (SELECT 1 FROM service_catalog WHERE service_code = 'SRV-005')
+    INSERT INTO service_catalog (service_code, name, type, price, active, created_at, updated_at)
+    VALUES ('SRV-005', N'Đo điện tâm đồ (ECG)', 'PROCEDURE', 100000.00, 1, GETDATE(), GETDATE());
+
+-- 11. SEED APPOINTMENTS
+IF NOT EXISTS (SELECT 1 FROM appointments WHERE appointment_code = 'APT-000001')
+    INSERT INTO appointments (appointment_code, patient_id, doctor_id, room_id, scheduled_start, scheduled_end, reason, source, status, reminder_sent, created_at, updated_at)
+    SELECT 'APT-000001', p.id, d.id, r.id, DATEADD(hour, 9, CAST(GETDATE() AS DATETIME)), DATEADD(hour, 9, DATEADD(minute, 30, CAST(GETDATE() AS DATETIME))), N'Khám sức khỏe định kỳ', 'WEB', 'BOOKED', 0, GETDATE(), GETDATE()
+    FROM patients p, doctors d, rooms r
+    WHERE p.patient_code = 'PAT-000001' AND d.license_number = 'LIC-001' AND r.room_code = 'ROOM-101';
+
+-- 12. SEED QUEUE_ITEMS
+IF NOT EXISTS (SELECT 1 FROM queue_items WHERE queue_date = CAST(GETDATE() AS DATE) AND queue_number = 1)
+    INSERT INTO queue_items (queue_date, queue_number, patient_id, doctor_id, room_id, appointment_id, priority, status, created_at, updated_at)
+    SELECT CAST(GETDATE() AS DATE), 1, p.id, d.id, r.id, a.id, 'NORMAL', 'WAITING', GETDATE(), GETDATE()
+    FROM patients p, doctors d, rooms r, appointments a
+    WHERE p.patient_code = 'PAT-000001' AND d.license_number = 'LIC-001' AND r.room_code = 'ROOM-101' AND a.appointment_code = 'APT-000001';
+
+-- 13. SEED AUDIT_LOGS
+INSERT INTO audit_logs (action, resource, details, username, ip_address, created_at)
+VALUES (N'INITIAL_SEED', N'SYSTEM', N'Tự động khởi tạo dữ liệu Seed Data thành công', 'admin', '127.0.0.1', GETDATE());
+
+PRINT N'SUCCESS: 100% Comprehensive Seed Data Script executed successfully!';
 GO

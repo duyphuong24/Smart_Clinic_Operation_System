@@ -5,6 +5,12 @@ import com.smartclinic.invoice.dto.InvoiceCancelRequest;
 import com.smartclinic.invoice.dto.InvoiceCreateRequest;
 import com.smartclinic.invoice.dto.InvoiceResponse;
 import com.smartclinic.invoice.service.InvoiceService;
+import com.smartclinic.payment.dto.PaymentRequest;
+import com.smartclinic.payment.dto.PaymentResponse;
+import com.smartclinic.payment.entity.PaymentMethod;
+import com.smartclinic.payment.entity.PaymentStatus;
+import com.smartclinic.payment.service.PaymentService;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class BillingController {
 
     private final InvoiceService invoiceService;
+    private final PaymentService paymentService;
 
     @GetMapping
     public String dashboard(Model model) {
@@ -51,9 +58,38 @@ public class BillingController {
     @GetMapping("/invoices/{id}")
     public String detail(@PathVariable Long id, Model model) {
         InvoiceResponse invoice = invoiceService.getById(id);
+        List<PaymentResponse> payments = paymentService.findAll(id, null);
+
         model.addAttribute("invoice", invoice);
+        model.addAttribute("payments", payments);
+        model.addAttribute("paymentMethods", PaymentMethod.values());
         model.addAttribute("title", "Invoices");
         return "billing/detail";
+    }
+
+    @PostMapping("/invoices/{id}/payments")
+    public String recordPayment(
+            @PathVariable Long id,
+            @RequestParam BigDecimal amount,
+            @RequestParam PaymentMethod method,
+            @RequestParam(required = false) String transactionRef,
+            @RequestParam(required = false) String note,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            PaymentRequest request = new PaymentRequest();
+            request.setAmount(amount);
+            request.setMethod(method);
+            request.setStatus(PaymentStatus.SUCCESS);
+            request.setTransactionRef(transactionRef);
+            request.setNote(note);
+
+            PaymentResponse payment = paymentService.record(id, request);
+            redirectAttributes.addFlashAttribute("success", "Payment of " + payment.getAmount() + " ₫ recorded successfully.");
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("error", "Failed to record payment: " + ex.getMessage());
+        }
+        return "redirect:/billing/invoices/" + id;
     }
 
     @PostMapping("/invoices/{id}/cancel")
@@ -77,3 +113,4 @@ public class BillingController {
         return "redirect:/billing/invoices/" + id;
     }
 }
+

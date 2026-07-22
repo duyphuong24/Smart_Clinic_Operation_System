@@ -75,5 +75,9 @@ public class Appointment extends BaseEntity {
 
     @Column(name = "reminder_sent")
     @Builder.Default
-    private boolean reminderSent = false;
+    private Boolean reminderSent = false;
+
+    public boolean isReminderSent() {
+        return Boolean.TRUE.equals(reminderSent);
+    }
 }
