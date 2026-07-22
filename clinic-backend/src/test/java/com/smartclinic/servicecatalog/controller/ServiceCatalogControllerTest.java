@@ -63,12 +63,12 @@ class ServiceCatalogControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
-    void toggleStatus_ShouldDeactivateServiceAndRedirect() throws Exception {
+    void toggleStatus_ShouldToggleServiceStatusAndRedirect() throws Exception {
         mockMvc.perform(post("/admin/services/1/toggle-status")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/services"));
 
-        verify(serviceCatalogService).deactivate(eq(1L));
+        verify(serviceCatalogService).toggleStatus(eq(1L));
     }
 }
