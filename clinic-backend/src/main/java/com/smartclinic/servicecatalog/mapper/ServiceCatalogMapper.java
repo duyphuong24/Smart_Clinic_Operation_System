@@ -13,6 +13,7 @@ public final class ServiceCatalogMapper {
                 .id(service.getId())
                 .serviceCode(service.getServiceCode())
                 .name(service.getName())
+                .description(service.getType() != null ? service.getType().name() : "")
                 .type(service.getType())
                 .price(service.getPrice())
                 .active(service.isActive())

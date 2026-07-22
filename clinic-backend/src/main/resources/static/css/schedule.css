@@ -1,6 +1,46 @@
 /* ==========================================================================
-   Schedule Module specific styles
+   Schedule Module specific styles - Doctor Duty Schedule Board
    ========================================================================== */
+
+.schedule-board-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.schedule-board-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.12);
+}
+
+.schedule-shift-badge {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.825rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+}
+
+.schedule-day-column {
+    background: #f8fafc;
+    min-height: 480px;
+    border-right: 1px solid #e2e8f0;
+}
+
+.schedule-doctor-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    color: #0284c7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
 
 .schedule-form-panel {
     max-width: 600px;
