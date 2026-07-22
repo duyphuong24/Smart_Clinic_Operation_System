@@ -1,5 +1,6 @@
 package com.smartclinic.schedule.controller;
 
+import com.smartclinic.audit.service.AuditLogService;
 import com.smartclinic.doctor.service.DoctorService;
 import com.smartclinic.masterdata.service.RoomService;
 import com.smartclinic.masterdata.service.SpecialtyService;
@@ -24,6 +25,7 @@ public class DoctorScheduleBoardController {
     private final DoctorService doctorService;
     private final SpecialtyService specialtyService;
     private final RoomService roomService;
+    private final AuditLogService auditLogService;
 
     @GetMapping("/schedule/board")
     public String board(Model model) {
@@ -39,13 +41,15 @@ public class DoctorScheduleBoardController {
 
     @PostMapping("/schedule/board/save")
     public String saveShift(@Valid @ModelAttribute("newShift") DoctorAvailabilityRequest request) {
-        doctorAvailabilityService.create(request);
+        DoctorAvailabilityResponse response = doctorAvailabilityService.create(request);
+        auditLogService.record("CREATE_SHIFT", "DOCTOR_AVAILABILITY", response.getId(), "Assigned doctor shift for " + response.getDoctorName() + " on day " + response.getDayOfWeek());
         return "redirect:/schedule/board";
     }
 
     @PostMapping("/schedule/board/{id}/delete")
     public String deleteShift(@PathVariable Long id) {
         doctorAvailabilityService.deactivate(id);
+        auditLogService.record("REMOVE_SHIFT", "DOCTOR_AVAILABILITY", id, "Deactivated doctor duty shift ID: " + id);
         return "redirect:/schedule/board";
     }
 }

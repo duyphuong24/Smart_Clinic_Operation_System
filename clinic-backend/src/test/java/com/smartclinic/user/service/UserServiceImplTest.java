@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.smartclinic.audit.service.AuditLogService;
 import com.smartclinic.common.exception.BadRequestException;
 import com.smartclinic.common.exception.DuplicateResourceException;
 import com.smartclinic.common.exception.ResourceNotFoundException;
@@ -43,6 +44,9 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     private UserMapper userMapper;
     private UserServiceImpl userService;
 
@@ -52,7 +56,7 @@ class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         userMapper = new UserMapper();
-        userService = new UserServiceImpl(userRepository, roleRepository, userMapper, passwordEncoder);
+        userService = new UserServiceImpl(userRepository, roleRepository, userMapper, passwordEncoder, auditLogService);
 
         sampleRole = new Role(1L, "ROLE_ADMIN");
         sampleUser = User.builder()

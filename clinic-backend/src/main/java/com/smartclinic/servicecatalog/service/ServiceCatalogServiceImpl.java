@@ -1,5 +1,6 @@
 package com.smartclinic.servicecatalog.service;
 
+import com.smartclinic.audit.service.AuditLogService;
 import com.smartclinic.common.exception.BadRequestException;
 import com.smartclinic.common.exception.DuplicateResourceException;
 import com.smartclinic.common.exception.ResourceNotFoundException;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServiceCatalogServiceImpl implements ServiceCatalogService {
 
     private final ServiceCatalogRepository serviceCatalogRepository;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,7 +62,10 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
         service.setType(request.getType());
         service.setPrice(request.getPrice());
         service.setActive(request.isActive());
-        return ServiceCatalogMapper.toResponse(serviceCatalogRepository.save(service));
+        
+        ServiceCatalog saved = serviceCatalogRepository.save(service);
+        auditLogService.record("CREATE_SERVICE", "SERVICE_CATALOG", saved.getId(), "Created medical service: " + saved.getName() + " (" + saved.getServiceCode() + ")");
+        return ServiceCatalogMapper.toResponse(saved);
     }
 
     @Override
@@ -77,7 +82,10 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
         service.setType(request.getType());
         service.setPrice(request.getPrice());
         service.setActive(request.isActive());
-        return ServiceCatalogMapper.toResponse(serviceCatalogRepository.save(service));
+        
+        ServiceCatalog saved = serviceCatalogRepository.save(service);
+        auditLogService.record("UPDATE_SERVICE", "SERVICE_CATALOG", saved.getId(), "Updated medical service: " + saved.getName());
+        return ServiceCatalogMapper.toResponse(saved);
     }
 
     @Override
@@ -85,13 +93,16 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
         ServiceCatalog service = findService(id);
         service.setActive(false);
         serviceCatalogRepository.save(service);
+        auditLogService.record("DEACTIVATE_SERVICE", "SERVICE_CATALOG", service.getId(), "Deactivated service: " + service.getName());
     }
 
     @Override
     public ServiceCatalogResponse toggleStatus(Long id) {
         ServiceCatalog service = findService(id);
         service.setActive(!service.isActive());
-        return ServiceCatalogMapper.toResponse(serviceCatalogRepository.save(service));
+        ServiceCatalog saved = serviceCatalogRepository.save(service);
+        auditLogService.record("TOGGLE_SERVICE_STATUS", "SERVICE_CATALOG", saved.getId(), "Toggled service active status to " + saved.isActive() + " for " + saved.getName());
+        return ServiceCatalogMapper.toResponse(saved);
     }
 
     private ServiceCatalog findService(Long id) {

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.smartclinic.audit.service.AuditLogService;
 import com.smartclinic.common.exception.BadRequestException;
 import com.smartclinic.common.exception.DuplicateResourceException;
 import com.smartclinic.servicecatalog.dto.ServiceCatalogRequest;
@@ -27,6 +28,9 @@ class ServiceCatalogServiceImplTest {
 
     @Mock
     private ServiceCatalogRepository serviceCatalogRepository;
+
+    @Mock
+    private AuditLogService auditLogService;
 
     @InjectMocks
     private ServiceCatalogServiceImpl service;
