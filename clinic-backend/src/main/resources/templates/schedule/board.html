@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Doctor Duty Schedule Board - Smart Clinic</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-calendar3-week me-2"></i>Doctor Duty Schedule Board</h2>
+            <p class="text-muted mb-0">Overview of doctor shifts, working hours, and assigned consultation rooms</p>
+        </div>
+    </div>
+
+    <!-- Schedule Weekly Board Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-navy text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i>Weekly Roster Matrix</h5>
+            <span class="badge bg-primary px-3 py-2 fs-6">Active Roster</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0 text-center">
+                    <thead class="bg-light">
+                    <tr>
+                        <th style="width: 14%;">Mon (T2)</th>
+                        <th style="width: 14%;">Tue (T3)</th>
+                        <th style="width: 14%;">Wed (T4)</th>
+                        <th style="width: 14%;">Thu (T5)</th>
+                        <th style="width: 14%;">Fri (T6)</th>
+                        <th style="width: 14%;">Sat (T7)</th>
+                        <th style="width: 16%;">Sun (CN)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <!-- Day 1 (Mon) -->
+                        <td class="p-2 align-top">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == 1}" class="card mb-2 shadow-xs border-primary text-start">
+                                <div class="card-body p-2">
+                                    <div class="fw-bold text-navy" th:text="${avail.doctorName}">Dr. John</div>
+                                    <small class="text-muted d-block" th:text="${avail.specialtyName}">Cardiology</small>
+                                    <div class="mt-1 small">
+                                        <span class="badge bg-info text-dark" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    </div>
+                                    <div class="mt-1 small text-dark fw-semibold">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Day 2 (Tue) -->
+                        <td class="p-2 align-top">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == 2}" class="card mb-2 shadow-xs border-primary text-start">
+                                <div class="card-body p-2">
+                                    <div class="fw-bold text-navy" th:text="${avail.doctorName}">Dr. John</div>
+                                    <small class="text-muted d-block" th:text="${avail.specialtyName}">Cardiology</small>
+                                    <div class="mt-1 small">
+                                        <span class="badge bg-info text-dark" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    </div>
+                                    <div class="mt-1 small text-dark fw-semibold">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Day 3 (Wed) -->
+                        <td class="p-2 align-top">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == 3}" class="card mb-2 shadow-xs border-primary text-start">
+                                <div class="card-body p-2">
+                                    <div class="fw-bold text-navy" th:text="${avail.doctorName}">Dr. John</div>
+                                    <small class="text-muted d-block" th:text="${avail.specialtyName}">Cardiology</small>
+                                    <div class="mt-1 small">
+                                        <span class="badge bg-info text-dark" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    </div>
+                                    <div class="mt-1 small text-dark fw-semibold">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Day 4 (Thu) -->
+                        <td class="p-2 align-top">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == 4}" class="card mb-2 shadow-xs border-primary text-start">
+                                <div class="card-body p-2">
+                                    <div class="fw-bold text-navy" th:text="${avail.doctorName}">Dr. John</div>
+                                    <small class="text-muted d-block" th:text="${avail.specialtyName}">Cardiology</small>
+                                    <div class="mt-1 small">
+                                        <span class="badge bg-info text-dark" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    </div>
+                                    <div class="mt-1 small text-dark fw-semibold">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Day 5 (Fri) -->
+                        <td class="p-2 align-top">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == 5}" class="card mb-2 shadow-xs border-primary text-start">
+                                <div class="card-body p-2">
+                                    <div class="fw-bold text-navy" th:text="${avail.doctorName}">Dr. John</div>
+                                    <small class="text-muted d-block" th:text="${avail.specialtyName}">Cardiology</small>
+                                    <div class="mt-1 small">
+                                        <span class="badge bg-info text-dark" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    </div>
+                                    <div class="mt-1 small text-dark fw-semibold">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Day 6 (Sat) -->
+                        <td class="p-2 align-top">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == 6}" class="card mb-2 shadow-xs border-primary text-start">
+                                <div class="card-body p-2">
+                                    <div class="fw-bold text-navy" th:text="${avail.doctorName}">Dr. John</div>
+                                    <small class="text-muted d-block" th:text="${avail.specialtyName}">Cardiology</small>
+                                    <div class="mt-1 small">
+                                        <span class="badge bg-info text-dark" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    </div>
+                                    <div class="mt-1 small text-dark fw-semibold">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Day 7 (Sun) -->
+                        <td class="p-2 align-top">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == 7}" class="card mb-2 shadow-xs border-primary text-start">
+                                <div class="card-body p-2">
+                                    <div class="fw-bold text-navy" th:text="${avail.doctorName}">Dr. John</div>
+                                    <small class="text-muted d-block" th:text="${avail.specialtyName}">Cardiology</small>
+                                    <div class="mt-1 small">
+                                        <span class="badge bg-info text-dark" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    </div>
+                                    <div class="mt-1 small text-dark fw-semibold">
+                                        <i class="bi bi-clock me-1 text-primary"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
