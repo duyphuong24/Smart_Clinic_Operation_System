@@ -9,23 +9,23 @@
         <!-- Header Section -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <h3 class="fw-bold m-0 text-white d-flex align-items-center gap-2">
+                <h3 class="fw-bold m-0 text-primary d-flex align-items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-warning"></i>
                     <span>System Audit Trail & Logs</span>
                 </h3>
                 <p class="text-secondary m-0 text-sm mt-1">Real-time security logs, user actions, and transaction audit history.</p>
             </div>
             <div>
-                <span class="badge bg-soft-cyan text-cyan px-3 py-2 fs-6 rounded-pill border border-cyan">
+                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 fs-6 rounded-pill">
                     <i class="fa-solid fa-shield-halved me-1"></i> Security Auditor
                 </span>
             </div>
         </div>
 
         <!-- Logs Table -->
-        <div class="table-responsive rounded-3 border border-secondary border-opacity-25">
-            <table class="table table-hover align-middle text-white m-0">
-                <thead class="bg-navy text-cyan font-monospace">
+        <div class="table-responsive rounded-3">
+            <table class="table align-middle m-0">
+                <thead>
                 <tr>
                     <th class="ps-4" style="width: 180px;">Timestamp</th>
                     <th>User / Actor</th>
@@ -35,22 +35,22 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="log : ${logs}" class="border-bottom border-secondary border-opacity-10">
+                <tr th:each="log : ${logs}">
                     <td class="ps-4 font-monospace text-secondary text-sm" 
                         th:text="${log.createdAt != null ? #temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}">2026-07-22 10:00:00</td>
                     <td>
-                        <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 px-3 py-1 font-monospace" 
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-1 font-monospace" 
                               th:text="${log.actorUserName != null ? log.actorUserName : 'SYSTEM'}">admin</span>
                     </td>
                     <td>
-                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50 px-3 py-1 font-monospace" 
+                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-1 font-monospace" 
                               th:text="${log.action}">CREATE</span>
                     </td>
                     <td>
-                        <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-50 px-3 py-1 font-monospace" 
+                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-1 font-monospace" 
                               th:text="${log.entityType != null ? log.entityType : '-'}">PATIENT</span>
                     </td>
-                    <td class="pe-4 text-light text-sm" th:text="${log.message}">System initial seed data generated successfully</td>
+                    <td class="pe-4 text-secondary text-sm" th:text="${log.message}">System initial seed data generated successfully</td>
                 </tr>
                 <tr th:if="${logs == null or logs.isEmpty()}">
                     <td colspan="5" class="text-center py-5 text-secondary">

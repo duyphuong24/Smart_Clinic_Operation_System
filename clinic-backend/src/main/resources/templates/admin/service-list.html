@@ -9,42 +9,41 @@
         <!-- Header Section -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <h3 class="fw-bold m-0 text-white d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-notes-medical text-cyan"></i>
+                <h3 class="fw-bold m-0 text-primary d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-notes-medical text-primary"></i>
                     <span>Medical Services & Pricing Catalog</span>
                 </h3>
                 <p class="text-secondary m-0 text-sm mt-1">Manage clinic services, consultation fees, and laboratory test pricing.</p>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-premium px-3 py-2 btn-sm text-white" data-bs-toggle="modal" data-bs-target="#addServiceModal">
-                    <i class="fa-solid fa-plus me-1"></i> Add Medical Service
+                <button type="button" class="btn btn-premium px-3 py-2 text-white btn-premium-custom" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+                    <i class="fa-solid fa-plus me-2"></i>Add Medical Service
                 </button>
-                <span class="badge bg-soft-cyan text-cyan px-3 py-2 fs-6 rounded-pill border border-cyan">
-                    <i class="fa-solid fa-layer-group me-1"></i> Catalog Management
-                </span>
             </div>
         </div>
 
         <!-- Filter Bar -->
-        <div class="glass-panel p-3 mb-4 border border-secondary border-opacity-25">
+        <div class="glass-panel p-3 mb-4">
             <form th:action="@{/admin/services}" method="get" class="row g-3 align-items-center">
                 <div class="col-md-4">
-                    <label class="form-label text-xs text-cyan fw-bold font-monospace text-uppercase mb-1">Filter by Service Category</label>
-                    <select name="type" class="form-select bg-dark text-white border-secondary" onchange="this.form.submit()">
-                        <option value="">All Service Types</option>
-                        <option th:each="t : ${serviceTypes}"
-                                th:value="${t}"
-                                th:text="${t}"
-                                th:selected="${t == selectedType}">LAB_TEST</option>
-                    </select>
+                    <label class="form-label mb-1">Filter by Service Category</label>
+                    <div class="input-glow-wrapper">
+                        <select name="type" class="form-control-custom select-custom-arrow" onchange="this.form.submit()">
+                            <option value="">All Service Types</option>
+                            <option th:each="t : ${serviceTypes}"
+                                    th:value="${t}"
+                                    th:text="${t}"
+                                    th:selected="${t == selectedType}">LAB_TEST</option>
+                        </select>
+                    </div>
                 </div>
             </form>
         </div>
 
         <!-- Services Table -->
-        <div class="table-responsive rounded-3 border border-secondary border-opacity-25">
-            <table class="table table-hover align-middle text-white m-0">
-                <thead class="bg-navy text-cyan font-monospace">
+        <div class="table-responsive rounded-3">
+            <table class="table align-middle m-0">
+                <thead>
                 <tr>
                     <th class="ps-4">Service Code</th>
                     <th>Service Name & Details</th>
@@ -54,26 +53,26 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="service : ${services}" class="border-bottom border-secondary border-opacity-10">
-                    <td class="ps-4 font-monospace fw-bold text-cyan" th:text="${service.serviceCode}">LAB-001</td>
+                <tr th:each="service : ${services}">
+                    <td class="ps-4 font-monospace fw-bold text-primary" th:text="${service.serviceCode}">LAB-001</td>
                     <td>
-                        <div class="fw-bold text-white fs-6" th:text="${service.name}">Blood Test</div>
+                        <div class="fw-bold text-dark fs-6" th:text="${service.name}">Blood Test</div>
                         <small class="text-secondary" th:text="${service.description != null ? service.description : ''}">Standard CBC blood panel</small>
                     </td>
                     <td>
-                        <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-50" th:text="${service.type}">LAB_TEST</span>
+                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25" th:text="${service.type}">LAB_TEST</span>
                     </td>
-                    <td class="text-end fw-bold text-cyan font-monospace fs-6" th:text="${#numbers.formatDecimal(service.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</td>
+                    <td class="text-end fw-bold text-primary font-monospace fs-6" th:text="${#numbers.formatDecimal(service.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</td>
                     <td class="text-center pe-4">
                         <div class="d-flex align-items-center justify-content-center gap-2">
-                            <span th:if="${service.active}" class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-1 rounded-pill">
+                            <span th:if="${service.active}" class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill">
                                 <i class="fa-solid fa-circle-check me-1"></i>Active
                             </span>
-                            <span th:unless="${service.active}" class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary px-3 py-1 rounded-pill">
+                            <span th:unless="${service.active}" class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-1 rounded-pill">
                                 <i class="fa-solid fa-circle-minus me-1"></i>Inactive
                             </span>
                             <form th:action="@{'/admin/services/' + ${service.id} + '/toggle-status'}" method="post" class="d-inline ms-2">
-                                <button type="submit" class="btn btn-outline-warning btn-xs" title="Toggle Active Status">
+                                <button type="submit" class="btn btn-outline-warning btn-sm rounded-2" title="Toggle Active Status">
                                     <i class="fa-solid fa-power-off"></i>
                                 </button>
                             </form>
@@ -91,38 +90,48 @@
         </div>
     </div>
 
-    <!-- Modal Add Medical Service -->
+    <!-- Standardized Light Glassmorphic Modal -->
     <div class="modal fade" id="addServiceModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-navy text-white border border-secondary">
-                <div class="modal-header border-secondary">
-                    <h5 class="modal-title fw-bold text-cyan"><i class="fa-solid fa-notes-medical me-2"></i>Create Medical Service</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content glass-panel border-0 shadow-lg">
+                <div class="modal-header border-bottom border-bottom-card-imp">
+                    <h5 class="modal-title fw-bold text-primary"><i class="fa-solid fa-notes-medical me-2"></i>Create Medical Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form th:action="@{/admin/services/save}" method="post">
-                    <div class="modal-body row g-3">
+                    <div class="modal-body row g-3 p-4">
                         <div class="col-md-6">
-                            <label class="form-label text-xs text-cyan fw-bold">Service Code</label>
-                            <input type="text" name="serviceCode" class="form-control bg-dark text-white border-secondary" placeholder="e.g. SRV-010" required>
+                            <label class="form-label">Service Code <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" name="serviceCode" class="form-control-custom" placeholder="e.g. SRV-010" required>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label text-xs text-cyan fw-bold">Category Type</label>
-                            <select name="type" class="form-select bg-dark text-white border-secondary" required>
-                                <option th:each="t : ${serviceTypes}" th:value="${t}" th:text="${t}"></option>
-                            </select>
+                            <label class="form-label">Category Type <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select name="type" class="form-control-custom select-custom-arrow" required>
+                                    <option th:each="t : ${serviceTypes}" th:value="${t}" th:text="${t}"></option>
+                                </select>
+                            </div>
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label text-xs text-cyan fw-bold">Service Name</label>
-                            <input type="text" name="name" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Khám chuyên khoa Tim Mạch" required>
+                            <label class="form-label">Service Name <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" name="name" class="form-control-custom" placeholder="e.g. Khám chuyên khoa Tim Mạch" required>
+                            </div>
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label text-xs text-cyan fw-bold">Unit Price (₫)</label>
-                            <input type="number" name="price" class="form-control bg-dark text-white border-secondary" placeholder="e.g. 200000" min="0" step="1000" required>
+                            <label class="form-label">Unit Price (₫) <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="number" name="price" class="form-control-custom" placeholder="e.g. 200000" min="0" step="1000" required>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-secondary">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary px-4">Create Service</button>
+                    <div class="modal-footer border-top-card p-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 btn-cancel-custom" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-premium px-4 btn-premium-custom">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>Create Service
+                        </button>
                     </div>
                 </form>
             </div>
