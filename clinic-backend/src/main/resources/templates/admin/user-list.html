@@ -46,7 +46,7 @@
                                  th:text="${#strings.substring(u.userName, 0, 1).toUpperCase()}">A</div>
                             <div>
                                 <div class="fw-bold text-white fs-6" th:text="${u.userName}">admin</div>
-                                <div class="text-muted text-xs font-monospace" th:text="${u.email != null ? u.email : 'system.user@clinic.com'}">admin@clinic.com</div>
+                                <div class="text-muted text-xs font-monospace" th:text="${u.userName + '@clinic.com'}">admin@clinic.com</div>
                             </div>
                         </div>
                     </td>
@@ -76,7 +76,7 @@
                         </span>
                     </td>
                     <td class="text-end pe-4 text-secondary font-monospace text-sm" 
-                        th:text="${#temporals.format(u.createdAt, 'yyyy-MM-dd HH:mm')}">2026-07-22 10:00</td>
+                        th:text="${u.createdAt != null ? #temporals.format(u.createdAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">2026-07-22 10:00</td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(users)}">
                     <td colspan="7" class="text-center py-5 text-secondary">
