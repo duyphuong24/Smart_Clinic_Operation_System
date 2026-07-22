@@ -1,8 +1,8 @@
 package com.smartclinic.report.service;
 
 import com.smartclinic.appointment.repository.AppointmentRepository;
-import com.smartclinic.payment.entity.PaymentStatus;
-import com.smartclinic.payment.repository.PaymentRepository;
+import com.smartclinic.billing.entity.PaymentStatus;
+import com.smartclinic.billing.repository.PaymentRepository;
 import com.smartclinic.queue.entity.QueueStatus;
 import com.smartclinic.queue.repository.QueueItemRepository;
 import com.smartclinic.report.dto.DashboardMetricsResponse;
