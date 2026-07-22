@@ -162,20 +162,20 @@ IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-202')
 -- ===============================================================================
 -- 7. SEED DOCTORS
 -- ===============================================================================
-IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_number = 'LIC-001')
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_number, consultation_fee, active)
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-001')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
     SELECT s.id, sp.id, r.id, 'LIC-001', 150000.00, 1
     FROM staff s, specialties sp, rooms r
     WHERE s.employee_code = 'EMP-000001' AND sp.name = N'Nội tổng quát' AND r.room_code = 'ROOM-101';
 
-IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_number = 'LIC-002')
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_number, consultation_fee, active)
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-002')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
     SELECT s.id, sp.id, r.id, 'LIC-002', 200000.00, 1
     FROM staff s, specialties sp, rooms r
     WHERE s.employee_code = 'EMP-000002' AND sp.name = N'Nhi khoa' AND r.room_code = 'ROOM-102';
 
-IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_number = 'LIC-003')
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_number, consultation_fee, active)
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-003')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
     SELECT s.id, sp.id, r.id, 'LIC-003', 180000.00, 1
     FROM staff s, specialties sp, rooms r
     WHERE s.employee_code = 'EMP-000003' AND sp.name = N'Tai Mũi Họng' AND r.room_code = 'ROOM-201';
@@ -183,25 +183,25 @@ IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_number = 'LIC-003')
 -- ===============================================================================
 -- 8. SEED DOCTOR AVAILABILITIES (FULL 7-DAY WEEKLY ROSTER FOR SCHEDULE BOARD)
 -- ===============================================================================
--- Doctor 1 (Nội tổng quát) - T2, T3, T4, T5, T6 (Morning Shift)
-INSERT INTO doctor_availabilities (doctor_id, day_of_week, start_time, end_time, slot_duration_minutes, max_patients_per_slot, active)
-SELECT d.id, day, '08:00:00', '12:00:00', 30, 4, 1 
-FROM doctors d CROSS JOIN (VALUES (1),(2),(3),(4),(5)) AS Days(day)
-WHERE d.license_number = 'LIC-001'
+-- Doctor 1 (Nội tổng quát - ROOM-101) - T2, T3, T4, T5, T6 (Morning Shift)
+INSERT INTO doctor_availabilities (doctor_id, room_id, day_of_week, start_time, end_time, slot_minutes, active)
+SELECT d.id, r.id, day, '08:00:00', '12:00:00', 30, 1 
+FROM doctors d, rooms r CROSS JOIN (VALUES (1),(2),(3),(4),(5)) AS Days(day)
+WHERE d.license_no = 'LIC-001' AND r.room_code = 'ROOM-101'
 AND NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = d.id AND day_of_week = day);
 
--- Doctor 2 (Nhi khoa) - T2, T4, T6, T7 (Afternoon Shift)
-INSERT INTO doctor_availabilities (doctor_id, day_of_week, start_time, end_time, slot_duration_minutes, max_patients_per_slot, active)
-SELECT d.id, day, '13:30:00', '17:30:00', 30, 4, 1 
-FROM doctors d CROSS JOIN (VALUES (1),(3),(5),(6)) AS Days(day)
-WHERE d.license_number = 'LIC-002'
+-- Doctor 2 (Nhi khoa - ROOM-102) - T2, T4, T6, T7 (Afternoon Shift)
+INSERT INTO doctor_availabilities (doctor_id, room_id, day_of_week, start_time, end_time, slot_minutes, active)
+SELECT d.id, r.id, day, '13:30:00', '17:30:00', 30, 1 
+FROM doctors d, rooms r CROSS JOIN (VALUES (1),(3),(5),(6)) AS Days(day)
+WHERE d.license_no = 'LIC-002' AND r.room_code = 'ROOM-102'
 AND NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = d.id AND day_of_week = day);
 
--- Doctor 3 (Tai Mũi Họng) - T3, T5, T7, CN (Full Weekend Shift)
-INSERT INTO doctor_availabilities (doctor_id, day_of_week, start_time, end_time, slot_duration_minutes, max_patients_per_slot, active)
-SELECT d.id, day, '08:30:00', '11:30:00', 30, 3, 1 
-FROM doctors d CROSS JOIN (VALUES (2),(4),(6),(7)) AS Days(day)
-WHERE d.license_number = 'LIC-003'
+-- Doctor 3 (Tai Mũi Họng - ROOM-201) - T3, T5, T7, CN (Full Weekend Shift)
+INSERT INTO doctor_availabilities (doctor_id, room_id, day_of_week, start_time, end_time, slot_minutes, active)
+SELECT d.id, r.id, day, '08:30:00', '11:30:00', 30, 1 
+FROM doctors d, rooms r CROSS JOIN (VALUES (2),(4),(6),(7)) AS Days(day)
+WHERE d.license_no = 'LIC-003' AND r.room_code = 'ROOM-201'
 AND NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = d.id AND day_of_week = day);
 
 -- ===============================================================================
@@ -261,13 +261,13 @@ IF NOT EXISTS (SELECT 1 FROM appointments WHERE appointment_code = 'APT-000001')
     INSERT INTO appointments (appointment_code, patient_id, doctor_id, room_id, scheduled_start, scheduled_end, reason, source, status, reminder_sent, created_at, updated_at)
     SELECT 'APT-000001', p.id, d.id, r.id, DATEADD(hour, 9, CAST(GETDATE() AS DATETIME)), DATEADD(hour, 9, DATEADD(minute, 30, CAST(GETDATE() AS DATETIME))), N'Khám sức khỏe định kỳ', 'WEB', 'BOOKED', 0, GETDATE(), GETDATE()
     FROM patients p, doctors d, rooms r
-    WHERE p.patient_code = 'PAT-000001' AND d.license_number = 'LIC-001' AND r.room_code = 'ROOM-101';
+    WHERE p.patient_code = 'PAT-000001' AND d.license_no = 'LIC-001' AND r.room_code = 'ROOM-101';
 
 IF NOT EXISTS (SELECT 1 FROM appointments WHERE appointment_code = 'APT-000002')
     INSERT INTO appointments (appointment_code, patient_id, doctor_id, room_id, scheduled_start, scheduled_end, reason, source, status, reminder_sent, created_at, updated_at)
     SELECT 'APT-000002', p.id, d.id, r.id, DATEADD(hour, 14, CAST(GETDATE() AS DATETIME)), DATEADD(hour, 14, DATEADD(minute, 30, CAST(GETDATE() AS DATETIME))), N'Sốt nhẹ và ho hắt hơi', 'WALK_IN', 'CONFIRMED', 0, GETDATE(), GETDATE()
     FROM patients p, doctors d, rooms r
-    WHERE p.patient_code = 'PAT-000002' AND d.license_number = 'LIC-002' AND r.room_code = 'ROOM-102';
+    WHERE p.patient_code = 'PAT-000002' AND d.license_no = 'LIC-002' AND r.room_code = 'ROOM-102';
 
 -- ===============================================================================
 -- 12. SEED QUEUE_ITEMS & VISITS
@@ -276,22 +276,22 @@ IF NOT EXISTS (SELECT 1 FROM queue_items WHERE queue_date = CAST(GETDATE() AS DA
     INSERT INTO queue_items (queue_date, queue_number, patient_id, doctor_id, room_id, appointment_id, priority, status, created_at, updated_at)
     SELECT CAST(GETDATE() AS DATE), 1, p.id, d.id, r.id, a.id, 'NORMAL', 'WAITING', GETDATE(), GETDATE()
     FROM patients p, doctors d, rooms r, appointments a
-    WHERE p.patient_code = 'PAT-000001' AND d.license_number = 'LIC-001' AND r.room_code = 'ROOM-101' AND a.appointment_code = 'APT-000001';
+    WHERE p.patient_code = 'PAT-000001' AND d.license_no = 'LIC-001' AND r.room_code = 'ROOM-101' AND a.appointment_code = 'APT-000001';
 
 IF NOT EXISTS (SELECT 1 FROM visits WHERE visit_code = 'VST-000001')
-    INSERT INTO visits (visit_code, patient_id, doctor_id, room_id, appointment_id, check_in_time, status, notes, created_at, updated_at)
-    SELECT 'VST-000001', p.id, d.id, r.id, a.id, GETDATE(), 'IN_PROGRESS', N'Đã làm thủ tục đón tiếp tại quầy', GETDATE(), GETDATE()
-    FROM patients p, doctors d, rooms r, appointments a
-    WHERE p.patient_code = 'PAT-000001' AND d.license_number = 'LIC-001' AND r.room_code = 'ROOM-101' AND a.appointment_code = 'APT-000001';
+    INSERT INTO visits (visit_code, patient_id, doctor_id, appointment_id, queue_item_id, status, started_at, created_at, updated_at)
+    SELECT 'VST-000001', p.id, d.id, a.id, q.id, 'IN_PROGRESS', GETDATE(), GETDATE(), GETDATE()
+    FROM patients p, doctors d, appointments a, queue_items q
+    WHERE p.patient_code = 'PAT-000001' AND d.license_no = 'LIC-001' AND a.appointment_code = 'APT-000001' AND q.queue_number = 1;
 
 -- ===============================================================================
 -- 13. SEED ENCOUNTERS
 -- ===============================================================================
-IF NOT EXISTS (SELECT 1 FROM encounters WHERE symptoms = N'Đau đầu, sốt nhẹ, mệt mỏi')
-    INSERT INTO encounters (visit_id, doctor_id, patient_id, start_time, end_time, symptoms, diagnosis, clinical_notes, status, created_at, updated_at)
-    SELECT v.id, d.id, p.id, GETDATE(), DATEADD(minute, 20, GETDATE()), N'Đau đầu, sốt nhẹ, mệt mỏi', N'J00 - Viêm mũi họng cấp (Cảm lạnh thông thường)', N'Theo dõi nhiệt độ, nghỉ ngơi hợp lý và uống nhiều nước', 'COMPLETED', GETDATE(), GETDATE()
-    FROM visits v, doctors d, patients p
-    WHERE v.visit_code = 'VST-000001' AND d.license_number = 'LIC-001' AND p.patient_code = 'PAT-000001';
+IF NOT EXISTS (SELECT 1 FROM encounters WHERE chief_complaint = N'Đau đầu, sốt nhẹ, mệt mỏi')
+    INSERT INTO encounters (visit_id, doctor_id, chief_complaint, diagnosis, clinical_note, status, started_at, completed_at, created_at, updated_at)
+    SELECT v.id, d.id, N'Đau đầu, sốt nhẹ, mệt mỏi', N'J00 - Viêm mũi họng cấp (Cảm lạnh thông thường)', N'Theo dõi nhiệt độ, nghỉ ngơi hợp lý và uống nhiều nước', 'COMPLETED', GETDATE(), DATEADD(minute, 20, GETDATE()), GETDATE(), GETDATE()
+    FROM visits v, doctors d
+    WHERE v.visit_code = 'VST-000001' AND d.license_no = 'LIC-001';
 
 -- ===============================================================================
 -- 14. SEED INVOICES & INVOICE ITEMS (FOR PAYOS QR & BILLING TESTING)
@@ -303,15 +303,15 @@ IF NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_number = 'INV-001001')
     FROM visits v, encounters e, patients p
     WHERE v.visit_code = 'VST-000001' AND e.visit_id = v.id AND p.patient_code = 'PAT-000001';
 
-IF NOT EXISTS (SELECT 1 FROM invoice_items WHERE item_name = N'Khám tổng quát nội khoa')
-    INSERT INTO invoice_items (invoice_id, service_catalog_id, item_name, unit_price, quantity, line_total)
-    SELECT i.id, s.id, s.name, s.price, 1, s.price
+IF NOT EXISTS (SELECT 1 FROM invoice_items WHERE description = N'Khám tổng quát nội khoa')
+    INSERT INTO invoice_items (invoice_id, item_type, reference_id, description, unit_price, quantity, line_total, created_at, updated_at)
+    SELECT i.id, 'CONSULTATION', s.id, s.name, s.price, 1, s.price, GETDATE(), GETDATE()
     FROM invoices i, service_catalog s
     WHERE i.invoice_number = 'INV-001001' AND s.service_code = 'SRV-001';
 
-IF NOT EXISTS (SELECT 1 FROM invoice_items WHERE item_name = N'Xét nghiệm công thức máu toàn phần (CBC)')
-    INSERT INTO invoice_items (invoice_id, service_catalog_id, item_name, unit_price, quantity, line_total)
-    SELECT i.id, s.id, s.name, s.price, 1, s.price
+IF NOT EXISTS (SELECT 1 FROM invoice_items WHERE description = N'Xét nghiệm công thức máu toàn phần (CBC)')
+    INSERT INTO invoice_items (invoice_id, item_type, reference_id, description, unit_price, quantity, line_total, created_at, updated_at)
+    SELECT i.id, 'SERVICE', s.id, s.name, s.price, 1, s.price, GETDATE(), GETDATE()
     FROM invoices i, service_catalog s
     WHERE i.invoice_number = 'INV-001001' AND s.service_code = 'SRV-002';
 
@@ -334,7 +334,7 @@ INSERT INTO audit_logs (action, resource, details, username, ip_address, created
 VALUES (N'PAYMENT_RECEIVED', N'PAYMENT', N'Thanh toán PayOS VietQR nạp tiền thành công cho Hóa đơn INV-001001', 'payos_webhook', '127.0.0.1', GETDATE());
 
 INSERT INTO audit_logs (action, resource, details, username, ip_address, created_at)
-VALUES (N'INITIAL_SEED', N'SYSTEM', N'Tự động khởi tạo dữ liệu Seed Data bao phủ 100% chức năng thành công', 'admin', '127.0.0.1', GETDATE());
+VALUES (N'INITIAL_SEED', N'SYSTEM', N'Tự động khởi tạo dữ liệu Seed Data chuẩn JPA schema thành công', 'admin', '127.0.0.1', GETDATE());
 
 PRINT N'SUCCESS: 100% Comprehensive Seed Data Script executed successfully!';
 GO
