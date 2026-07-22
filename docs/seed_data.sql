@@ -186,47 +186,47 @@ IF NOT EXISTS (SELECT 1 FROM rooms WHERE room_code = 'ROOM-202')
     INSERT INTO rooms (room_code, name, floor, active) VALUES ('ROOM-202', N'Phòng Tim Mạch 202', N'Tầng 2', 1);
 
 -- ===============================================================================
--- 7. SEED DOCTORS (USING FAULT-TOLERANT DECLARE VARIABLES)
+-- 7. SEED DOCTORS (MUST INCLUDE created_at AND updated_at FROM BaseEntity!)
 -- ===============================================================================
 -- Doctor 1: BS. Nguyễn Văn An
 DECLARE @Staff1 BIGINT = (SELECT TOP 1 id FROM staff WHERE employee_code = 'EMP-000001');
 DECLARE @Spec1 BIGINT = (SELECT TOP 1 id FROM specialties WHERE name LIKE N'%Nội%');
 DECLARE @Room1 BIGINT = (SELECT TOP 1 id FROM rooms WHERE room_code = 'ROOM-101');
 IF @Staff1 IS NOT NULL AND @Spec1 IS NOT NULL AND NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-001' OR staff_id = @Staff1)
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
-    VALUES (@Staff1, @Spec1, @Room1, 'LIC-001', 150000.00, 1);
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active, created_at, updated_at)
+    VALUES (@Staff1, @Spec1, @Room1, 'LIC-001', 150000.00, 1, GETDATE(), GETDATE());
 
 -- Doctor 2: BS. Lê Thị Bích
 DECLARE @Staff2 BIGINT = (SELECT TOP 1 id FROM staff WHERE employee_code = 'EMP-000002');
 DECLARE @Spec2 BIGINT = (SELECT TOP 1 id FROM specialties WHERE name LIKE N'%Nhi%');
 DECLARE @Room2 BIGINT = (SELECT TOP 1 id FROM rooms WHERE room_code = 'ROOM-102');
 IF @Staff2 IS NOT NULL AND @Spec2 IS NOT NULL AND NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-002' OR staff_id = @Staff2)
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
-    VALUES (@Staff2, @Spec2, @Room2, 'LIC-002', 200000.00, 1);
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active, created_at, updated_at)
+    VALUES (@Staff2, @Spec2, @Room2, 'LIC-002', 200000.00, 1, GETDATE(), GETDATE());
 
 -- Doctor 3: BS. Phạm Hoàng Cường
 DECLARE @Staff3 BIGINT = (SELECT TOP 1 id FROM staff WHERE employee_code = 'EMP-000003');
 DECLARE @Spec3 BIGINT = (SELECT TOP 1 id FROM specialties WHERE name LIKE N'%Tai%');
 DECLARE @Room3 BIGINT = (SELECT TOP 1 id FROM rooms WHERE room_code = 'ROOM-201');
 IF @Staff3 IS NOT NULL AND @Spec3 IS NOT NULL AND NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-003' OR staff_id = @Staff3)
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
-    VALUES (@Staff3, @Spec3, @Room3, 'LIC-003', 180000.00, 1);
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active, created_at, updated_at)
+    VALUES (@Staff3, @Spec3, @Room3, 'LIC-003', 180000.00, 1, GETDATE(), GETDATE());
 
 -- Doctor 4: BS. Hoàng Văn Dung
 DECLARE @Staff4 BIGINT = (SELECT TOP 1 id FROM staff WHERE employee_code = 'EMP-000006');
 DECLARE @Spec4 BIGINT = (SELECT TOP 1 id FROM specialties WHERE name LIKE N'%Tim%');
 DECLARE @Room4 BIGINT = (SELECT TOP 1 id FROM rooms WHERE room_code = 'ROOM-202');
 IF @Staff4 IS NOT NULL AND @Spec4 IS NOT NULL AND NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-004' OR staff_id = @Staff4)
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
-    VALUES (@Staff4, @Spec4, @Room4, 'LIC-004', 250000.00, 1);
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active, created_at, updated_at)
+    VALUES (@Staff4, @Spec4, @Room4, 'LIC-004', 250000.00, 1, GETDATE(), GETDATE());
 
 -- Doctor 5: BS. Ngô Thị Thu Hà
 DECLARE @Staff5 BIGINT = (SELECT TOP 1 id FROM staff WHERE employee_code = 'EMP-000007');
 DECLARE @Spec5 BIGINT = (SELECT TOP 1 id FROM specialties WHERE name LIKE N'%Răng%');
 DECLARE @Room5 BIGINT = (SELECT TOP 1 id FROM rooms WHERE room_code = 'ROOM-201');
 IF @Staff5 IS NOT NULL AND @Spec5 IS NOT NULL AND NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-005' OR staff_id = @Staff5)
-    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
-    VALUES (@Staff5, @Spec5, @Room5, 'LIC-005', 220000.00, 1);
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active, created_at, updated_at)
+    VALUES (@Staff5, @Spec5, @Room5, 'LIC-005', 220000.00, 1, GETDATE(), GETDATE());
 
 -- ===============================================================================
 -- 8. SEED DOCTOR AVAILABILITIES (FULL 7-DAY WEEKLY ROSTER FOR SCHEDULE BOARD)
