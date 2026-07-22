@@ -42,6 +42,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final DoctorRepository doctorRepository;
     private final RoomRepository roomRepository;
     private final DoctorAvailabilityRepository availabilityRepository;
+    private final com.smartclinic.notification.service.NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -90,7 +91,11 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .source(request.getSource())
                 .status(AppointmentStatus.BOOKED)
                 .build();
-        return AppointmentMapper.toResponse(appointmentRepository.save(appointment));
+        Appointment saved = appointmentRepository.save(appointment);
+        if (notificationService != null) {
+            notificationService.sendAppointmentConfirmation(saved);
+        }
+        return AppointmentMapper.toResponse(saved);
     }
 
     @Override
@@ -129,6 +134,17 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setCancelledReason(reason);
         return AppointmentMapper.toResponse(appointmentRepository.save(appointment));
     }
+
+    @Override
+    public AppointmentResponse markNoShow(Long id) {
+        Appointment appointment = findAppointment(id);
+        if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+            throw new BadRequestException("Only BOOKED appointment can be marked as NO_SHOW");
+        }
+        appointment.setStatus(AppointmentStatus.NO_SHOW);
+        return AppointmentMapper.toResponse(appointmentRepository.save(appointment));
+    }
+
 
     private Appointment findAppointment(Long id) {
         return appointmentRepository.findById(id)

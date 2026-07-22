@@ -2,6 +2,7 @@ package com.smartclinic.patient.service;
 
 import com.smartclinic.common.api.PageResponse;
 import com.smartclinic.patient.dto.PatientCreateRequest;
+import com.smartclinic.patient.dto.PatientMedicalHistoryResponse;
 import com.smartclinic.patient.dto.PatientResponse;
 import com.smartclinic.patient.dto.PatientUpdateRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,4 +16,8 @@ public interface PatientService {
     PatientResponse getById(Long id);
 
     PageResponse<PatientResponse> search(String keyword, Pageable pageable);
+
+    void deactivate(Long id);
+
+    PatientMedicalHistoryResponse getMedicalHistory(Long id);
 }

@@ -17,4 +17,6 @@ public interface AppointmentService {
     AppointmentResponse reschedule(Long id, AppointmentRescheduleRequest request);
 
     AppointmentResponse cancel(Long id, String reason);
+
+    AppointmentResponse markNoShow(Long id);
 }

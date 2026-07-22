@@ -20,4 +20,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     Optional<Visit> findTopByOrderByIdDesc();
 
     long countByStatus(VisitStatus status);
+
+    java.util.List<Visit> findByPatientIdOrderByIdDesc(Long patientId);
 }

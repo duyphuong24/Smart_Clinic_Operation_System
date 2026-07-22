@@ -29,11 +29,14 @@ class PatientServiceImplTest {
     @Mock
     private PatientRepository patientRepository;
 
+    @Mock
+    private com.smartclinic.visit.repository.VisitRepository visitRepository;
+
     private PatientServiceImpl patientService;
 
     @BeforeEach
     void setUp() {
-        patientService = new PatientServiceImpl(patientRepository);
+        patientService = new PatientServiceImpl(patientRepository, visitRepository);
     }
 
     @Test
