@@ -1,12 +1,18 @@
 package com.smartclinic.servicecatalog.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.smartclinic.servicecatalog.dto.ServiceCatalogRequest;
 import com.smartclinic.servicecatalog.service.ServiceCatalogService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -38,5 +44,31 @@ class ServiceCatalogControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/service-list"))
                 .andExpect(model().attributeExists("services", "serviceTypes"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void saveService_ShouldCreateServiceAndRedirect() throws Exception {
+        mockMvc.perform(post("/admin/services/save")
+                        .with(csrf())
+                        .param("serviceCode", "SRV-099")
+                        .param("name", "Cardiology Exam")
+                        .param("type", "CONSULTATION")
+                        .param("price", "250000"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/services"));
+
+        verify(serviceCatalogService).create(any(ServiceCatalogRequest.class));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void toggleStatus_ShouldDeactivateServiceAndRedirect() throws Exception {
+        mockMvc.perform(post("/admin/services/1/toggle-status")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/services"));
+
+        verify(serviceCatalogService).deactivate(eq(1L));
     }
 }
