@@ -29,7 +29,7 @@ public class Specialty {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, columnDefinition = "NVARCHAR(150)")
     private String name;
 
     @Column(name = "description", columnDefinition = "nvarchar(max)")
