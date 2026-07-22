@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(title, content_fragment)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -180,9 +181,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
 
-                <div layout:fragment="content">
-                    <!-- Page content will be injected here -->
-                </div>
+                <!-- Compatible Content Injection (Supports both th:replace and layout:fragment) -->
+                <div th:if="${content_fragment != null}" th:replace="${content_fragment}"></div>
+                <div th:if="${content_fragment == null}" layout:fragment="content"></div>
             </div>
         </div>
     </div>

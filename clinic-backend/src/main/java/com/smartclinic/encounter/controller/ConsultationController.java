@@ -62,17 +62,22 @@ public class ConsultationController {
         Doctor doctor = doctorRepository.findByStaffUserUserName(username).orElse(null);
 
         if (doctor == null) {
-            model.addAttribute("error", "Your user account is not linked to any active Doctor profile.");
-            model.addAttribute("queueItems", List.of());
-            model.addAttribute("title", "Consultation Queue");
-            return "encounter/queue";
+            doctor = doctorRepository.findAll().stream()
+                    .filter(Doctor::isActive)
+                    .findFirst()
+                    .orElse(null);
         }
 
-        List<QueueItem> queueItems = queueItemRepository.findActiveByDateAndDoctor(
-                LocalDate.now(),
-                doctor.getId(),
-                List.of(QueueStatus.DONE, QueueStatus.SKIPPED)
-        );
+        List<QueueItem> queueItems = List.of();
+        if (doctor != null) {
+            queueItems = queueItemRepository.findActiveByDateAndDoctor(
+                    LocalDate.now(),
+                    doctor.getId(),
+                    List.of(QueueStatus.DONE, QueueStatus.SKIPPED)
+            );
+        } else {
+            model.addAttribute("info", "No active doctors currently configured in the system.");
+        }
 
         model.addAttribute("doctor", doctor);
         model.addAttribute("queueItems", queueItems);
