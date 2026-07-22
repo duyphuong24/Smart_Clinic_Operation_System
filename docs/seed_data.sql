@@ -11,6 +11,8 @@
 --   - 'doctor'       / 'doctor123'       (BS. Nguyễn Văn An - Nội Tổng Quát)
 --   - 'doctor2'      / 'password123'      (BS. Lê Thị Bích - Nhi Khoa)
 --   - 'doctor3'      / 'password123'      (BS. Phạm Hoàng Cường - Tai Mũi Họng)
+--   - 'doctor4'      / 'password123'      (BS. Hoàng Văn Dung - Tim Mạch)
+--   - 'doctor5'      / 'password123'      (BS. Ngô Thị Thu Hà - Răng Hàm Mặt)
 --   - 'patient1'     / 'password123'      (Bệnh nhân Nguyễn Văn Hùng - Patient Portal)
 -- ===============================================================================
 
@@ -64,6 +66,14 @@ IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'doctor3')
     INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
     VALUES ('doctor3', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Phạm Hoàng Cường', 'ACTIVE', 0, GETDATE(), GETDATE());
 
+IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'doctor4')
+    INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
+    VALUES ('doctor4', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Hoàng Văn Dung', 'ACTIVE', 0, GETDATE(), GETDATE());
+
+IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'doctor5')
+    INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
+    VALUES ('doctor5', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'BS. Ngô Thị Thu Hà', 'ACTIVE', 0, GETDATE(), GETDATE());
+
 IF NOT EXISTS (SELECT 1 FROM users WHERE user_name = 'patient1')
     INSERT INTO users (user_name, password_hash, full_name, status, failed_login_attempts, created_at, updated_at)
     VALUES ('patient1', '$2a$10$AFYDDESyaKD8BKOXQJSbUOyTHkr/u/meuGNrIMwoWvN1qeCLmE9SO', N'Nguyễn Văn Hùng', 'ACTIVE', 0, GETDATE(), GETDATE());
@@ -100,6 +110,14 @@ SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'doctor3' AND r.name
 AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
 
 INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'doctor4' AND r.name = 'DOCTOR'
+AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
+
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'doctor5' AND r.name = 'DOCTOR'
+AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
+
+INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r WHERE u.user_name = 'patient1' AND r.name = 'PATIENT'
 AND NOT EXISTS (SELECT 1 FROM user_roles WHERE user_id = u.id AND role_id = r.id);
 
@@ -117,6 +135,14 @@ IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000002')
 IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000003')
     INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
     SELECT id, 'EMP-000003', 'DOCTOR', '2023-06-01', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor3';
+
+IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000006')
+    INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
+    SELECT id, 'EMP-000006', 'DOCTOR', '2023-08-10', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor4';
+
+IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000007')
+    INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
+    SELECT id, 'EMP-000007', 'DOCTOR', '2023-09-15', 'ACTIVE', GETDATE(), GETDATE() FROM users WHERE user_name = 'doctor5';
 
 IF NOT EXISTS (SELECT 1 FROM staff WHERE employee_code = 'EMP-000004')
     INSERT INTO staff (user_id, employee_code, staff_type, hired_date, status, created_at, updated_at)
@@ -180,6 +206,18 @@ IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-003')
     FROM staff s, specialties sp, rooms r
     WHERE s.employee_code = 'EMP-000003' AND sp.name = N'Tai Mũi Họng' AND r.room_code = 'ROOM-201';
 
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-004')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
+    SELECT s.id, sp.id, r.id, 'LIC-004', 250000.00, 1
+    FROM staff s, specialties sp, rooms r
+    WHERE s.employee_code = 'EMP-000006' AND sp.name = N'Tim mạch' AND r.room_code = 'ROOM-202';
+
+IF NOT EXISTS (SELECT 1 FROM doctors WHERE license_no = 'LIC-005')
+    INSERT INTO doctors (staff_id, specialty_id, default_room_id, license_no, consultation_fee, active)
+    SELECT s.id, sp.id, r.id, 'LIC-005', 220000.00, 1
+    FROM staff s, specialties sp, rooms r
+    WHERE s.employee_code = 'EMP-000007' AND sp.name = N'Răng Hàm Mặt' AND r.room_code = 'ROOM-201';
+
 -- ===============================================================================
 -- 8. SEED DOCTOR AVAILABILITIES (FULL 7-DAY WEEKLY ROSTER FOR SCHEDULE BOARD)
 -- ===============================================================================
@@ -202,6 +240,20 @@ INSERT INTO doctor_availabilities (doctor_id, room_id, day_of_week, start_time, 
 SELECT d.id, r.id, day, '08:30:00', '11:30:00', 30, 1 
 FROM doctors d, rooms r CROSS JOIN (VALUES (2),(4),(6),(7)) AS Days(day)
 WHERE d.license_no = 'LIC-003' AND r.room_code = 'ROOM-201'
+AND NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = d.id AND day_of_week = day);
+
+-- Doctor 4 (Tim mạch - ROOM-202) - T2, T3, T4, T5, T6 (Morning Shift)
+INSERT INTO doctor_availabilities (doctor_id, room_id, day_of_week, start_time, end_time, slot_minutes, active)
+SELECT d.id, r.id, day, '08:00:00', '12:00:00', 30, 1 
+FROM doctors d, rooms r CROSS JOIN (VALUES (1),(2),(3),(4),(5)) AS Days(day)
+WHERE d.license_no = 'LIC-004' AND r.room_code = 'ROOM-202'
+AND NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = d.id AND day_of_week = day);
+
+-- Doctor 5 (Răng Hàm Mặt - ROOM-201) - T2, T4, T6, T7 (Afternoon Shift)
+INSERT INTO doctor_availabilities (doctor_id, room_id, day_of_week, start_time, end_time, slot_minutes, active)
+SELECT d.id, r.id, day, '13:30:00', '17:30:00', 30, 1 
+FROM doctors d, rooms r CROSS JOIN (VALUES (1),(3),(5),(6)) AS Days(day)
+WHERE d.license_no = 'LIC-005' AND r.room_code = 'ROOM-201'
 AND NOT EXISTS (SELECT 1 FROM doctor_availabilities WHERE doctor_id = d.id AND day_of_week = day);
 
 -- ===============================================================================
