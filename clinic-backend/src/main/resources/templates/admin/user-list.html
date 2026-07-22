@@ -1,61 +1,91 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/main}">
-<head>
-    <title>User Accounts Management - Smart Clinic</title>
-</head>
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('User Accounts Management', ~{::content_fragment})}">
 <body>
-<div layout:fragment="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-person-gear me-2"></i>System User Accounts</h2>
-            <p class="text-muted mb-0">Manage system login credentials, role assignments, and account statuses</p>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4">ID</th>
-                        <th>Username</th>
-                        <th>Full Name</th>
-                        <th>Phone</th>
-                        <th>Roles</th>
-                        <th>Status</th>
-                        <th>Created At</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="u : ${users}">
-                        <td class="ps-4 fw-semibold" th:text="${u.id}">1</td>
-                        <td>
-                            <div class="fw-bold text-dark" th:text="${u.userName}">admin</div>
-                        </td>
-                        <td>
-                            <div class="text-navy fw-semibold" th:text="${u.fullName}">Nguyen Van A</div>
-                        </td>
-                        <td class="text-muted" th:text="${u.phone != null ? u.phone : 'N/A'}">0901234567</td>
-                        <td>
-                            <span th:each="r : ${u.roles}"
-                                  class="badge bg-secondary me-1"
-                                  th:text="${r.name}">ROLE_ADMIN</span>
-                        </td>
-                        <td>
-                            <span th:if="${u.status != null and u.status.name() == 'ACTIVE'}" class="badge bg-success"><i class="bi bi-check-circle me-1"></i>ACTIVE</span>
-                            <span th:unless="${u.status != null and u.status.name() == 'ACTIVE'}" class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>LOCKED</span>
-                        </td>
-                        <td class="text-muted" th:text="${#temporals.format(u.createdAt, 'yyyy-MM-dd HH:mm')}">2026-07-22 10:00</td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(users)}">
-                        <td colspan="7" class="text-center py-4 text-muted">No user accounts found.</td>
-                    </tr>
-                    </tbody>
-                </table>
+<div th:fragment="content_fragment">
+    <!-- Glassmorphism Container Panel -->
+    <div class="glass-panel p-4">
+        <!-- Header Section -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold m-0 text-white d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-users-gear text-cyan"></i>
+                    <span>System User Accounts</span>
+                </h3>
+                <p class="text-secondary m-0 text-sm mt-1">Manage system login credentials, role assignments, and account statuses.</p>
             </div>
+            <div>
+                <span class="badge bg-soft-cyan text-cyan px-3 py-2 fs-6 rounded-pill border border-cyan">
+                    <i class="fa-solid fa-user-shield me-1"></i> Admin Security Center
+                </span>
+            </div>
+        </div>
+
+        <!-- User Accounts Table -->
+        <div class="table-responsive rounded-3 border border-secondary border-opacity-25">
+            <table class="table table-hover align-middle text-white m-0">
+                <thead class="bg-navy text-cyan font-monospace">
+                <tr>
+                    <th class="ps-4" style="width: 80px;">ID</th>
+                    <th>User Credentials</th>
+                    <th>Full Name</th>
+                    <th>Phone</th>
+                    <th>Roles</th>
+                    <th class="text-center">Account Status</th>
+                    <th class="text-end pe-4">Created At</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${users}" class="border-bottom border-secondary border-opacity-10">
+                    <td class="ps-4 font-monospace text-cyan fw-bold" th:text="${'#' + u.id}">#1</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-soft-cyan text-cyan d-flex align-items-center justify-content-center fw-bold font-monospace"
+                                 style="width: 38px; height: 38px; font-size: 1rem; border: 1px solid rgba(56,189,248,0.3);"
+                                 th:text="${#strings.substring(u.userName, 0, 1).toUpperCase()}">A</div>
+                            <div>
+                                <div class="fw-bold text-white fs-6" th:text="${u.userName}">admin</div>
+                                <div class="text-muted text-xs font-monospace" th:text="${u.email != null ? u.email : 'system.user@clinic.com'}">admin@clinic.com</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold text-light" th:text="${u.fullName}">Nguyen Van A</div>
+                    </td>
+                    <td>
+                        <span class="text-secondary font-monospace" th:text="${u.phone != null ? u.phone : 'N/A'}">0901234567</span>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-wrap gap-1">
+                            <span th:each="r : ${u.roles}"
+                                  th:class="${r.name == 'ROLE_ADMIN' ? 'badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50' : 
+                                            (r.name == 'ROLE_MANAGER' ? 'badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50' : 
+                                            (r.name == 'ROLE_DOCTOR' ? 'badge bg-info bg-opacity-25 text-info border border-info border-opacity-50' : 'badge bg-secondary bg-opacity-25 text-light border border-secondary'))}"
+                                  th:text="${r.name}">ROLE_ADMIN</span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <span th:if="${u.status != null and u.status.name() == 'ACTIVE'}" 
+                              class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-2 rounded-pill">
+                            <i class="fa-solid fa-circle-check me-1"></i>ACTIVE
+                        </span>
+                        <span th:unless="${u.status != null and u.status.name() == 'ACTIVE'}" 
+                              class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 px-3 py-2 rounded-pill">
+                            <i class="fa-solid fa-circle-xmark me-1"></i>LOCKED
+                        </span>
+                    </td>
+                    <td class="text-end pe-4 text-secondary font-monospace text-sm" 
+                        th:text="${#temporals.format(u.createdAt, 'yyyy-MM-dd HH:mm')}">2026-07-22 10:00</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(users)}">
+                    <td colspan="7" class="text-center py-5 text-secondary">
+                        <i class="fa-solid fa-users-slash fs-2 mb-2 text-muted"></i>
+                        <p class="m-0">No system user accounts found.</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
