@@ -325,16 +325,16 @@ IF NOT EXISTS (SELECT 1 FROM payments WHERE transaction_ref = 'PAYOS-REF-DEMO001
     FROM invoices i WHERE i.invoice_number = 'INV-001001';
 
 -- ===============================================================================
--- 16. SEED AUDIT LOGS
+-- 16. SEED AUDIT LOGS (MATCHING AuditLog.java JPA SCHEMA)
 -- ===============================================================================
-INSERT INTO audit_logs (action, resource, details, username, ip_address, created_at)
-VALUES (N'LOGIN_SUCCESS', N'AUTH', N'Đăng nhập thành công tài khoản Quản trị hệ thống', 'admin', '127.0.0.1', GETDATE());
+INSERT INTO audit_logs (actor_user_name, action, entity_type, entity_id, message, created_at)
+VALUES ('admin', N'LOGIN_SUCCESS', N'AUTH', 1, N'Đăng nhập thành công tài khoản Quản trị hệ thống', GETDATE());
 
-INSERT INTO audit_logs (action, resource, details, username, ip_address, created_at)
-VALUES (N'PAYMENT_RECEIVED', N'PAYMENT', N'Thanh toán PayOS VietQR nạp tiền thành công cho Hóa đơn INV-001001', 'payos_webhook', '127.0.0.1', GETDATE());
+INSERT INTO audit_logs (actor_user_name, action, entity_type, entity_id, message, created_at)
+VALUES ('payos_webhook', N'PAYMENT_RECEIVED', N'PAYMENT', 1, N'Thanh toán PayOS VietQR nạp tiền thành công cho Hóa đơn INV-001001', GETDATE());
 
-INSERT INTO audit_logs (action, resource, details, username, ip_address, created_at)
-VALUES (N'INITIAL_SEED', N'SYSTEM', N'Tự động khởi tạo dữ liệu Seed Data chuẩn JPA schema thành công', 'admin', '127.0.0.1', GETDATE());
+INSERT INTO audit_logs (actor_user_name, action, entity_type, entity_id, message, created_at)
+VALUES ('admin', N'INITIAL_SEED', N'SYSTEM', 1, N'Tự động khởi tạo dữ liệu Seed Data chuẩn JPA schema thành công', GETDATE());
 
 PRINT N'SUCCESS: 100% Comprehensive Seed Data Script executed successfully!';
 GO
