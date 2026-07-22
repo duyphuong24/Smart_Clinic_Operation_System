@@ -3,45 +3,65 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout/main :: layout('Audit Logs', ~{::content_fragment})}">
 <body>
-    <div th:fragment="content_fragment">
-        <!-- Header -->
+<div th:fragment="content_fragment">
+    <!-- Glassmorphism Container Panel -->
+    <div class="glass-panel p-4">
+        <!-- Header Section -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <h3 class="fw-bold m-0 text-white"><i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i>Audit Logs</h3>
-                <p class="text-secondary m-0 text-sm">System audit trail and security activity history.</p>
+                <h3 class="fw-bold m-0 text-white d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-warning"></i>
+                    <span>System Audit Trail & Logs</span>
+                </h3>
+                <p class="text-secondary m-0 text-sm mt-1">Real-time security logs, user actions, and transaction audit history.</p>
+            </div>
+            <div>
+                <span class="badge bg-soft-cyan text-cyan px-3 py-2 fs-6 rounded-pill border border-cyan">
+                    <i class="fa-solid fa-shield-halved me-1"></i> Security Auditor
+                </span>
             </div>
         </div>
 
         <!-- Logs Table -->
-        <div class="glass-panel p-4">
-            <div class="table-responsive">
-                <table class="table align-middle text-white m-0">
-                    <thead>
-                        <tr class="border-bottom text-secondary text-badge-sz text-uppercase">
-                            <th class="w-20">Timestamp</th>
-                            <th class="w-15">User</th>
-                            <th class="w-15">Action</th>
-                            <th class="w-15">Resource</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="log : ${logs}" class="border-bottom border-secondary-subtle">
-                            <td class="py-3 font-monospace text-xs text-white-50" th:text="${#temporals.format(log.createdAt, 'dd-MM-yyyy HH:mm:ss')}">20-07-2026 12:00:00</td>
-                            <td><span class="badge bg-secondary text-white text-xs" th:text="${log.username != null ? log.username : 'SYSTEM'}">admin</span></td>
-                            <td><span class="badge bg-warning-subtle text-warning text-xs" th:text="${log.action}">CREATE</span></td>
-                            <td class="font-monospace text-xs text-info" th:text="${log.resource != null ? log.resource : '-'}">PATIENT</td>
-                            <td class="text-xs text-white-50" th:text="${log.details}">Patient record created successfully</td>
-                        </tr>
-                        <tr th:if="${logs == null or logs.isEmpty()}">
-                            <td colspan="5" class="text-center py-4 text-secondary">
-                                <i class="fa-solid fa-inbox me-2"></i>No audit logs recorded yet.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive rounded-3 border border-secondary border-opacity-25">
+            <table class="table table-hover align-middle text-white m-0">
+                <thead class="bg-navy text-cyan font-monospace">
+                <tr>
+                    <th class="ps-4" style="width: 180px;">Timestamp</th>
+                    <th>User / Actor</th>
+                    <th>Action Type</th>
+                    <th>Target Resource</th>
+                    <th class="pe-4">Audit Message / Details</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${logs}" class="border-bottom border-secondary border-opacity-10">
+                    <td class="ps-4 font-monospace text-secondary text-sm" 
+                        th:text="${log.createdAt != null ? #temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}">2026-07-22 10:00:00</td>
+                    <td>
+                        <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 px-3 py-1 font-monospace" 
+                              th:text="${log.actorUserName != null ? log.actorUserName : 'SYSTEM'}">admin</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50 px-3 py-1 font-monospace" 
+                              th:text="${log.action}">CREATE</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-50 px-3 py-1 font-monospace" 
+                              th:text="${log.entityType != null ? log.entityType : '-'}">PATIENT</span>
+                    </td>
+                    <td class="pe-4 text-light text-sm" th:text="${log.message}">System initial seed data generated successfully</td>
+                </tr>
+                <tr th:if="${logs == null or logs.isEmpty()}">
+                    <td colspan="5" class="text-center py-5 text-secondary">
+                        <i class="fa-solid fa-inbox fs-2 mb-2 text-muted"></i>
+                        <p class="m-0">No audit logs recorded yet.</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 </body>
 </html>

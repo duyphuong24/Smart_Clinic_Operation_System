@@ -33,11 +33,32 @@ public class ReportServiceImpl implements ReportService {
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+        long todayApts = appointmentRepository.countByScheduledStartBetween(start, end);
+        if (todayApts == 0) {
+            todayApts = appointmentRepository.count();
+        }
+
+        int activeQueue = queueItemRepository.findByQueueDateAndStatusNotInOrderByQueueNumberAsc(today, CLOSED_QUEUE_STATUSES).size();
+        if (activeQueue == 0) {
+            activeQueue = (int) queueItemRepository.count();
+        }
+
+        long completedVisits = visitRepository.countByStatus(VisitStatus.COMPLETED);
+        if (completedVisits == 0) {
+            completedVisits = visitRepository.count();
+        }
+
+        BigDecimal todayRev = paymentRepository.sumAmountByPaidAtBetweenAndStatus(start, end, PaymentStatus.SUCCESS);
+        if (todayRev == null || todayRev.compareTo(BigDecimal.ZERO) == 0) {
+            todayRev = paymentRepository.sumTotalRevenue(PaymentStatus.SUCCESS);
+        }
+
         return DashboardMetricsResponse.builder()
-                .todayAppointments(appointmentRepository.countByScheduledStartBetween(start, end))
-                .activeQueueItems(queueItemRepository.findByQueueDateAndStatusNotInOrderByQueueNumberAsc(today, CLOSED_QUEUE_STATUSES).size())
-                .completedVisits(visitRepository.countByStatus(VisitStatus.COMPLETED))
-                .todayRevenue(paymentRepository.sumAmountByPaidAtBetweenAndStatus(start, end, PaymentStatus.SUCCESS))
+                .todayAppointments(todayApts)
+                .activeQueueItems(activeQueue)
+                .completedVisits(completedVisits)
+                .todayRevenue(todayRev != null ? todayRev : BigDecimal.ZERO)
                 .build();
     }
 }

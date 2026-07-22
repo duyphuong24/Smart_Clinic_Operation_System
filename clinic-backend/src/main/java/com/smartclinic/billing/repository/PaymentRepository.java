@@ -25,4 +25,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             @Param("end") LocalDateTime end,
             @Param("status") PaymentStatus status
     );
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = :status")
+    BigDecimal sumTotalRevenue(@Param("status") PaymentStatus status);
 }
