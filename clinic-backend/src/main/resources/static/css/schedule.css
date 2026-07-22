@@ -1,45 +1,85 @@
 /* ==========================================================================
-   Schedule Module specific styles - Doctor Duty Schedule Board
+   Schedule Module Specific Styles - Doctor Duty Schedule Board (Glassmorphism)
    ========================================================================== */
 
-.schedule-board-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+.schedule-day-column {
+    background: rgba(255, 255, 255, 0.02);
+    min-height: 480px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.schedule-board-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.12);
-}
-
-.schedule-shift-badge {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    color: #ffffff;
+.schedule-day-header {
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(8px);
+    color: #38bdf8 !important;
+    font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    font-size: 0.825rem;
-    padding: 0.35rem 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.schedule-shift-card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.schedule-shift-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #38bdf8;
+    box-shadow: 0 8px 25px rgba(56, 189, 248, 0.25);
+}
+
+.schedule-doctor-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.schedule-specialty {
+    color: #94a3b8;
+    font-size: 0.8rem;
+}
+
+.schedule-room-badge {
+    background: rgba(56, 189, 248, 0.18) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 3px 8px;
     border-radius: 6px;
 }
 
-.schedule-day-column {
-    background: #f8fafc;
-    min-height: 480px;
-    border-right: 1px solid #e2e8f0;
+.schedule-time-badge {
+    background: rgba(127, 0, 255, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(192, 132, 252, 0.3);
+    font-weight: 600;
+    font-size: 0.775rem;
+    padding: 4px 8px;
+    border-radius: 6px;
 }
 
 .schedule-doctor-avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: #e0f2fe;
-    color: #0284c7;
+    background: linear-gradient(135deg, #0072ff, #7f00ff);
+    color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
+    font-size: 0.85rem;
 }
 
 .schedule-form-panel {
