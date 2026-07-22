@@ -8,9 +8,17 @@
         <link th:href="@{/css/dashboard.css}" rel="stylesheet">
 
         <!-- Welcome Message -->
-        <div class="mb-4">
-            <h2 class="fw-bold">Welcome back, <span sec:authentication="name">User</span>!</h2>
-            <p class="text-secondary">Here is an overview of today's activities and clinic metrics.</p>
+        <div class="mb-4 d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="fw-bold m-0 text-primary">Welcome back, <span sec:authentication="name">User</span>!</h2>
+                <p class="text-secondary m-0 text-sm mt-1" sec:authorize="hasRole('ROLE_MANAGER')">Clinic Operations, Roster Management, & Financial Oversight Hub.</p>
+                <p class="text-secondary m-0 text-sm mt-1" sec:authorize="!hasRole('ROLE_MANAGER')">Here is an overview of today's activities and clinic metrics.</p>
+            </div>
+            <div>
+                <span sec:authorize="hasRole('ROLE_MANAGER')" class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 fs-6 rounded-pill">
+                    <i class="fa-solid fa-user-tie me-1"></i> Operations Manager
+                </span>
+            </div>
         </div>
 
         <!-- Metrics Grid -->
@@ -18,7 +26,7 @@
             <!-- Metric Card 1: Today Appointments -->
             <div class="metric-card glass-panel">
                 <div class="metric-card-info">
-                    <span class="metric-card-label">Today Appointments</span>
+                    <span class="metric-card-label">Appointments</span>
                     <span class="metric-card-value" th:text="${appointmentsCount}">12</span>
                 </div>
                 <div class="metric-card-icon-box box-blue">
@@ -48,10 +56,10 @@
                 </div>
             </div>
 
-            <!-- Metric Card 4: Today Revenue -->
+            <!-- Metric Card 4: Total Revenue -->
             <div class="metric-card glass-panel">
                 <div class="metric-card-info">
-                    <span class="metric-card-label">Today Revenue</span>
+                    <span class="metric-card-label">Total Revenue</span>
                     <span class="metric-card-value dashboard-revenue-text" th:text="${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 0, 'POINT')} + ' ₫'">3,250,000 ₫</span>
                 </div>
                 <div class="metric-card-icon-box box-orange">
@@ -62,11 +70,11 @@
 
         <!-- Dashboard Content Sections -->
         <div class="row g-4">
-            <!-- Active Queue Board Panel -->
-            <div class="col-lg-8">
+            <!-- Active Queue Board Panel (General Roles) -->
+            <div class="col-lg-8" sec:authorize="!hasRole('ROLE_MANAGER')">
                 <div class="glass-panel p-4 h-100">
                     <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h4 class="m-0 fw-bold"><i class="fa-solid fa-list-ol me-2 text-primary"></i>Today's Active Queue</h4>
+                        <h4 class="m-0 fw-bold text-primary"><i class="fa-solid fa-list-ol me-2 text-primary"></i>Today's Active Queue</h4>
                         <a th:href="@{/queue}" class="btn btn-sm btn-outline-primary px-3 dashboard-action-btn-all btn-cancel-custom">View All</a>
                     </div>
                     
@@ -77,15 +85,67 @@
                 </div>
             </div>
 
+            <!-- Dedicated Operations & Financial Hub Panel (Manager Role) -->
+            <div class="col-lg-8" sec:authorize="hasRole('ROLE_MANAGER')">
+                <div class="glass-panel p-4 h-100">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h4 class="m-0 fw-bold text-primary"><i class="fa-solid fa-chart-line me-2 text-primary"></i>Manager Operations & Oversight Hub</h4>
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill">Active Control</span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-white h-100">
+                                <strong class="text-dark d-block mb-2"><i class="fa-solid fa-notes-medical text-primary me-2"></i>Medical Catalog Pricing</strong>
+                                <p class="text-secondary text-xs m-0 mb-3">Manage consultation fees, laboratory test pricing, and service catalog availability.</p>
+                                <a th:href="@{/admin/services}" class="btn btn-sm btn-outline-primary w-100 btn-cancel-custom">
+                                    <i class="fa-solid fa-toolbox me-1"></i>Manage Medical Services
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-white h-100">
+                                <strong class="text-dark d-block mb-2"><i class="fa-solid fa-calendar-days text-info me-2"></i>Doctor Duty Roster</strong>
+                                <p class="text-secondary text-xs m-0 mb-3">Assign doctor working shifts, duty rooms, and weekly consultation schedules.</p>
+                                <a th:href="@{/schedule/board}" class="btn btn-sm btn-outline-info w-100 btn-cancel-custom">
+                                    <i class="fa-solid fa-calendar-plus me-1"></i>Schedule Duty Roster
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-white h-100">
+                                <strong class="text-dark d-block mb-2"><i class="fa-solid fa-chart-pie text-warning me-2"></i>Financial & Revenue Reports</strong>
+                                <p class="text-secondary text-xs m-0 mb-3">Analyze clinic revenue streams, payment method breakdowns, and visit statistics.</p>
+                                <a th:href="@{/reports}" class="btn btn-sm btn-outline-warning w-100 btn-cancel-custom">
+                                    <i class="fa-solid fa-square-poll-vertical me-1"></i>View Revenue Reports
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-white h-100">
+                                <strong class="text-dark d-block mb-2"><i class="fa-solid fa-clock-rotate-left text-danger me-2"></i>Audit Trail & Compliance</strong>
+                                <p class="text-secondary text-xs m-0 mb-3">Inspect system security logs, staff activities, and payment transaction audits.</p>
+                                <a th:href="@{/audit-logs}" class="btn btn-sm btn-outline-danger w-100 btn-cancel-custom">
+                                    <i class="fa-solid fa-shield-halved me-1"></i>Inspect Audit Logs
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Quick Actions Panel -->
             <div class="col-lg-4">
                 <div class="glass-panel p-4 h-100">
-                    <h4 class="mb-4 fw-bold"><i class="fa-solid fa-bolt me-2 text-warning"></i>Quick Actions</h4>
+                    <h4 class="mb-4 fw-bold text-primary"><i class="fa-solid fa-bolt me-2 text-warning"></i>Quick Actions</h4>
                     
                     <div class="d-flex flex-column gap-3">
                         <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/patients}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Register Patient</span>
+                                <span class="d-block fw-bold text-dark mb-1 dashboard-quick-action-title">Register Patient</span>
                                 <span class="d-block text-secondary dashboard-quick-action-desc">Add a new patient profile</span>
                             </div>
                             <i class="fa-solid fa-user-plus text-primary"></i>
@@ -93,7 +153,7 @@
 
                         <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" th:href="@{/appointments}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Book Appointment</span>
+                                <span class="d-block fw-bold text-dark mb-1 dashboard-quick-action-title">Book Appointment</span>
                                 <span class="d-block text-secondary dashboard-quick-action-desc">Schedule a slot with a doctor</span>
                             </div>
                             <i class="fa-solid fa-calendar-plus text-purple"></i>
@@ -101,15 +161,15 @@
 
                         <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_DOCTOR')" th:href="@{/consultation}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Consultation Desk</span>
+                                <span class="d-block fw-bold text-dark mb-1 dashboard-quick-action-title">Consultation Desk</span>
                                 <span class="d-block text-secondary dashboard-quick-action-desc">Treat patients in the queue</span>
                             </div>
                             <i class="fa-solid fa-stethoscope text-success"></i>
                         </a>
 
-                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_CASHIER')" th:href="@{/billing}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
+                        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_CASHIER', 'ROLE_MANAGER')" th:href="@{/billing}" class="btn btn-outline-light text-start p-3 w-100 d-flex align-items-center justify-content-between dashboard-quick-action-card">
                             <div>
-                                <span class="d-block fw-bold text-white mb-1 dashboard-quick-action-title">Pending Invoices</span>
+                                <span class="d-block fw-bold text-dark mb-1 dashboard-quick-action-title">Pending Invoices</span>
                                 <span class="d-block text-secondary dashboard-quick-action-desc">Collect payments & issue bills</span>
                             </div>
                             <i class="fa-solid fa-receipt text-warning"></i>

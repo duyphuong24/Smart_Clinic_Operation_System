@@ -87,6 +87,13 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
         serviceCatalogRepository.save(service);
     }
 
+    @Override
+    public ServiceCatalogResponse toggleStatus(Long id) {
+        ServiceCatalog service = findService(id);
+        service.setActive(!service.isActive());
+        return ServiceCatalogMapper.toResponse(serviceCatalogRepository.save(service));
+    }
+
     private ServiceCatalog findService(Long id) {
         return serviceCatalogRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found"));

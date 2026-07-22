@@ -72,8 +72,9 @@
                                 <i class="fa-solid fa-circle-minus me-1"></i>Inactive
                             </span>
                             <form th:action="@{'/admin/services/' + ${service.id} + '/toggle-status'}" method="post" class="d-inline ms-2">
-                                <button type="submit" class="btn btn-outline-warning btn-sm rounded-2" title="Toggle Active Status">
-                                    <i class="fa-solid fa-power-off"></i>
+                                <button type="submit" th:class="${service.active ? 'btn btn-outline-warning btn-sm rounded-2' : 'btn btn-outline-success btn-sm rounded-2'}" th:title="${service.active ? 'Deactivate Service' : 'Activate Service'}">
+                                    <i th:class="${service.active ? 'fa-solid fa-power-off me-1' : 'fa-solid fa-check me-1'}"></i>
+                                    <span th:text="${service.active ? 'Disable' : 'Enable'}">Disable</span>
                                 </button>
                             </form>
                         </div>

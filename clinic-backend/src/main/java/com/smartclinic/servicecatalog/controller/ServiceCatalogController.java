@@ -52,7 +52,7 @@ public class ServiceCatalogController {
 
     @PostMapping("/{id}/toggle-status")
     public String toggleStatus(@PathVariable Long id) {
-        serviceCatalogService.deactivate(id);
+        serviceCatalogService.toggleStatus(id);
         return "redirect:/admin/services";
     }
 }
