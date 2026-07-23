@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @Controller
 @RequestMapping("/doctor")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('DOCTOR')")
 public class DoctorPortalController {
 
     private final DoctorRepository doctorRepository;
