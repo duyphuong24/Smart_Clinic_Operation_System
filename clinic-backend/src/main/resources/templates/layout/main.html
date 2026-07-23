@@ -117,8 +117,8 @@
                         <span>Doctor Schedule Board</span>
                     </a>
 
-                    <!-- Today's Patients (Doctor) -->
-                    <a sec:authorize="hasRole('ROLE_DOCTOR')" 
+                    <!-- Today's Patients (Doctor, Admin) -->
+                    <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_DOCTOR')" 
                        th:href="@{/doctor/my-patients}" th:classappend="${title == 'Today''s Patients' || title == 'Today Patients' ? 'active' : ''}" class="menu-item-link">
                         <i class="fa-solid fa-user-injured"></i>
                         <span>Today's Patients</span>

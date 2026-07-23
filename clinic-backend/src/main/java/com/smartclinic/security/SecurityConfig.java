@@ -72,7 +72,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/register").permitAll()
                         .requestMatchers("/admin/users/**").hasRole("ADMIN")
                         .requestMatchers("/manager/staff/**", "/admin/staff/**", "/admin/services/**").hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers("/doctor/**").hasRole("DOCTOR")
+                        .requestMatchers("/doctor/**").hasAnyRole("ADMIN", "DOCTOR")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/audit-logs/**", "/reports/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/schedule/board").hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "DOCTOR")
