@@ -38,14 +38,16 @@ public final class PaymentDialog {
                 dialogStage.initOwner(owner);
             }
 
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, 560, 640);
             var stylesheet = PaymentDialog.class.getResource("/css/app.css");
             if (stylesheet != null) {
                 scene.getStylesheets().add(stylesheet.toExternalForm());
             }
 
             dialogStage.setScene(scene);
-            dialogStage.setResizable(false);
+            dialogStage.setResizable(true);
+            dialogStage.setMinWidth(480);
+            dialogStage.setMinHeight(500);
             dialogStage.showAndWait();
 
             return controller.getResult();

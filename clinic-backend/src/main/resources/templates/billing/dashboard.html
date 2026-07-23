@@ -87,11 +87,55 @@
             </div>
         </div>
 
-        <!-- 2. Invoice History Section (Hidden by default) -->
+        <!-- 2. Invoice & Transaction History Section (Hidden by default) -->
         <div id="historySection" class="glass-panel p-4 d-none">
+            <!-- Payment Transactions Registry -->
             <div class="mb-4">
-                <h4 class="fw-bold m-0 text-white">Invoice History</h4>
-                <p class="text-secondary m-0 text-sm">Archived medical bill invoices and cash records.</p>
+                <h4 class="fw-bold m-0 text-white"><i class="fa-solid fa-money-bill-transfer text-success me-2"></i>Payment Transactions Registry</h4>
+                <p class="text-secondary m-0 text-sm">Realtime payment transaction log recorded via Cash, PayOS VietQR, and POS Cards.</p>
+            </div>
+            
+            <div class="table-responsive mb-5">
+                <table class="table table-hover align-middle text-white m-0 billing-table">
+                    <thead>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-15">Paid At</th>
+                            <th class="w-15">Invoice ID</th>
+                            <th class="w-15">Method</th>
+                            <th class="w-15">Status</th>
+                            <th class="w-15">Amount</th>
+                            <th class="pe-3 w-25">Transaction Ref / Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="pm : ${paymentHistory}" class="glass-panel billing-table-row">
+                            <td class="ps-3 py-3 font-monospace text-xs" th:text="${pm.paidAt != null ? #temporals.format(pm.paidAt, 'dd-MM-yyyy HH:mm') : '-'}">20-07-2026 12:00</td>
+                            <td class="font-monospace text-xs text-info" th:text="'#' + ${pm.invoiceId}">#100</td>
+                            <td>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle" th:text="${pm.method}">CASH</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle" th:text="${pm.status}">SUCCESS</span>
+                            </td>
+                            <td>
+                                <span class="fw-bold text-success font-monospace" th:text="${#numbers.formatDecimal(pm.amount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</span>
+                            </td>
+                            <td class="pe-3 text-xs text-white-50" th:text="${pm.transactionRef != null ? pm.transactionRef + ' ' + (pm.note != null ? pm.note : '') : (pm.note != null ? pm.note : '-')}">-</td>
+                        </tr>
+                        <!-- Empty state -->
+                        <tr th:if="${#lists.isEmpty(paymentHistory)}">
+                            <td colspan="6" class="text-center py-4 text-secondary">
+                                <i class="fa-solid fa-receipt mb-2 text-secondary"></i>
+                                <p class="m-0 text-xs">No payment transactions recorded yet.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-4 pt-3 border-top border-secondary-subtle">
+                <h4 class="fw-bold m-0 text-white"><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i>Invoice Archive</h4>
+                <p class="text-secondary m-0 text-sm">Archived medical bill invoices.</p>
             </div>
             
             <div class="table-responsive">
@@ -121,7 +165,10 @@
                                 <span class="fw-bold text-accent" th:text="${#numbers.formatDecimal(inv.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</span>
                             </td>
                             <td>
-                                <span class="badge billing-status-badge" th:classappend="${inv.status.name() == 'ISSUED' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${inv.status}">ISSUED</span>
+                                <span class="badge billing-status-badge" th:classappend="${
+                                    inv.status.name() == 'PAID' ? 'bg-success-subtle text-success border border-success-subtle' : 
+                                    inv.status.name() == 'ISSUED' ? 'bg-warning-subtle text-warning border border-warning-subtle' : 
+                                    'bg-danger-subtle text-danger border border-danger-subtle'}" th:text="${inv.status}">ISSUED</span>
                             </td>
                             <td class="pe-3 text-end">
                                 <a th:href="@{/billing/invoices/{id}(id=${inv.id})}" class="btn btn-sm btn-outline-info billing-action-btn" title="View Details">

@@ -1,21 +1,19 @@
 package com.smartclinic.report.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.smartclinic.appointment.repository.AppointmentRepository;
-import com.smartclinic.payment.entity.PaymentStatus;
-import com.smartclinic.payment.repository.PaymentRepository;
-import com.smartclinic.queue.entity.QueueItem;
-import com.smartclinic.queue.entity.QueueStatus;
+import com.smartclinic.billing.entity.PaymentStatus;
+import com.smartclinic.billing.repository.PaymentRepository;
 import com.smartclinic.queue.repository.QueueItemRepository;
+import com.smartclinic.report.dto.DashboardMetricsResponse;
 import com.smartclinic.visit.entity.VisitStatus;
 import com.smartclinic.visit.repository.VisitRepository;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,24 +37,28 @@ class ReportServiceImplTest {
     private PaymentRepository paymentRepository;
 
     @InjectMocks
-    private ReportServiceImpl service;
+    private ReportServiceImpl reportService;
 
     @Test
-    void dashboardMetricsShouldAggregateOperationalCounts() {
-        when(appointmentRepository.countByScheduledStartBetween(any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(12L);
-        when(queueItemRepository.findByQueueDateAndStatusNotInOrderByQueueNumberAsc(eq(LocalDate.now()), any()))
-                .thenReturn(List.of(new QueueItem(), new QueueItem()));
-        when(visitRepository.countByStatus(VisitStatus.COMPLETED)).thenReturn(8L);
-        when(paymentRepository.sumAmountByPaidAtBetweenAndStatus(
-                any(LocalDateTime.class), any(LocalDateTime.class), eq(PaymentStatus.SUCCESS)))
-                .thenReturn(BigDecimal.valueOf(3250000));
+    void dashboardMetrics_ShouldReturnMetricsWithFallbackValues() {
+        when(appointmentRepository.countByScheduledStartBetween(any(), any())).thenReturn(0L);
+        when(appointmentRepository.count()).thenReturn(5L);
 
-        var response = service.dashboardMetrics();
+        when(queueItemRepository.findByQueueDateAndStatusNotInOrderByQueueNumberAsc(any(), any())).thenReturn(List.of());
+        when(queueItemRepository.count()).thenReturn(2L);
 
-        assertThat(response.getTodayAppointments()).isEqualTo(12L);
-        assertThat(response.getActiveQueueItems()).isEqualTo(2L);
-        assertThat(response.getCompletedVisits()).isEqualTo(8L);
-        assertThat(response.getTodayRevenue()).isEqualByComparingTo("3250000");
+        when(visitRepository.countByStatus(VisitStatus.COMPLETED)).thenReturn(0L);
+        when(visitRepository.count()).thenReturn(10L);
+
+        when(paymentRepository.sumAmountByPaidAtBetweenAndStatus(any(), any(), eq(PaymentStatus.SUCCESS))).thenReturn(BigDecimal.ZERO);
+        when(paymentRepository.sumTotalRevenue(PaymentStatus.SUCCESS)).thenReturn(new BigDecimal("500000.00"));
+
+        DashboardMetricsResponse metrics = reportService.dashboardMetrics();
+
+        assertNotNull(metrics);
+        assertEquals(5L, metrics.getTodayAppointments());
+        assertEquals(2, metrics.getActiveQueueItems());
+        assertEquals(10L, metrics.getCompletedVisits());
+        assertEquals(new BigDecimal("500000.00"), metrics.getTodayRevenue());
     }
 }

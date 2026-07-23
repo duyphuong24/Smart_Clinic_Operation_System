@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nhắc lịch hẹn khám - Smart Clinic</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .header { background: linear-gradient(135deg, #ff9800, #f57c00); color: #ffffff; padding: 24px; text-align: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .content { padding: 30px; }
+        .info-box { background-color: #fff8e1; border-left: 4px solid #ffb300; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .info-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .info-table td { padding: 10px; border-bottom: 1px solid #eef2f5; }
+        .info-table td.label { font-weight: bold; color: #555; width: 35%; }
+        .footer { background-color: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Smart Clinic Operations System</h1>
+        <p style="margin: 5px 0 0 0;">🔔 Nhắc nhở lịch hẹn khám ngày mai</p>
+    </div>
+    <div class="content">
+        <p>Xin chào <strong th:text="${patientName}">Bệnh nhân</strong>,</p>
+        <p>Smart Clinic xin nhắc bạn về lịch hẹn khám bệnh diễn ra vào <strong>ngày mai</strong>:</p>
+
+        <div class="info-box">
+            <table class="info-table">
+                <tr>
+                    <td class="label">Mã đặt lịch:</td>
+                    <td><strong th:text="${appointmentCode}">APT-000001</strong></td>
+                </tr>
+                <tr>
+                    <td class="label">Thời gian:</td>
+                    <td><strong th:text="${scheduledTime}">08:00 - 08:30</strong> (Ngày <span th:text="${scheduledDate}">2026-07-22</span>)</td>
+                </tr>
+                <tr>
+                    <td class="label">Bác sĩ:</td>
+                    <td th:text="${doctorName}">BS. Nguyễn Văn A</td>
+                </tr>
+                <tr>
+                    <td class="label">Phòng khám:</td>
+                    <td th:text="${roomName}">Phòng 101</td>
+                </tr>
+            </table>
+        </div>
+
+        <p style="font-size: 14px; color: #555;">
+            * Nhớ mang theo giấy tờ tùy thân và có mặt trước 15 phút tại phòng khám.<br>
+            * Nếu bạn cần đổi lịch hoặc hủy hẹn, xin vui lòng liên hệ bộ phận Lễ tân trước giờ khám.
+        </p>
+    </div>
+    <div class="footer">
+        &copy; 2026 Smart Clinic Operations System. All rights reserved.<br>
+        Email tự động nhắc nhở lịch hẹn khám bệnh.
+    </div>
+</div>
+</body>
+</html>

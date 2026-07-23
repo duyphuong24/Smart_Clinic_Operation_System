@@ -3,6 +3,7 @@ package com.smartclinic.desktop.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.smartclinic.desktop.dto.ApiResponse;
 import com.smartclinic.desktop.dto.InvoiceResponse;
+import com.smartclinic.desktop.dto.PayOSPaymentResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -41,6 +42,15 @@ public class InvoiceApiClient {
                 "/invoices/" + id + "/cancel",
                 body,
                 new TypeReference<ApiResponse<InvoiceResponse>>() {},
+                true
+        );
+    }
+
+    public CompletableFuture<ApiResponse<PayOSPaymentResponse>> createPayOSLink(Long invoiceId) {
+        return apiClient.post(
+                "/invoices/" + invoiceId + "/payos-link",
+                null,
+                new TypeReference<ApiResponse<PayOSPaymentResponse>>() {},
                 true
         );
     }

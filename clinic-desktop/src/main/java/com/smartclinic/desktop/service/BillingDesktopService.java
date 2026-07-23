@@ -3,6 +3,7 @@ package com.smartclinic.desktop.service;
 import com.smartclinic.desktop.api.ApiException;
 import com.smartclinic.desktop.api.InvoiceApiClient;
 import com.smartclinic.desktop.dto.InvoiceResponse;
+import com.smartclinic.desktop.dto.PayOSPaymentResponse;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +37,16 @@ public class BillingDesktopService {
 
     public CompletableFuture<InvoiceResponse> cancel(Long id, String reason) {
         return invoiceApiClient.cancel(id, reason)
+                .thenApply(res -> {
+                    if (res != null && res.isSuccess()) {
+                        return res.getData();
+                    }
+                    throw new ApiException(res == null ? "No response" : res.getMessage(), null);
+                });
+    }
+
+    public CompletableFuture<PayOSPaymentResponse> createPayOSLink(Long id) {
+        return invoiceApiClient.createPayOSLink(id)
                 .thenApply(res -> {
                     if (res != null && res.isSuccess()) {
                         return res.getData();

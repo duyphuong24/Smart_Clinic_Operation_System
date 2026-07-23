@@ -2,6 +2,7 @@ package com.smartclinic.queue.service;
 
 import com.smartclinic.queue.dto.AppointmentCheckInRequest;
 import com.smartclinic.queue.dto.QueueItemResponse;
+import com.smartclinic.queue.dto.QueueTransferRequest;
 import com.smartclinic.queue.dto.WalkInQueueRequest;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,4 +26,11 @@ public interface QueueItemService {
 
     @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.canManageQueueItem(#id)")
     QueueItemResponse skip(Long id);
+
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.canManageQueueItem(#id)")
+    QueueItemResponse skip(Long id, String reason);
+
+    QueueItemResponse transferQueueItem(Long id, QueueTransferRequest request);
+
+    QueueItemResponse reQueueItem(Long id);
 }

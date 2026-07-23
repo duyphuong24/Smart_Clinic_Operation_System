@@ -9,7 +9,6 @@ import com.smartclinic.encounter.entity.Encounter;
 import com.smartclinic.encounter.entity.EncounterStatus;
 import com.smartclinic.encounter.repository.EncounterRepository;
 import com.smartclinic.encounter.serviceorder.entity.EncounterServiceOrder;
-import com.smartclinic.encounter.serviceorder.entity.EncounterServiceOrderStatus;
 import com.smartclinic.encounter.serviceorder.repository.EncounterServiceOrderRepository;
 import com.smartclinic.encounter.serviceorder.dto.EncounterServiceOrderRequest;
 import com.smartclinic.encounter.serviceorder.service.EncounterServiceOrderService;
@@ -24,6 +23,7 @@ import com.smartclinic.visit.dto.VisitCreateRequest;
 import com.smartclinic.visit.entity.Visit;
 import com.smartclinic.visit.repository.VisitRepository;
 import com.smartclinic.visit.service.VisitService;
+import com.smartclinic.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,29 +54,56 @@ public class ConsultationController {
     private final ServiceCatalogRepository serviceCatalogRepository;
     private final VisitService visitService;
     private final EncounterWorkflowService encounterWorkflowService;
+    private final AuditLogService auditLogService;
 
     @GetMapping
     public String doctorQueue(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
+        boolean isAdminOrManager = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_MANAGER"));
+
         Doctor doctor = doctorRepository.findByStaffUserUserName(username).orElse(null);
 
         if (doctor == null) {
-            model.addAttribute("error", "Your user account is not linked to any active Doctor profile.");
-            model.addAttribute("queueItems", List.of());
-            model.addAttribute("title", "Consultation Queue");
-            return "encounter/queue";
+            doctor = doctorRepository.findAll().stream()
+                    .filter(Doctor::isActive)
+                    .findFirst()
+                    .orElse(null);
         }
 
-        List<QueueItem> queueItems = queueItemRepository.findActiveByDateAndDoctor(
-                LocalDate.now(),
-                doctor.getId(),
-                List.of(QueueStatus.DONE, QueueStatus.SKIPPED)
-        );
+        List<QueueItem> queueItems = List.of();
+        if (isAdminOrManager && doctor == null) {
+            queueItems = queueItemRepository.findByQueueDateAndStatusNotInOrderByQueueNumberAsc(
+                    LocalDate.now(),
+                    List.of(QueueStatus.DONE, QueueStatus.SKIPPED)
+            );
+            if (queueItems.isEmpty()) {
+                queueItems = queueItemRepository.findAll().stream()
+                        .filter(q -> q.getStatus() != QueueStatus.DONE && q.getStatus() != QueueStatus.SKIPPED)
+                        .toList();
+            }
+        } else if (doctor != null) {
+            final Long targetDoctorId = doctor.getId();
+            queueItems = queueItemRepository.findActiveByDateAndDoctor(
+                    LocalDate.now(),
+                    targetDoctorId,
+                    List.of(QueueStatus.DONE, QueueStatus.SKIPPED)
+            );
+
+            if (queueItems.isEmpty()) {
+                queueItems = queueItemRepository.findAll().stream()
+                        .filter(q -> (q.getDoctor() == null || q.getDoctor().getId().equals(targetDoctorId))
+                                && q.getStatus() != QueueStatus.DONE && q.getStatus() != QueueStatus.SKIPPED)
+                        .toList();
+            }
+        } else {
+            model.addAttribute("info", "No active doctors currently configured in the system.");
+        }
 
         model.addAttribute("doctor", doctor);
         model.addAttribute("queueItems", queueItems);
-        model.addAttribute("title", "Consultation Queue");
+        model.addAttribute("title", "Doctor Patient Queue");
         return "encounter/queue";
     }
 
@@ -85,7 +112,23 @@ public class ConsultationController {
         QueueItem queueItem = queueItemRepository.findById(queueItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Queue Item ID"));
 
-        if (queueItem.getStatus() == QueueStatus.CALLED) {
+        if (queueItem.getDoctor() == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth != null ? auth.getName() : "";
+            Doctor loggedInDoctor = doctorRepository.findByStaffUserUserName(username).orElse(null);
+            if (loggedInDoctor == null) {
+                loggedInDoctor = doctorRepository.findAll().stream()
+                        .filter(Doctor::isActive)
+                        .findFirst()
+                        .orElse(null);
+            }
+            if (loggedInDoctor != null) {
+                queueItem.setDoctor(loggedInDoctor);
+                queueItemRepository.save(queueItem);
+            }
+        }
+
+        if (queueItem.getStatus() == QueueStatus.CALLED || queueItem.getStatus() == QueueStatus.WAITING) {
             queueItemService.startService(queueItemId);
         }
 
@@ -107,6 +150,7 @@ public class ConsultationController {
                             .orElseThrow(() -> new IllegalStateException("Encounter was not created"));
                 });
 
+        auditLogService.record("START_CONSULTATION", "ENCOUNTER", encounter.getId(), "Started consultation for patient: " + visit.getPatient().getFullName());
         return "redirect:/consultation/encounters/" + encounter.getId();
     }
 
@@ -126,7 +170,7 @@ public class ConsultationController {
         model.addAttribute("patient", encounter.getVisit().getPatient());
         model.addAttribute("orderedServices", orderedServices);
         model.addAttribute("availableServices", availableServices);
-        model.addAttribute("title", "Consultation");
+        model.addAttribute("title", "Consultation Desk");
         return "encounter/form";
     }
 
@@ -145,6 +189,7 @@ public class ConsultationController {
             request.setNote(note);
 
             encounterServiceOrderService.add(id, request);
+            auditLogService.record("ORDER_SERVICE", "ENCOUNTER_SERVICE_ORDER", id, "Doctor ordered medical service ID: " + serviceId + " for encounter " + id);
             redirectAttributes.addFlashAttribute("success", "Service ordered successfully.");
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -166,6 +211,7 @@ public class ConsultationController {
             request.setClinicalNote(encounterData.getClinicalNote());
             encounterWorkflowService.update(id, request);
             encounterWorkflowService.complete(id);
+            auditLogService.record("COMPLETE_CONSULTATION", "ENCOUNTER", id, "Completed consultation encounter ID: " + id);
             redirectAttributes.addFlashAttribute("success", "Consultation completed successfully.");
             return "redirect:/consultation/encounters/" + id + "/detail";
         } catch (Exception ex) {

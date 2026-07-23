@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận Đặt lịch hẹn - Smart Clinic</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .header { background: linear-gradient(135deg, #007bff, #0056b3); color: #ffffff; padding: 24px; text-align: center; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .content { padding: 30px; }
+        .info-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .info-table td { padding: 12px; border-bottom: 1px solid #eef2f5; }
+        .info-table td.label { font-weight: bold; color: #555; width: 35%; }
+        .footer { background-color: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #eee; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 4px; background-color: #28a745; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Smart Clinic Operations System</h1>
+        <p style="margin: 5px 0 0 0;">Xác nhận đặt lịch khám thành công</p>
+    </div>
+    <div class="content">
+        <p>Xin chào <strong th:text="${patientName}">Bệnh nhân</strong>,</p>
+        <p>Lịch hẹn khám bệnh của bạn đã được ghi nhận thành công trên hệ thống. Dưới đây là thông tin chi tiết:</p>
+
+        <table class="info-table">
+            <tr>
+                <td class="label">Mã đặt lịch:</td>
+                <td><span class="badge" th:text="${appointmentCode}">APT-000001</span></td>
+            </tr>
+            <tr>
+                <td class="label">Bác sĩ khám:</td>
+                <td th:text="${doctorName}">BS. Nguyễn Văn A</td>
+            </tr>
+            <tr>
+                <td class="label">Phòng khám:</td>
+                <td th:text="${roomName}">Phòng 101</td>
+            </tr>
+            <tr>
+                <td class="label">Thời gian hẹn:</td>
+                <td><strong th:text="${scheduledTime}">08:00 - 08:30</strong> (Ngày <span th:text="${scheduledDate}">2026-07-22</span>)</td>
+            </tr>
+            <tr>
+                <td class="label">Lý do khám:</td>
+                <td th:text="${reason}">Khám tổng quát</td>
+            </tr>
+        </table>
+
+        <p style="margin-top: 25px; font-size: 14px; color: #666;">
+            * Vui lòng có mặt trước giờ hẹn 15 phút tại Quầy lễ tân để làm thủ tục check-in.
+        </p>
+    </div>
+    <div class="footer">
+        &copy; 2026 Smart Clinic Operations System. All rights reserved.<br>
+        Đây là email tự động, vui lòng không phản hồi lại email này.
+    </div>
+</div>
+</body>
+</html>

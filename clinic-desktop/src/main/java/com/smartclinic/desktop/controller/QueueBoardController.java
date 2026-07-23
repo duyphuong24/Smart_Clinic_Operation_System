@@ -258,9 +258,9 @@ public class QueueBoardController implements NavigationAware {
 
         private final HBox actionsBox = new HBox(6);
         private final Button callButton = actionButton("Call", "btn-info");
-        private final Button startButton = actionButton("Start", "btn-primary");
         private final Button doneButton = actionButton("Done", "btn-success");
         private final Button skipButton = actionButton("Skip", "btn-danger-outline");
+        private final Button viewReasonButton = actionButton("Reason", "btn-warning-outline");
 
         private ActionsTableCell() {
             actionsBox.setAlignment(Pos.CENTER_RIGHT);
@@ -268,17 +268,28 @@ public class QueueBoardController implements NavigationAware {
                 QueueItemResponse item = getTableView().getItems().get(getIndex());
                 performAction("Call", item.getId(), () -> queueService.call(item.getId()));
             });
-            startButton.setOnAction(event -> {
-                QueueItemResponse item = getTableView().getItems().get(getIndex());
-                performAction("Start", item.getId(), () -> queueService.startService(item.getId()));
-            });
             doneButton.setOnAction(event -> {
                 QueueItemResponse item = getTableView().getItems().get(getIndex());
                 performAction("Done", item.getId(), () -> queueService.done(item.getId()));
             });
             skipButton.setOnAction(event -> {
                 QueueItemResponse item = getTableView().getItems().get(getIndex());
-                performAction("Skip", item.getId(), () -> queueService.skip(item.getId()));
+                javafx.scene.control.TextInputDialog dialog = new javafx.scene.control.TextInputDialog();
+                dialog.setTitle("Skip Patient");
+                dialog.setHeaderText("Skip Patient: " + QueueUiUtil.formatPatient(item));
+                dialog.setContentText("Reason for Skip / Cancellation:");
+                dialog.showAndWait().ifPresent(reason -> {
+                    if (!reason.isBlank()) {
+                        performAction("Skip", item.getId(), () -> queueService.skip(item.getId(), reason));
+                    }
+                });
+            });
+            viewReasonButton.setOnAction(event -> {
+                QueueItemResponse item = getTableView().getItems().get(getIndex());
+                String reason = item.getReason() != null && !item.getReason().isBlank()
+                        ? item.getReason()
+                        : "No specific reason recorded.";
+                AlertUtil.showInfo("Skip Reason Log", "Patient: " + QueueUiUtil.formatPatient(item) + "\n\nReason: " + reason);
             });
         }
 
@@ -296,14 +307,14 @@ public class QueueBoardController implements NavigationAware {
             if (QueueUiUtil.canCall(userRoles, status)) {
                 actionsBox.getChildren().add(callButton);
             }
-            if (QueueUiUtil.canStart(userRoles, status)) {
-                actionsBox.getChildren().add(startButton);
-            }
             if (QueueUiUtil.canDone(userRoles, status)) {
                 actionsBox.getChildren().add(doneButton);
             }
             if (QueueUiUtil.canSkip(userRoles, status)) {
                 actionsBox.getChildren().add(skipButton);
+            }
+            if ("SKIPPED".equals(status)) {
+                actionsBox.getChildren().add(viewReasonButton);
             }
 
             setGraphic(actionsBox.getChildren().isEmpty() ? null : actionsBox);
