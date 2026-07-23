@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/doctor")
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DoctorPortalController {
 
     private final DoctorRepository doctorRepository;
@@ -40,27 +42,20 @@ public class DoctorPortalController {
 
         List<QueueItem> queueItems = List.of();
         if (doctor != null && doctor.getId() != null) {
-            final Long targetDoctorId = doctor.getId();
-            queueItems = queueItemRepository.findAll().stream()
-                    .filter(q -> q != null && q.getDoctor() != null && q.getDoctor().getId() != null && q.getDoctor().getId().equals(targetDoctorId))
-                    .filter(q -> q.getQueueDate() != null && q.getQueueDate().equals(LocalDate.now()))
-                    .toList();
-
+            queueItems = queueItemRepository.findByQueueDateAndDoctorIdOrderByQueueNumberAsc(LocalDate.now(), doctor.getId());
             if (queueItems.isEmpty()) {
-                queueItems = queueItemRepository.findAll().stream()
-                        .filter(q -> q != null && q.getDoctor() != null && q.getDoctor().getId() != null && q.getDoctor().getId().equals(targetDoctorId))
-                        .toList();
+                queueItems = queueItemRepository.findByDoctorIdOrderByQueueNumberAsc(doctor.getId());
             }
         }
 
         long waitingCount = queueItems.stream()
-                .filter(q -> q.getStatus() == QueueStatus.WAITING || q.getStatus() == QueueStatus.CALLED)
+                .filter(q -> q != null && (q.getStatus() == QueueStatus.WAITING || q.getStatus() == QueueStatus.CALLED))
                 .count();
         long inServiceCount = queueItems.stream()
-                .filter(q -> q.getStatus() == QueueStatus.IN_SERVICE)
+                .filter(q -> q != null && q.getStatus() == QueueStatus.IN_SERVICE)
                 .count();
         long doneCount = queueItems.stream()
-                .filter(q -> q.getStatus() == QueueStatus.DONE)
+                .filter(q -> q != null && q.getStatus() == QueueStatus.DONE)
                 .count();
 
         model.addAttribute("doctor", doctor);

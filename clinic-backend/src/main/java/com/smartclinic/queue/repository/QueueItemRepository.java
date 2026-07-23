@@ -38,4 +38,10 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
             @Param("doctorId") Long doctorId,
             @Param("excludedStatuses") Collection<QueueStatus> excludedStatuses
     );
+
+    @EntityGraph(attributePaths = {"patient", "doctor", "doctor.staff", "doctor.staff.user", "room", "appointment"})
+    List<QueueItem> findByQueueDateAndDoctorIdOrderByQueueNumberAsc(LocalDate queueDate, Long doctorId);
+
+    @EntityGraph(attributePaths = {"patient", "doctor", "doctor.staff", "doctor.staff.user", "room", "appointment"})
+    List<QueueItem> findByDoctorIdOrderByQueueNumberAsc(Long doctorId);
 }
