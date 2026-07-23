@@ -134,6 +134,6 @@ public class InvoiceResponse {
     }
 
     public boolean isPayAllowed() {
-        return "UNPAID".equals(status);
+        return "ISSUED".equals(status) || "UNPAID".equals(status);
     }
 }

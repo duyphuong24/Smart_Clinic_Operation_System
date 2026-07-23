@@ -1,8 +1,80 @@
-/* ==========================================================================
-   Schedule Module specific styles
-   ========================================================================== */
+.schedule-day-header {
+    background: rgba(0, 114, 255, 0.08) !important;
+    color: var(--primary-color, #0072ff) !important;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 12px !important;
+    border-bottom: 2px solid rgba(0, 114, 255, 0.2) !important;
+}
 
-.schedule-form-panel {
-    max-width: 600px;
-    margin: 0 auto;
+.schedule-day-column {
+    background: rgba(255, 255, 255, 0.4);
+    min-height: 480px;
+    border-right: 1px dashed rgba(0, 0, 0, 0.06);
+}
+
+.schedule-day-column:last-child {
+    border-right: none;
+}
+
+.schedule-shift-card {
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 114, 255, 0.15) !important;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.25s ease;
+}
+
+.schedule-shift-card:hover {
+    transform: translateY(-3px);
+    border-color: #0072ff !important;
+    box-shadow: 0 8px 20px rgba(0, 114, 255, 0.15) !important;
+}
+
+.schedule-doctor-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0072ff, #7f00ff);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.schedule-doctor-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: #0f172a !important;
+    font-size: 0.95rem;
+}
+
+.schedule-specialty {
+    color: #475569 !important;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.schedule-room-badge {
+    background: rgba(0, 114, 255, 0.1) !important;
+    color: #0072ff !important;
+    border: 1px solid rgba(0, 114, 255, 0.25);
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.schedule-time-badge {
+    background: rgba(127, 0, 255, 0.08) !important;
+    color: #7f00ff !important;
+    border: 1px solid rgba(127, 0, 255, 0.2);
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 6px;
 }

@@ -22,6 +22,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smartclinic.doctor.entity.Doctor;
+import com.smartclinic.doctor.repository.DoctorRepository;
+
+import com.smartclinic.billing.dto.InvoiceCreateRequest;
+import com.smartclinic.billing.service.InvoiceService;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,6 +39,8 @@ public class EncounterWorkflowServiceImpl implements EncounterWorkflowService {
     private final VisitRepository visitRepository;
     private final AppointmentRepository appointmentRepository;
     private final QueueItemRepository queueItemRepository;
+    private final DoctorRepository doctorRepository;
+    private final InvoiceService invoiceService;
 
     @Override
     @Transactional(readOnly = true)
@@ -48,9 +58,18 @@ public class EncounterWorkflowServiceImpl implements EncounterWorkflowService {
         if (encounterRepository.existsByVisitId(visit.getId())) {
             throw new DuplicateResourceException("Visit already has an encounter");
         }
+        Doctor doctor = visit.getDoctor();
+        if (doctor == null) {
+            doctor = doctorRepository.findAll().stream()
+                    .filter(Doctor::isActive)
+                    .findFirst()
+                    .orElseThrow(() -> new BadRequestException("Doctor cannot be null when creating encounter"));
+            visit.setDoctor(doctor);
+            visitRepository.save(visit);
+        }
         Encounter encounter = new Encounter();
         encounter.setVisit(visit);
-        encounter.setDoctor(visit.getDoctor());
+        encounter.setDoctor(doctor);
         encounter.setChiefComplaint(request.getChiefComplaint());
         encounter.setDiagnosis(request.getDiagnosis());
         encounter.setClinicalNote(request.getClinicalNote());
@@ -88,7 +107,19 @@ public class EncounterWorkflowServiceImpl implements EncounterWorkflowService {
             visit.getQueueItem().setStatus(QueueStatus.DONE);
             queueItemRepository.save(visit.getQueueItem());
         }
-        return EncounterMapper.toResponse(encounterRepository.save(encounter));
+        EncounterResponse response = EncounterMapper.toResponse(encounterRepository.save(encounter));
+
+        // Auto-generate invoice for Cashier upon completion
+        try {
+            InvoiceCreateRequest invoiceReq = new InvoiceCreateRequest();
+            invoiceReq.setEncounterId(id);
+            invoiceService.generate(invoiceReq);
+            log.info("Auto-generated invoice for completed encounter ID: {}", id);
+        } catch (Exception ex) {
+            log.warn("Auto invoice generation on encounter completion skipped/failed for encounter ID {}: {}", id, ex.getMessage());
+        }
+
+        return response;
     }
 
     private Encounter findEncounter(Long id) {

@@ -96,8 +96,8 @@ public class PendingInvoicesController implements NavigationAware {
     }
 
     private void configureFilters() {
-        statusFilterCombo.setItems(FXCollections.observableArrayList("ALL", "UNPAID", "PAID", "CANCELLED"));
-        statusFilterCombo.getSelectionModel().select("UNPAID");
+        statusFilterCombo.setItems(FXCollections.observableArrayList("ALL", "ISSUED", "PAID", "CANCELLED"));
+        statusFilterCombo.getSelectionModel().select("ISSUED");
         statusFilterCombo.setOnAction(event -> loadInvoices());
     }
 
@@ -253,7 +253,7 @@ public class PendingInvoicesController implements NavigationAware {
             Label badge = new Label(status);
             badge.getStyleClass().add("status-badge");
             switch (status) {
-                case "UNPAID" -> badge.getStyleClass().add("status-badge-no-show");
+                case "ISSUED", "UNPAID" -> badge.getStyleClass().add("status-badge-no-show");
                 case "PAID" -> badge.getStyleClass().add("status-badge-checked-in");
                 case "CANCELLED" -> badge.getStyleClass().add("status-badge-cancelled");
                 default -> badge.getStyleClass().add("status-badge-default");

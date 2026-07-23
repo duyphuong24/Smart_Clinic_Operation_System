@@ -16,3 +16,6 @@ Thumbs.db
 .env
 .envi
 *.env
+
+# AI_Agent
+**/AI_Agent/

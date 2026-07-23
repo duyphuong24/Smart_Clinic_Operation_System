@@ -17,6 +17,15 @@ public class AppointmentResponse {
     private LocalDateTime scheduledEnd;
     private String reason;
     private String status;
+    private String cancelledReason;
+
+    public String getCancelledReason() {
+        return cancelledReason;
+    }
+
+    public void setCancelledReason(String cancelledReason) {
+        this.cancelledReason = cancelledReason;
+    }
 
     public Long getId() {
         return id;

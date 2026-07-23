@@ -22,17 +22,18 @@ import com.smartclinic.encounter.entity.Encounter;
 import com.smartclinic.encounter.entity.EncounterStatus;
 import com.smartclinic.encounter.repository.EncounterRepository;
 import com.smartclinic.encounter.service.EncounterWorkflowServiceImpl;
-import com.smartclinic.invoice.dto.InvoiceCreateRequest;
-import com.smartclinic.invoice.entity.Invoice;
-import com.smartclinic.invoice.repository.InvoiceRepository;
-import com.smartclinic.invoice.service.InvoiceServiceImpl;
 import com.smartclinic.patient.entity.Patient;
 import com.smartclinic.patient.repository.PatientRepository;
-import com.smartclinic.payment.dto.PaymentRequest;
-import com.smartclinic.payment.entity.PaymentMethod;
-import com.smartclinic.payment.entity.PaymentStatus;
-import com.smartclinic.payment.repository.PaymentRepository;
-import com.smartclinic.payment.service.PaymentServiceImpl;
+import com.smartclinic.billing.dto.InvoiceCreateRequest;
+import com.smartclinic.billing.dto.PaymentRequest;
+import com.smartclinic.billing.entity.Invoice;
+import com.smartclinic.billing.entity.InvoiceStatus;
+import com.smartclinic.billing.entity.PaymentMethod;
+import com.smartclinic.billing.entity.PaymentStatus;
+import com.smartclinic.billing.repository.InvoiceRepository;
+import com.smartclinic.billing.repository.PaymentRepository;
+import com.smartclinic.billing.service.InvoiceServiceImpl;
+import com.smartclinic.billing.service.PaymentServiceImpl;
 import com.smartclinic.queue.dto.AppointmentCheckInRequest;
 import com.smartclinic.queue.entity.QueuePriority;
 import com.smartclinic.queue.repository.QueueItemRepository;
@@ -57,7 +58,7 @@ class WorkflowBusinessRulesTest {
         DoctorAvailabilityRepository availabilityRepository = mock(DoctorAvailabilityRepository.class);
 
         AppointmentServiceImpl appointmentService = new AppointmentServiceImpl(
-                appointmentRepository, patientRepository, doctorRepository, mock(com.smartclinic.masterdata.repository.RoomRepository.class), availabilityRepository
+                appointmentRepository, patientRepository, doctorRepository, mock(com.smartclinic.masterdata.repository.RoomRepository.class), availabilityRepository, mock(com.smartclinic.notification.service.NotificationService.class)
         );
 
         Patient patient = new Patient();
@@ -122,7 +123,7 @@ class WorkflowBusinessRulesTest {
     void completedEncounterCannotBeEdited() {
         EncounterRepository encounterRepository = mock(EncounterRepository.class);
         EncounterWorkflowServiceImpl encounterService = new EncounterWorkflowServiceImpl(
-                encounterRepository, mock(VisitRepository.class), mock(AppointmentRepository.class), mock(QueueItemRepository.class)
+                encounterRepository, mock(VisitRepository.class), mock(AppointmentRepository.class), mock(QueueItemRepository.class), mock(DoctorRepository.class), mock(com.smartclinic.billing.service.InvoiceService.class)
         );
 
         Encounter completedEncounter = new Encounter();
@@ -166,7 +167,7 @@ class WorkflowBusinessRulesTest {
         PaymentServiceImpl paymentService = new PaymentServiceImpl(invoiceRepository, paymentRepository);
 
         Invoice invoice = new Invoice();
-        invoice.setStatus(com.smartclinic.invoice.entity.InvoiceStatus.ISSUED);
+        invoice.setStatus(InvoiceStatus.ISSUED);
         invoice.setTotalAmount(BigDecimal.valueOf(150000));
         when(invoiceRepository.findById(1L)).thenReturn(Optional.of(invoice));
 

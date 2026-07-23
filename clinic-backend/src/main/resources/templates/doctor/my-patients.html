@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Today''s Patients', ~{::content_fragment})}">
+<body>
+    <div th:fragment="content_fragment">
+        <!-- Link to Module-Specific CSS -->
+        <link th:href="@{/css/doctor.css}" rel="stylesheet">
+        <link th:href="@{/css/encounter.css}" rel="stylesheet">
+
+        <!-- Top Overview Metric Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="glass-panel p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-secondary text-xs text-uppercase fw-semibold d-block">Total Patients Today</span>
+                        <h2 class="fw-bold text-white mb-0 mt-1" th:text="${totalCount}">0</h2>
+                    </div>
+                    <div class="rounded-circle bg-primary-subtle p-3 text-primary">
+                        <i class="fa-solid fa-users fs-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-secondary text-xs text-uppercase fw-semibold d-block">Waiting / Called</span>
+                        <h2 class="fw-bold text-warning mb-0 mt-1" th:text="${waitingCount}">0</h2>
+                    </div>
+                    <div class="rounded-circle bg-warning-subtle p-3 text-warning">
+                        <i class="fa-solid fa-clock fs-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-secondary text-xs text-uppercase fw-semibold d-block">In Consultation</span>
+                        <h2 class="fw-bold text-info mb-0 mt-1" th:text="${inServiceCount}">0</h2>
+                    </div>
+                    <div class="rounded-circle bg-info-subtle p-3 text-info">
+                        <i class="fa-solid fa-stethoscope fs-4"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="glass-panel p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-secondary text-xs text-uppercase fw-semibold d-block">Completed</span>
+                        <h2 class="fw-bold text-success mb-0 mt-1" th:text="${doneCount}">0</h2>
+                    </div>
+                    <div class="rounded-circle bg-success-subtle p-3 text-success">
+                        <i class="fa-solid fa-circle-check fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel p-4">
+            <!-- Header Section -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h3 class="fw-bold m-0 text-white">Today's Patients</h3>
+                    <p class="text-secondary m-0 text-sm" th:if="${doctor != null}">
+                        Assigned to: <span class="text-white fw-semibold" th:text="${doctor.staff != null && doctor.staff.user != null ? doctor.staff.user.fullName : (doctor.fullName != null ? doctor.fullName : 'Doctor')}">Dr. Smith</span> 
+                        | Specialty: <span class="text-white fw-semibold" th:text="${doctor.specialty != null ? doctor.specialty.name : 'General'}">General</span>
+                    </p>
+                </div>
+                <a th:href="@{/consultation}" class="btn btn-outline-primary px-3 btn-cancel-custom">
+                    <i class="fa-solid fa-stethoscope me-2"></i>Consultation Desk
+                </a>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-white m-0 encounter-table">
+                    <thead>
+                        <tr class="border-bottom-card-imp text-secondary text-badge-sz text-uppercase">
+                            <th class="ps-3 py-3 w-10">Queue No</th>
+                            <th class="w-25">Patient Info</th>
+                            <th class="w-15">Priority</th>
+                            <th class="w-15">Room</th>
+                            <th class="w-15">Status</th>
+                            <th class="pe-3 text-end w-20">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${queueItems}" class="glass-panel encounter-table-row">
+                            <td class="ps-3 py-3">
+                                <span class="badge bg-secondary font-monospace px-3 py-2 queue-number-badge" th:text="${item.queueNumber}">1</span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-white d-block" th:text="${item.patient != null ? item.patient.fullName : 'Patient'}">Nguyen Van A</span>
+                                <span class="text-secondary font-monospace queue-patient-code" th:text="${item.patient != null ? item.patient.patientCode : '-'}">PT-00001</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${
+                                    item.priority == null ? 'bg-secondary-subtle text-secondary border border-secondary-subtle' :
+                                    item.priority.name() == 'NORMAL' ? 'bg-secondary-subtle text-secondary border border-secondary-subtle' : 
+                                    item.priority.name() == 'HIGH' ? 'bg-warning-subtle text-warning border border-warning-subtle' : 
+                                    'bg-danger-subtle text-danger border border-danger-subtle'}" 
+                                      th:text="${item.priority}">NORMAL</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark-subtle border border-secondary text-secondary" th:text="${item.room != null ? item.room.roomCode : '-'}">ROOM</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${
+                                    item.status == null ? 'bg-secondary-subtle text-secondary border border-secondary-subtle' :
+                                    item.status.name() == 'WAITING' ? 'bg-secondary-subtle text-secondary border border-secondary-subtle' : 
+                                    item.status.name() == 'CALLED' ? 'bg-info-subtle text-info border border-info-subtle' : 
+                                    item.status.name() == 'IN_SERVICE' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 
+                                    item.status.name() == 'DONE' ? 'bg-success-subtle text-success border border-success-subtle' : 
+                                    'bg-danger-subtle text-danger border border-danger-subtle'}" 
+                                      th:text="${item.status}">WAITING</span>
+                            </td>
+                            <td class="pe-3 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <!-- Start Consultation -->
+                                    <form th:if="${item.status != null && (item.status.name() == 'CALLED' || item.status.name() == 'WAITING')}" th:action="@{/consultation/start(queueItemId=${item.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-premium queue-action-btn btn-premium-custom">
+                                            <i class="fa-solid fa-stethoscope me-1"></i>Start Consult
+                                        </button>
+                                    </form>
+
+                                    <!-- Resume Consultation -->
+                                    <form th:if="${item.status != null && item.status.name() == 'IN_SERVICE'}" th:action="@{/consultation/start(queueItemId=${item.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-primary queue-action-btn">
+                                            <i class="fa-solid fa-play me-1"></i>Resume
+                                        </button>
+                                    </form>
+
+                                    <span th:if="${item.status != null && item.status.name() == 'DONE'}" class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                        <i class="fa-solid fa-check me-1"></i>Completed
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(queueItems)}">
+                            <td colspan="6" class="text-center py-5 text-secondary">
+                                <i class="fa-solid fa-calendar-xmark mb-3 empty-state-icon-lg"></i>
+                                <p class="m-0">No patients scheduled for today yet.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

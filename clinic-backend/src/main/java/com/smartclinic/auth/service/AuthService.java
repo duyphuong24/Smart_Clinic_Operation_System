@@ -52,7 +52,7 @@ public class AuthService {
         this.refreshTokenValidSeconds = refreshTokenValidSeconds;
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = BadCredentialsException.class)
     public LoginResponse login(LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(

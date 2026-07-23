@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Staff Management', ~{::content_fragment})}">
+<body>
+<div th:fragment="content_fragment">
+    <!-- Glassmorphism Container Panel -->
+    <div class="glass-panel p-4">
+        <!-- Header Section -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold m-0 text-primary d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-id-badge text-primary"></i>
+                    <span>Clinic Staff & Employment Roster</span>
+                </h3>
+                <p class="text-secondary m-0 text-sm mt-1">Manage internal clinic personnel, staff positions, and active employment status.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-premium px-3 py-2 text-white btn-premium-custom" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                    <i class="fa-solid fa-user-plus me-2"></i>Register New Staff
+                </button>
+            </div>
+        </div>
+
+        <!-- Staff Table -->
+        <div class="table-responsive rounded-3">
+            <table class="table align-middle m-0">
+                <thead>
+                <tr>
+                    <th class="ps-4">Employee Code</th>
+                    <th>Full Name & Username</th>
+                    <th>Staff Position</th>
+                    <th>Contact Phone</th>
+                    <th>Hired Date</th>
+                    <th class="text-center pe-4">Status & Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="st : ${staffList}">
+                    <td class="ps-4 font-monospace fw-bold text-primary" th:text="${st.employeeCode}">EMP-000001</td>
+                    <td>
+                        <div class="fw-bold text-dark fs-6" th:text="${st.user != null ? st.user.fullName : 'N/A'}">Nguyen Van A</div>
+                        <small class="text-secondary" th:text="${'@' + (st.user != null ? st.user.userName : 'user')}">@doctor</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25" th:text="${st.staffType}">DOCTOR</span>
+                    </td>
+                    <td class="font-monospace text-secondary" th:text="${st.user != null ? st.user.phone : 'N/A'}">0901234567</td>
+                    <td class="text-secondary" th:text="${st.hiredDate}">2023-01-15</td>
+                    <td class="text-center pe-4">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span th:if="${#strings.toString(st.status) == 'ACTIVE'}" class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1 rounded-pill">
+                                <i class="fa-solid fa-circle-check me-1"></i>Active
+                            </span>
+                            <span th:unless="${#strings.toString(st.status) == 'ACTIVE'}" class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-1 rounded-pill">
+                                <i class="fa-solid fa-circle-minus me-1"></i>Soft Deleted
+                            </span>
+                            <form th:action="@{'/manager/staff/' + ${st.id} + '/toggle-status'}" method="post" class="d-inline ms-2">
+                                <button type="submit" th:class="${#strings.toString(st.status) == 'ACTIVE' ? 'btn btn-outline-warning btn-sm rounded-2' : 'btn btn-outline-success btn-sm rounded-2'}" th:title="${#strings.toString(st.status) == 'ACTIVE' ? 'Soft Delete Staff' : 'Restore Staff'}">
+                                    <i th:class="${#strings.toString(st.status) == 'ACTIVE' ? 'fa-solid fa-user-slash me-1' : 'fa-solid fa-user-check me-1'}"></i>
+                                    <span th:text="${#strings.toString(st.status) == 'ACTIVE' ? 'Deactivate' : 'Restore'}">Deactivate</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(staffList)}">
+                    <td colspan="6" class="text-center py-5 text-secondary">
+                        <i class="fa-solid fa-users-slash fs-2 mb-2 text-muted"></i>
+                        <p class="m-0">No staff members found.</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Standardized Light Glassmorphic Modal -->
+    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel border-0 shadow-lg">
+                <div class="modal-header border-bottom border-bottom-card-imp">
+                    <h5 class="modal-title fw-bold text-primary"><i class="fa-solid fa-user-plus me-2"></i>Register New Staff Member</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/manager/staff/save}" method="post">
+                    <div class="modal-body row g-3 p-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Username <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" name="username" class="form-control-custom" placeholder="e.g. doctor6" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Staff Position <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select name="staffType" class="form-control-custom select-custom-arrow" required>
+                                    <option th:each="st : ${staffTypes}" th:value="${st}" th:text="${st}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" name="fullName" class="form-control-custom" placeholder="e.g. BS. Trịnh Văn Minh" required>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Contact Phone <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="text" name="phone" class="form-control-custom" placeholder="e.g. 0909888777" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-card p-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 btn-cancel-custom" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-premium px-4 btn-premium-custom">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>Create Staff Member
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

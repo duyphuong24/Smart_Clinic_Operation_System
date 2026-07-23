@@ -80,32 +80,41 @@
                                       th:text="${item.status}">WAITING</span>
                             </td>
                             <td class="pe-3 text-end">
-                                <div class="d-flex justify-content-end gap-2" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST', 'ROLE_DOCTOR')">
-                                    <!-- Call Button -->
-                                    <form th:if="${item.status.name() == 'WAITING'}" th:action="@{/queue/{id}/call(id=${item.id})}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-info text-white queue-action-btn">
-                                            <i class="fa-solid fa-volume-high me-1"></i>Call
-                                        </button>
-                                    </form>
-                                    <!-- Start Consultation Button -->
-                                    <form th:if="${item.status.name() == 'CALLED'}" th:action="@{/queue/{id}/start(id=${item.id})}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-primary queue-action-btn btn-w-auto">
-                                            <i class="fa-solid fa-play me-1"></i>Start
-                                        </button>
-                                    </form>
-                                    <!-- Complete/Done Button -->
-                                    <form th:if="${item.status.name() == 'IN_SERVICE'}" th:action="@{/queue/{id}/done(id=${item.id})}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-success queue-action-btn">
-                                            <i class="fa-solid fa-check me-1"></i>Done
-                                        </button>
-                                    </form>
-                                    <!-- Skip Button -->
-                                    <form th:if="${item.status.name() == 'CALLED'}" th:action="@{/queue/{id}/skip(id=${item.id})}" method="post">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger queue-action-btn" title="Skip Patient">
-                                            <i class="fa-solid fa-forward"></i>
-                                        </button>
-                                    </form>
-                                    <span th:if="${item.status.name() == 'DONE' || item.status.name() == 'SKIPPED'}" class="text-secondary text-xs font-style-italic">Completed</span>
+                                <div class="d-flex justify-content-end gap-2 align-items-center">
+                                    <!-- DOCTOR ROLE VIEW -->
+                                    <div sec:authorize="hasRole('ROLE_DOCTOR')" class="d-flex gap-2 align-items-center">
+                                        <!-- Call Button -->
+                                        <form th:if="${item.status.name() == 'WAITING'}" th:action="@{/queue/{id}/call(id=${item.id})}" method="post">
+                                            <button type="submit" class="btn btn-sm btn-info text-white queue-action-btn">
+                                                <i class="fa-solid fa-volume-high me-1"></i>Call
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- ADMIN & RECEPTIONIST ROLE VIEW -->
+                                    <div sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_RECEPTIONIST')" class="d-flex gap-2 align-items-center">
+                                        <!-- Call Button -->
+                                        <form th:if="${item.status.name() == 'WAITING'}" th:action="@{/queue/{id}/call(id=${item.id})}" method="post">
+                                            <button type="submit" class="btn btn-sm btn-info text-white queue-action-btn">
+                                                <i class="fa-solid fa-volume-high me-1"></i>Call
+                                            </button>
+                                        </form>
+
+                                        <!-- Complete/Done Button -->
+                                        <form th:if="${item.status.name() == 'IN_SERVICE'}" th:action="@{/queue/{id}/done(id=${item.id})}" method="post">
+                                            <button type="submit" class="btn btn-sm btn-success queue-action-btn">
+                                                <i class="fa-solid fa-check me-1"></i>Done
+                                            </button>
+                                        </form>
+
+                                        <!-- Skip Button (Admin & Receptionist only) -->
+                                        <form th:if="${item.status.name() == 'CALLED' || item.status.name() == 'WAITING'}" th:action="@{/queue/{id}/skip(id=${item.id})}" method="post">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger queue-action-btn" title="Skip Patient">
+                                                <i class="fa-solid fa-forward"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <span th:if="${item.status.name() == 'SKIPPED'}" class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1 text-xs">SKIPPED</span>
                                 </div>
                             </td>
                         </tr>

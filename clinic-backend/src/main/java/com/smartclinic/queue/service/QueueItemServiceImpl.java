@@ -15,6 +15,7 @@ import com.smartclinic.patient.entity.PatientStatus;
 import com.smartclinic.patient.repository.PatientRepository;
 import com.smartclinic.queue.dto.AppointmentCheckInRequest;
 import com.smartclinic.queue.dto.QueueItemResponse;
+import com.smartclinic.queue.dto.QueueTransferRequest;
 import com.smartclinic.queue.dto.WalkInQueueRequest;
 import com.smartclinic.queue.entity.QueueItem;
 import com.smartclinic.queue.entity.QueuePriority;
@@ -136,13 +137,62 @@ public class QueueItemServiceImpl implements QueueItemService {
 
     @Override
     public QueueItemResponse skip(Long id) {
+        return skip(id, null);
+    }
+
+    @Override
+    public QueueItemResponse skip(Long id, String reason) {
         QueueItem item = findQueueItem(id);
         if (item.getStatus() != QueueStatus.WAITING && item.getStatus() != QueueStatus.CALLED) {
             throw new BadRequestException("Only WAITING or CALLED queue item can be skipped");
         }
         item.setStatus(QueueStatus.SKIPPED);
+        if (reason != null && !reason.isBlank()) {
+            item.setReason(reason);
+        }
+        if (item.getAppointment() != null) {
+            item.getAppointment().setStatus(AppointmentStatus.CANCELLED);
+            if (reason != null && !reason.isBlank()) {
+                item.getAppointment().setCancelledReason(reason);
+            }
+            appointmentRepository.save(item.getAppointment());
+        }
         return QueueItemMapper.toResponse(queueItemRepository.save(item));
     }
+
+    @Override
+    @Transactional
+    public QueueItemResponse transferQueueItem(Long id, QueueTransferRequest request) {
+        QueueItem item = findQueueItem(id);
+        if (item.getStatus() != QueueStatus.WAITING && item.getStatus() != QueueStatus.CALLED) {
+            throw new BadRequestException("Only WAITING or CALLED queue item can be transferred");
+        }
+        Doctor targetDoctor = findActiveDoctor(request.getTargetDoctorId());
+        Room targetRoom = request.getTargetRoomId() != null
+                ? findActiveRoom(request.getTargetRoomId())
+                : findDoctorDefaultRoom(targetDoctor);
+
+        int nextNumber = generateQueueNumber(item.getQueueDate());
+
+        item.setDoctor(targetDoctor);
+        item.setRoom(targetRoom);
+        item.setQueueNumber(nextNumber);
+        item.setStatus(QueueStatus.WAITING);
+
+        return QueueItemMapper.toResponse(queueItemRepository.save(item));
+    }
+
+    @Override
+    @Transactional
+    public QueueItemResponse reQueueItem(Long id) {
+        QueueItem item = findQueueItem(id);
+        if (item.getStatus() != QueueStatus.SKIPPED) {
+            throw new BadRequestException("Only SKIPPED queue item can be re-queued");
+        }
+        item.setStatus(QueueStatus.WAITING);
+        return QueueItemMapper.toResponse(queueItemRepository.save(item));
+    }
+
 
     private QueueItem findQueueItem(Long id) {
         return queueItemRepository.findById(id)

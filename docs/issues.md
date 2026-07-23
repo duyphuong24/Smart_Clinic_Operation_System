@@ -498,4 +498,24 @@ Address the compliance gap items identified against HSF302_Project_Requirements.
 - JaCoCo plugin is configured in pom.xml.
 - Desktop test plan and demo script are documented.
 
-**Labels:** compliance, backend, frontend, documentation, priority:high
+**Labels:** compliance, backend, frontend, documentation, priority:high
+
+### Issue 31: Fix Dashboard Null Pointer Defect & Implement Web Thymeleaf Payment, Reports, and Audit Logs UI
+
+**Title:** Fix Dashboard primitive null mapping error, optimize metrics query, and implement Web Thymeleaf Payment Recording, Reports, and Audit Logs views
+
+**Description:**
+Fix the runtime 500 error on /dashboard caused by null boolean mapping in Appointment entity, optimize dashboard aggregation to use ReportService, add POST payment recording endpoint and modal in Billing module, and build Web MVC controllers and Thymeleaf templates for /reports and /audit-logs.
+
+**Acceptance Criteria:**
+- Appointment.reminderSent is converted to a null-safe Boolean wrapper class with helper getter.
+- AuthController.dashboard() delegates to ReportService.dashboardMetrics() to prevent OOM.
+- BillingController supports POST /billing/invoices/{id}/payments to record cashier payments from Web forms.
+- billing/detail.html includes Payment History table and Record Payment modal dialog.
+- ReportController and report/dashboard.html are created to display KPI metrics and revenue.
+- AuditLogController and admin/audit-log.html are created to display system audit trail.
+- Sidebar menu in layout/main.html includes Reports & Analytics and Audit Logs links.
+- All unit and integration tests pass 100%.
+
+**Labels:** bugfix, feature, backend, frontend, priority:high
+

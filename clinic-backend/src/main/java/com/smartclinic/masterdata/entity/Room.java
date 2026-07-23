@@ -35,7 +35,7 @@ public class Room {
     @Column(name = "name", nullable = false, columnDefinition = "nvarchar(100)")
     private String name;
 
-    @Column(name = "floor", length = 30)
+    @Column(name = "floor", columnDefinition = "NVARCHAR(50)")
     private String floor;
 
     @Column(name = "active", nullable = false)

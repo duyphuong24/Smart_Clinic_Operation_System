@@ -1,148 +1,97 @@
 package com.smartclinic.staff.controller;
 
-import com.smartclinic.staff.dto.StaffRequest;
-import com.smartclinic.staff.dto.StaffResponse;
+import com.smartclinic.audit.service.AuditLogService;
+import com.smartclinic.staff.entity.Staff;
 import com.smartclinic.staff.entity.StaffStatus;
 import com.smartclinic.staff.entity.StaffType;
-import com.smartclinic.staff.service.StaffService;
-import com.smartclinic.user.entity.User;
-import com.smartclinic.user.repository.UserRepository;
 import com.smartclinic.staff.repository.StaffRepository;
-import jakarta.validation.Valid;
+import com.smartclinic.user.entity.Role;
+import com.smartclinic.user.entity.User;
+import com.smartclinic.user.entity.UserStatus;
+import com.smartclinic.user.repository.RoleRepository;
+import com.smartclinic.user.repository.UserRepository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/admin/staff")
+@RequestMapping({"/manager/staff", "/admin/staff"})
 @RequiredArgsConstructor
 public class StaffController {
 
-    private final StaffService staffService;
-    private final UserRepository userRepository;
     private final StaffRepository staffRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     @GetMapping
-    public String list(Model model) {
-        List<StaffResponse> staffList = staffService.findAll();
+    public String listStaff(Model model) {
+        List<Staff> staffList = staffRepository.findAll();
         model.addAttribute("staffList", staffList);
-        model.addAttribute("title", "Staff");
-        return "admin/staff-list";
-    }
-
-    @GetMapping("/new")
-    public String createForm(Model model) {
-        // Only show users who do not have a staff profile
-        List<User> usersWithoutStaff = userRepository.findAll().stream()
-                .filter(u -> !staffRepository.existsByUserId(u.getId()))
-                .toList();
-
-        model.addAttribute("staff", new StaffRequest());
-        model.addAttribute("users", usersWithoutStaff);
         model.addAttribute("staffTypes", StaffType.values());
-        model.addAttribute("isEdit", false);
-        model.addAttribute("title", "Staff");
-        return "admin/staff-form";
+        model.addAttribute("title", "Staff Management");
+        return "manager/staff-list";
     }
 
-    @PostMapping("/new")
-    public String create(
-            @Valid @ModelAttribute("staff") StaffRequest request,
-            BindingResult bindingResult,
-            Model model
+    @PostMapping("/save")
+    public String saveStaff(
+            @RequestParam String username,
+            @RequestParam String fullName,
+            @RequestParam String phone,
+            @RequestParam StaffType staffType
     ) {
-        if (bindingResult.hasErrors()) {
-            List<User> usersWithoutStaff = userRepository.findAll().stream()
-                    .filter(u -> !staffRepository.existsByUserId(u.getId()))
-                    .toList();
-            model.addAttribute("users", usersWithoutStaff);
-            model.addAttribute("staffTypes", StaffType.values());
-            model.addAttribute("isEdit", false);
-            model.addAttribute("title", "Staff");
-            return "admin/staff-form";
+        if (!userRepository.existsByUserName(username)) {
+            String roleName = "ROLE_" + staffType.name();
+            Role role = roleRepository.findByName(roleName)
+                    .orElseGet(() -> roleRepository.save(Role.builder().name(roleName).build()));
+
+            User user = User.builder()
+                    .userName(username)
+                    .passwordHash(passwordEncoder.encode("password123"))
+                    .fullName(fullName)
+                    .phone(phone)
+                    .status(UserStatus.ACTIVE)
+                    .roles(Set.of(role))
+                    .build();
+            User savedUser = userRepository.save(user);
+
+            long count = staffRepository.count() + 1;
+            String empCode = String.format("EMP-%06d", count);
+
+            Staff staff = Staff.builder()
+                    .user(savedUser)
+                    .employeeCode(empCode)
+                    .staffType(staffType)
+                    .hiredDate(LocalDate.now())
+                    .status(StaffStatus.ACTIVE)
+                    .build();
+            Staff savedStaff = staffRepository.save(staff);
+
+            auditLogService.record("CREATE_STAFF", "STAFF", savedStaff.getId(), "Created staff member: " + fullName + " (" + empCode + ")");
         }
-        try {
-            staffService.create(request);
-        } catch (Exception ex) {
-            bindingResult.rejectValue("employeeCode", "error.staff", ex.getMessage());
-            List<User> usersWithoutStaff = userRepository.findAll().stream()
-                    .filter(u -> !staffRepository.existsByUserId(u.getId()))
-                    .toList();
-            model.addAttribute("users", usersWithoutStaff);
-            model.addAttribute("staffTypes", StaffType.values());
-            model.addAttribute("isEdit", false);
-            model.addAttribute("title", "Staff");
-            return "admin/staff-form";
-        }
-        return "redirect:/admin/staff";
+        return "redirect:/manager/staff";
     }
 
-    @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
-        StaffResponse staff = staffService.getById(id);
-        StaffRequest request = new StaffRequest();
-        request.setUserId(staff.getUserId());
-        request.setEmployeeCode(staff.getEmployeeCode());
-        request.setStaffType(staff.getStaffType());
-        request.setHiredDate(staff.getHiredDate());
-        request.setStatus(staff.getStatus());
+    @PostMapping("/{id}/toggle-status")
+    public String toggleStatus(@PathVariable Long id) {
+        Staff staff = staffRepository.findById(id).orElse(null);
+        if (staff != null) {
+            StaffStatus newStatus = (staff.getStatus() == StaffStatus.ACTIVE) ? StaffStatus.INACTIVE : StaffStatus.ACTIVE;
+            staff.setStatus(newStatus);
+            staffRepository.save(staff);
 
-        List<User> users = userRepository.findAll();
-
-        model.addAttribute("staff", request);
-        model.addAttribute("staffId", id);
-        model.addAttribute("users", users);
-        model.addAttribute("staffTypes", StaffType.values());
-        model.addAttribute("staffStatuses", StaffStatus.values());
-        model.addAttribute("isEdit", true);
-        model.addAttribute("title", "Staff");
-        return "admin/staff-form";
-    }
-
-    @PostMapping("/{id}/edit")
-    public String update(
-            @PathVariable Long id,
-            @Valid @ModelAttribute("staff") StaffRequest request,
-            BindingResult bindingResult,
-            Model model
-    ) {
-        if (bindingResult.hasErrors()) {
-            List<User> users = userRepository.findAll();
-            model.addAttribute("staffId", id);
-            model.addAttribute("users", users);
-            model.addAttribute("staffTypes", StaffType.values());
-            model.addAttribute("staffStatuses", StaffStatus.values());
-            model.addAttribute("isEdit", true);
-            model.addAttribute("title", "Staff");
-            return "admin/staff-form";
+            auditLogService.record("SOFT_DELETE_STAFF", "STAFF", id, "Toggled staff status to " + newStatus + " for " + staff.getEmployeeCode());
         }
-        try {
-            staffService.update(id, request);
-        } catch (Exception ex) {
-            bindingResult.rejectValue("employeeCode", "error.staff", ex.getMessage());
-            List<User> users = userRepository.findAll();
-            model.addAttribute("staffId", id);
-            model.addAttribute("users", users);
-            model.addAttribute("staffTypes", StaffType.values());
-            model.addAttribute("staffStatuses", StaffStatus.values());
-            model.addAttribute("isEdit", true);
-            model.addAttribute("title", "Staff");
-            return "admin/staff-form";
-        }
-        return "redirect:/admin/staff";
-    }
-
-    @PostMapping("/{id}/deactivate")
-    public String deactivate(@PathVariable Long id) {
-        staffService.deactivate(id);
-        return "redirect:/admin/staff";
+        return "redirect:/manager/staff";
     }
 }

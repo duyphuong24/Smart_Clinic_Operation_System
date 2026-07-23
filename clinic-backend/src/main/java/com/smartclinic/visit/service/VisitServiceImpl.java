@@ -20,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smartclinic.doctor.entity.Doctor;
+import com.smartclinic.doctor.repository.DoctorRepository;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -28,6 +31,7 @@ public class VisitServiceImpl implements VisitService {
     private final VisitRepository visitRepository;
     private final AppointmentRepository appointmentRepository;
     private final QueueItemRepository queueItemRepository;
+    private final DoctorRepository doctorRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,10 +64,19 @@ public class VisitServiceImpl implements VisitService {
             appointment.setStatus(AppointmentStatus.IN_CONSULTATION);
             appointmentRepository.save(appointment);
         }
+        Doctor doctor = queueItem.getDoctor();
+        if (doctor == null) {
+            doctor = doctorRepository.findAll().stream()
+                    .filter(Doctor::isActive)
+                    .findFirst()
+                    .orElseThrow(() -> new BadRequestException("No active doctor available to assign to this visit"));
+            queueItem.setDoctor(doctor);
+            queueItemRepository.save(queueItem);
+        }
         Visit visit = new Visit();
         visit.setVisitCode(generateVisitCode());
         visit.setPatient(queueItem.getPatient());
-        visit.setDoctor(queueItem.getDoctor());
+        visit.setDoctor(doctor);
         visit.setAppointment(appointment);
         visit.setQueueItem(queueItem);
         visit.setStatus(VisitStatus.IN_CONSULTATION);
