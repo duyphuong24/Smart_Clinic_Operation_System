@@ -123,7 +123,7 @@ class WorkflowBusinessRulesTest {
     void completedEncounterCannotBeEdited() {
         EncounterRepository encounterRepository = mock(EncounterRepository.class);
         EncounterWorkflowServiceImpl encounterService = new EncounterWorkflowServiceImpl(
-                encounterRepository, mock(VisitRepository.class), mock(AppointmentRepository.class), mock(QueueItemRepository.class)
+                encounterRepository, mock(VisitRepository.class), mock(AppointmentRepository.class), mock(QueueItemRepository.class), mock(DoctorRepository.class), mock(com.smartclinic.billing.service.InvoiceService.class)
         );
 
         Encounter completedEncounter = new Encounter();

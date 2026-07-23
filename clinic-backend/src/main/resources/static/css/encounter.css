@@ -30,3 +30,56 @@
 .encounter-actions-border {
     border-top: 1px solid var(--border-card) !important;
 }
+
+/* ==========================================================================
+   Print Stylesheet for Medical Report PDF Generation
+   ========================================================================== */
+@media print {
+    /* Hide layout navigation, sidebar, and action buttons */
+    .sidebar-border, header, nav, .btn, .btn-cancel-custom, .btn-premium-custom, .sidebar, .sidebar-menu, .navbar, .d-flex.align-items-center.justify-content-between.pt-4 {
+        display: none !important;
+    }
+    
+    /* Reset body and glass panel containers to white paper with dark text */
+    html, body, .glass-panel, .encounter-detail-panel {
+        background: #ffffff !important;
+        color: #111111 !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    h2, h6, strong, span, div, td, th, p, label {
+        color: #111111 !important;
+        text-shadow: none !important;
+    }
+
+    .text-white, .text-secondary, .text-primary {
+        color: #111111 !important;
+    }
+
+    .badge {
+        border: 1px solid #333333 !important;
+        color: #111111 !important;
+        background: #f0f0f0 !important;
+    }
+
+    .patient-table-row {
+        background: #f8f9fa !important;
+        border: 1px solid #cccccc !important;
+        color: #111111 !important;
+    }
+
+    .table {
+        color: #111111 !important;
+        border-color: #cccccc !important;
+    }
+
+    .table th, .table td {
+        border-color: #cccccc !important;
+        color: #111111 !important;
+    }
+}

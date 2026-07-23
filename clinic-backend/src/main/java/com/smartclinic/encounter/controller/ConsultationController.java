@@ -60,6 +60,9 @@ public class ConsultationController {
     public String doctorQueue(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
+        boolean isAdminOrManager = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_MANAGER"));
+
         Doctor doctor = doctorRepository.findByStaffUserUserName(username).orElse(null);
 
         if (doctor == null) {
@@ -70,7 +73,17 @@ public class ConsultationController {
         }
 
         List<QueueItem> queueItems = List.of();
-        if (doctor != null) {
+        if (isAdminOrManager && doctor == null) {
+            queueItems = queueItemRepository.findByQueueDateAndStatusNotInOrderByQueueNumberAsc(
+                    LocalDate.now(),
+                    List.of(QueueStatus.DONE, QueueStatus.SKIPPED)
+            );
+            if (queueItems.isEmpty()) {
+                queueItems = queueItemRepository.findAll().stream()
+                        .filter(q -> q.getStatus() != QueueStatus.DONE && q.getStatus() != QueueStatus.SKIPPED)
+                        .toList();
+            }
+        } else if (doctor != null) {
             final Long targetDoctorId = doctor.getId();
             queueItems = queueItemRepository.findActiveByDateAndDoctor(
                     LocalDate.now(),
@@ -80,7 +93,8 @@ public class ConsultationController {
 
             if (queueItems.isEmpty()) {
                 queueItems = queueItemRepository.findAll().stream()
-                        .filter(q -> q.getDoctor() != null && q.getDoctor().getId().equals(targetDoctorId))
+                        .filter(q -> (q.getDoctor() == null || q.getDoctor().getId().equals(targetDoctorId))
+                                && q.getStatus() != QueueStatus.DONE && q.getStatus() != QueueStatus.SKIPPED)
                         .toList();
             }
         } else {
@@ -97,6 +111,22 @@ public class ConsultationController {
     public String startConsultation(@RequestParam Long queueItemId) {
         QueueItem queueItem = queueItemRepository.findById(queueItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid Queue Item ID"));
+
+        if (queueItem.getDoctor() == null) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth != null ? auth.getName() : "";
+            Doctor loggedInDoctor = doctorRepository.findByStaffUserUserName(username).orElse(null);
+            if (loggedInDoctor == null) {
+                loggedInDoctor = doctorRepository.findAll().stream()
+                        .filter(Doctor::isActive)
+                        .findFirst()
+                        .orElse(null);
+            }
+            if (loggedInDoctor != null) {
+                queueItem.setDoctor(loggedInDoctor);
+                queueItemRepository.save(queueItem);
+            }
+        }
 
         if (queueItem.getStatus() == QueueStatus.CALLED || queueItem.getStatus() == QueueStatus.WAITING) {
             queueItemService.startService(queueItemId);

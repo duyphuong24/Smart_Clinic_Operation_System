@@ -37,6 +37,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import com.smartclinic.doctor.repository.DoctorRepository;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -51,6 +52,9 @@ class VisitServiceImplTest {
 
     @Mock
     private QueueItemRepository queueItemRepository;
+
+    @Mock
+    private DoctorRepository doctorRepository;
 
     @InjectMocks
     private VisitServiceImpl service;

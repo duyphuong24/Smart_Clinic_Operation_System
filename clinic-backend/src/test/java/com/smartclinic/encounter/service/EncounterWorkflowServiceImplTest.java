@@ -12,6 +12,7 @@ import com.smartclinic.appointment.repository.AppointmentRepository;
 import com.smartclinic.common.exception.BadRequestException;
 import com.smartclinic.common.exception.DuplicateResourceException;
 import com.smartclinic.doctor.entity.Doctor;
+import com.smartclinic.doctor.repository.DoctorRepository;
 import com.smartclinic.encounter.dto.EncounterCreateRequest;
 import com.smartclinic.encounter.dto.EncounterResponse;
 import com.smartclinic.encounter.dto.EncounterUpdateRequest;
@@ -58,6 +59,9 @@ class EncounterWorkflowServiceImplTest {
 
     @Mock
     private QueueItemRepository queueItemRepository;
+
+    @Mock
+    private DoctorRepository doctorRepository;
 
     @InjectMocks
     private EncounterWorkflowServiceImpl service;

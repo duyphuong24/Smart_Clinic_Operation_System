@@ -116,12 +116,26 @@
                         <i class="fa-solid fa-calendar-days"></i>
                         <span>Doctor Schedule Board</span>
                     </a>
+
+                    <!-- Today's Patients (Doctor, Admin) -->
+                    <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_DOCTOR')" 
+                       th:href="@{/doctor/my-patients}" th:classappend="${title == 'Today''s Patients' || title == 'Today Patients' ? 'active' : ''}" class="menu-item-link">
+                        <i class="fa-solid fa-user-injured"></i>
+                        <span>Today's Patients</span>
+                    </a>
                     
                     <!-- Consultation (Admin, Doctor) -->
                     <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_DOCTOR')" 
                        th:href="@{/consultation}" th:classappend="${title == 'Consultation' ? 'active' : ''}" class="menu-item-link">
                         <i class="fa-solid fa-user-md"></i>
                         <span>Consultation</span>
+                    </a>
+
+                    <!-- Staff Management (Admin, Manager) -->
+                    <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')" 
+                       th:href="@{/manager/staff}" th:classappend="${title == 'Staff Management' ? 'active' : ''}" class="menu-item-link">
+                        <i class="fa-solid fa-id-card"></i>
+                        <span>Staff Management</span>
                     </a>
                     
                     <!-- Invoices & Billing (Admin, Cashier, Manager) -->

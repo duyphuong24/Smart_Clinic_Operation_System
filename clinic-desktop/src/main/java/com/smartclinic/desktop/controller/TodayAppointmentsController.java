@@ -326,6 +326,7 @@ public class TodayAppointmentsController implements NavigationAware {
         private final HBox actionsBox = new HBox(6);
         private final Button checkInBtn = actionButton("Check-in", "btn-success");
         private final Button cancelBtn = actionButton("Cancel", "btn-danger-outline");
+        private final Button reasonBtn = actionButton("Reason", "btn-warning-outline");
 
         private ActionsTableCell() {
             actionsBox.setAlignment(Pos.CENTER_RIGHT);
@@ -347,6 +348,17 @@ public class TodayAppointmentsController implements NavigationAware {
                 AppointmentResponse appt = getTableView().getItems().get(idx);
                 performCancel(appt);
             });
+            reasonBtn.setOnAction(event -> {
+                int idx = getIndex();
+                if (getTableView() == null || idx < 0 || idx >= getTableView().getItems().size()) {
+                    return;
+                }
+                AppointmentResponse appt = getTableView().getItems().get(idx);
+                String reason = appt.getCancelledReason() != null && !appt.getCancelledReason().isBlank()
+                        ? appt.getCancelledReason()
+                        : (appt.getReason() != null && !appt.getReason().isBlank() ? appt.getReason() : "No cancellation reason recorded.");
+                AlertUtil.showInfo("Cancellation Reason Log", "Appointment: " + appt.getAppointmentCode() + "\nPatient: " + AppointmentUiUtil.formatPatient(appt) + "\n\nReason: " + reason);
+            });
         }
 
         @Override
@@ -363,6 +375,9 @@ public class TodayAppointmentsController implements NavigationAware {
             }
             if (appt.isCancelAllowed()) {
                 actionsBox.getChildren().add(cancelBtn);
+            }
+            if ("CANCELLED".equals(appt.getStatus())) {
+                actionsBox.getChildren().add(reasonBtn);
             }
 
             setGraphic(actionsBox.getChildren().isEmpty() ? null : actionsBox);

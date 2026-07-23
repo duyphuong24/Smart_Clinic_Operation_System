@@ -56,8 +56,8 @@
                 </div>
             </div>
 
-            <!-- Metric Card 4: Total Revenue -->
-            <div class="metric-card glass-panel">
+            <!-- Metric Card 4: Total Revenue (Admin & Manager Only) -->
+            <div class="metric-card glass-panel" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')">
                 <div class="metric-card-info">
                     <span class="metric-card-label">Total Revenue</span>
                     <span class="metric-card-value dashboard-revenue-text" th:text="${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 0, 'POINT')} + ' ₫'">3,250,000 ₫</span>

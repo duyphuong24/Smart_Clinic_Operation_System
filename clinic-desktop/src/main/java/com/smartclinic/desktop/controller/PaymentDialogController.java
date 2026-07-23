@@ -60,6 +60,12 @@ public class PaymentDialogController {
     }
 
     @FXML
+    private javafx.scene.layout.VBox payosQrBox;
+
+    @FXML
+    private javafx.scene.image.ImageView payosQrImageView;
+
+    @FXML
     private void initialize() {
         invoiceNumberLabel.setText(invoice.getInvoiceNumber() == null ? "-" : invoice.getInvoiceNumber());
         patientLabel.setText(formatPatient(invoice));
@@ -68,8 +74,28 @@ public class PaymentDialogController {
         totalAmountLabel.setText(formatCurrency(total));
         amountField.setText(total.toPlainString());
 
-        methodCombo.setItems(FXCollections.observableArrayList("CASH", "BANK_TRANSFER", "CREDIT_CARD"));
+        methodCombo.setItems(FXCollections.observableArrayList("CASH", "PAYOS_QR", "CREDIT_CARD", "BANK_TRANSFER"));
+        methodCombo.valueProperty().addListener((obs, oldVal, newVal) -> updatePayOSQRDisplay(newVal));
         methodCombo.getSelectionModel().selectFirst();
+    }
+
+    private void updatePayOSQRDisplay(String method) {
+        if ("PAYOS_QR".equals(method)) {
+            String invNum = invoice.getInvoiceNumber() == null ? "INV" : invoice.getInvoiceNumber();
+            BigDecimal amount = invoice.getTotalAmount() == null ? BigDecimal.ZERO : invoice.getTotalAmount();
+            String qrUrl = String.format("https://img.vietqr.io/image/970422-123456789-compact2.png?amount=%s&addInfo=%s&accountName=SMART%%20CLINIC",
+                    amount.toPlainString(), invNum);
+            try {
+                payosQrImageView.setImage(new javafx.scene.image.Image(qrUrl, true));
+            } catch (Exception ex) {
+                // fallback ignore image load failure
+            }
+            payosQrBox.setVisible(true);
+            payosQrBox.setManaged(true);
+        } else {
+            payosQrBox.setVisible(false);
+            payosQrBox.setManaged(false);
+        }
     }
 
     @FXML
@@ -115,6 +141,8 @@ public class PaymentDialogController {
                         return;
                     }
                     recordedPayment = payment;
+                    var window = confirmButton.getScene() == null ? null : confirmButton.getScene().getWindow();
+                    com.smartclinic.desktop.util.ReceiptPrinterService.printReceipt(invoice, payment, window);
                     closeDialog();
                 }));
     }

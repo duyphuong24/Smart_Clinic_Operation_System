@@ -38,9 +38,11 @@ public class BillingController {
     public String dashboard(Model model) {
         List<Encounter> pendingBillings = invoiceService.findPendingBillings();
         List<InvoiceResponse> invoiceHistory = invoiceService.findAll(null);
+        List<PaymentResponse> paymentHistory = paymentService.findAll(null, null);
 
         model.addAttribute("pendingBillings", pendingBillings);
         model.addAttribute("invoiceHistory", invoiceHistory);
+        model.addAttribute("paymentHistory", paymentHistory);
         model.addAttribute("title", "Invoices");
         return "billing/dashboard";
     }

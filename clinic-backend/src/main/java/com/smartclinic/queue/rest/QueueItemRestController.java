@@ -68,8 +68,12 @@ public class QueueItemRestController {
     }
 
     @PatchMapping("/{id}/skip")
-    public ApiResponse<QueueItemResponse> skip(@PathVariable Long id, HttpServletRequest request) {
-        return ApiResponse.success("Queue item skipped", queueItemService.skip(id), request.getRequestURI());
+    public ApiResponse<QueueItemResponse> skip(
+            @PathVariable Long id,
+            @RequestParam(required = false) String reason,
+            HttpServletRequest request
+    ) {
+        return ApiResponse.success("Queue item skipped", queueItemService.skip(id, reason), request.getRequestURI());
     }
 
     @PatchMapping("/{id}/transfer")

@@ -8,6 +8,7 @@ public class QueueItemResponse {
     private Long patientId;
     private String patientCode;
     private String patientName;
+    private Long appointmentId;
     private Long doctorId;
     private String doctorName;
     private Long roomId;
@@ -15,6 +16,14 @@ public class QueueItemResponse {
     private String status;
     private String priority;
     private String reason;
+
+    public Long getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
+    }
 
     public Long getId() {
         return id;

@@ -6,6 +6,9 @@ import com.smartclinic.appointment.dto.AppointmentResponse;
 import com.smartclinic.appointment.dto.CancelAppointmentRequest;
 import com.smartclinic.appointment.service.AppointmentService;
 import com.smartclinic.common.api.ApiResponse;
+import com.smartclinic.queue.dto.AppointmentCheckInRequest;
+import com.smartclinic.queue.dto.QueueItemResponse;
+import com.smartclinic.queue.service.QueueItemService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -28,6 +31,8 @@ public class AppointmentRestController {
 
     private final AppointmentService appointmentService;
 
+    private final QueueItemService queueItemService;
+
     @GetMapping
     public ApiResponse<List<AppointmentResponse>> findAll(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -47,6 +52,16 @@ public class AppointmentRestController {
             HttpServletRequest request
     ) {
         return ApiResponse.created("Appointment booked", appointmentService.create(body), request.getRequestURI());
+    }
+
+    @PostMapping("/{id}/check-in")
+    public ApiResponse<QueueItemResponse> checkIn(
+            @PathVariable Long id,
+            HttpServletRequest request
+    ) {
+        AppointmentCheckInRequest checkInRequest = new AppointmentCheckInRequest();
+        checkInRequest.setAppointmentId(id);
+        return ApiResponse.created("Appointment checked in", queueItemService.checkIn(checkInRequest), request.getRequestURI());
     }
 
     @PatchMapping("/{id}/reschedule")

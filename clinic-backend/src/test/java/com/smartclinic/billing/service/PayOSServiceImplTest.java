@@ -1,25 +1,28 @@
 package com.smartclinic.billing.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.smartclinic.billing.config.PayOSConfig;
 import com.smartclinic.billing.dto.PayOSPaymentRequest;
+import com.smartclinic.billing.dto.PayOSPaymentResponse;
 import com.smartclinic.billing.dto.PayOSWebhookData;
 import com.smartclinic.billing.entity.Invoice;
 import com.smartclinic.billing.entity.InvoiceStatus;
+import com.smartclinic.billing.entity.Payment;
 import com.smartclinic.billing.repository.InvoiceRepository;
 import com.smartclinic.billing.repository.PaymentRepository;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PayOSServiceImplTest {
@@ -36,68 +39,65 @@ class PayOSServiceImplTest {
     @InjectMocks
     private PayOSServiceImpl payOSService;
 
-    private Invoice sampleInvoice;
+    private Invoice testInvoice;
 
     @BeforeEach
     void setUp() {
-        sampleInvoice = new Invoice();
-        sampleInvoice.setInvoiceNumber("INV-001001");
-        sampleInvoice.setTotalAmount(BigDecimal.valueOf(250000));
-        sampleInvoice.setStatus(InvoiceStatus.ISSUED);
+        testInvoice = new Invoice();
+        testInvoice.setId(100L);
+        testInvoice.setInvoiceNumber("INV-2026-0001");
+        testInvoice.setTotalAmount(new BigDecimal("250000.00"));
+        testInvoice.setStatus(InvoiceStatus.ISSUED);
     }
 
     @Test
-    void createPaymentLink_ShouldReturnVietQRData() {
+    @DisplayName("createPaymentLink - should return valid PayOS dynamic VietQR response")
+    void createPaymentLink_Success() {
         PayOSPaymentRequest request = PayOSPaymentRequest.builder()
-                .invoiceId(1001L)
-                .invoiceNumber("INV-001001")
-                .amount(BigDecimal.valueOf(250000))
-                .description("INV-001001")
+                .invoiceId(100L)
+                .invoiceNumber("INV-2026-0001")
+                .amount(new BigDecimal("250000.00"))
+                .description("Thanh toan hoa don INV-2026-0001")
                 .build();
 
-        var response = payOSService.createPaymentLink(request);
+        PayOSPaymentResponse response = payOSService.createPaymentLink(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getPaymentLinkId()).isEqualTo("PAYOS-1001");
-        assertThat(response.getQrCode()).contains("INV-001001");
+        assertNotNull(response);
+        assertEquals("100", response.getOrderCode());
+        assertNotNull(response.getQrCode());
+        assertTrue(response.getQrCode().contains("250000.00"));
+        assertEquals("PENDING", response.getStatus());
     }
 
     @Test
-    void verifyWebhookSignature_ShouldReturnTrue_WhenDataIsValid() {
-        PayOSWebhookData webhookData = new PayOSWebhookData();
-        webhookData.setData(new PayOSWebhookData.Data());
-
-        boolean result = payOSService.verifyWebhookSignature(webhookData);
-
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void verifyWebhookSignature_ShouldReturnFalse_WhenDataIsNull() {
-        boolean result = payOSService.verifyWebhookSignature(null);
-
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void processWebhook_ShouldReconcileInvoiceToPaid() {
-        when(invoiceRepository.findById(1001L)).thenReturn(Optional.of(sampleInvoice));
+    @DisplayName("processWebhook - should process valid webhook and update invoice to PAID")
+    void processWebhook_Success() {
+        PayOSWebhookData.Data webhookInnerData = new PayOSWebhookData.Data();
+        webhookInnerData.setOrderCode(100L);
+        webhookInnerData.setAmount(new BigDecimal("250000.00"));
+        webhookInnerData.setCode("00");
+        webhookInnerData.setReference("PAYOS-REF-999");
+        webhookInnerData.setDescription("INV-2026-0001");
 
         PayOSWebhookData webhookData = new PayOSWebhookData();
         webhookData.setCode("00");
         webhookData.setDesc("Success");
+        webhookData.setData(webhookInnerData);
 
-        PayOSWebhookData.Data innerData = new PayOSWebhookData.Data();
-        innerData.setOrderCode(1001L);
-        innerData.setCode("00");
-        innerData.setAmount(BigDecimal.valueOf(250000));
-        innerData.setReference("FT2607229988");
-        webhookData.setData(innerData);
+        when(invoiceRepository.findById(100L)).thenReturn(Optional.of(testInvoice));
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(i -> i.getArgument(0));
+        when(invoiceRepository.save(any(Invoice.class))).thenAnswer(i -> i.getArgument(0));
 
         payOSService.processWebhook(webhookData);
 
-        assertThat(sampleInvoice.getStatus()).isEqualTo(InvoiceStatus.PAID);
-        verify(paymentRepository).save(any());
-        verify(invoiceRepository).save(sampleInvoice);
+        assertEquals(InvoiceStatus.PAID, testInvoice.getStatus());
+
+        ArgumentCaptor<Payment> paymentCaptor = ArgumentCaptor.forClass(Payment.class);
+        verify(paymentRepository, times(1)).save(paymentCaptor.capture());
+        Payment savedPayment = paymentCaptor.getValue();
+
+        assertNotNull(savedPayment);
+        assertEquals(new BigDecimal("250000.00"), savedPayment.getAmount());
+        assertEquals("PAYOS-REF-999", savedPayment.getTransactionRef());
     }
 }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" styleClass="page-container" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smartclinic.desktop.controller.TransactionHistoryController">
+    <padding>
+        <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+    </padding>
+
+    <!-- Header Section -->
+    <VBox spacing="4.0">
+        <Label styleClass="page-title" text="Transaction Payment History" />
+        <Label styleClass="page-subtitle" text="Realtime payment transaction registry for Cash, PayOS VietQR, and Cards." />
+    </VBox>
+
+    <!-- Toolbar Filters -->
+    <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="toolbar">
+        <TextField fx:id="searchField" promptText="Search invoice ID or ref..." HBox.hgrow="ALWAYS" />
+        <ComboBox fx:id="methodFilterCombo" promptText="Payment Method" prefWidth="160.0" />
+        <Button onAction="#onRefresh" styleClass="btn-secondary" text="Refresh List" />
+    </HBox>
+
+    <!-- Table View -->
+    <TableView fx:id="transactionTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="paidAtCol" prefWidth="150.0" text="Paid At" />
+            <TableColumn fx:id="invoiceIdCol" prefWidth="100.0" text="Invoice ID" />
+            <TableColumn fx:id="methodCol" prefWidth="130.0" text="Method" />
+            <TableColumn fx:id="statusCol" prefWidth="110.0" text="Status" />
+            <TableColumn fx:id="amountCol" prefWidth="140.0" text="Amount" />
+            <TableColumn fx:id="transactionRefCol" prefWidth="200.0" text="Transaction Ref" />
+            <TableColumn fx:id="noteCol" prefWidth="200.0" text="Notes" />
+        </columns>
+    </TableView>
+</VBox>

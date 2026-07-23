@@ -40,7 +40,10 @@
                 </div>
                 <div>
                     <span class="badge billing-status-badge px-3 py-2 text-badge-sz" 
-                          th:classappend="${invoice.status.name() == 'ISSUED' ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle'}" 
+                          th:classappend="${
+                              invoice.status.name() == 'PAID' ? 'bg-success-subtle text-success border border-success-subtle' : 
+                              invoice.status.name() == 'ISSUED' ? 'bg-warning-subtle text-warning border border-warning-subtle' : 
+                              'bg-danger-subtle text-danger border border-danger-subtle'}" 
                           th:text="${invoice.status}">ISSUED</span>
                 </div>
             </div>
@@ -132,8 +135,18 @@
 
             <!-- Control Actions -->
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-4 pt-3 border-top billing-heading-border d-print-none">
-                <div>
-                    <!-- Record Payment Button (Triggers Modal) -->
+                <div class="d-flex align-items-center gap-2">
+                    <!-- PayOS VietQR Button (Triggers PayOS Modal) -->
+                    <button th:if="${invoice.status.name() == 'ISSUED' and payosQr != null}" 
+                            type="button" 
+                            class="btn btn-primary px-4 py-2 d-inline-flex align-items-center gap-2" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#payosQrModal">
+                        <i class="fa-solid fa-qrcode"></i>
+                        <span>PayOS VietQR Code</span>
+                    </button>
+
+                    <!-- Record Payment Button (Triggers Manual Payment Modal) -->
                     <button th:if="${invoice.status.name() == 'ISSUED'}" 
                             type="button" 
                             class="btn btn-success px-4 py-2 d-inline-flex align-items-center gap-2" 
@@ -167,7 +180,41 @@
             </div>
         </div>
 
-        <!-- Record Payment Modal -->
+        <!-- 1. PayOS VietQR Payment Modal -->
+        <div class="modal fade" id="payosQrModal" tabindex="-1" aria-labelledby="payosQrModalLabel" aria-hidden="true" th:if="${invoice.status.name() == 'ISSUED' and payosQr != null}">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glass-panel text-white border-secondary">
+                    <div class="modal-header border-bottom border-secondary">
+                        <h5 class="modal-title fw-bold" id="payosQrModalLabel"><i class="fa-solid fa-qrcode text-primary me-2"></i>PayOS VietQR Payment Code</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <p class="text-secondary text-sm mb-3">Scan this QR Code with your Banking App to pay invoice <strong class="text-white" th:text="${invoice.invoiceNumber}">INV-0001</strong>:</p>
+                        
+                        <!-- QR Code Image -->
+                        <div class="p-3 bg-white rounded d-inline-block shadow mb-3">
+                            <img th:src="${payosQr.qrCode}" alt="PayOS VietQR Code" class="img-fluid" style="max-width: 240px; height: auto;">
+                        </div>
+
+                        <div class="p-3 rounded bg-dark-subtle border border-secondary text-start text-xs mb-3">
+                            <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Bank:</span> <strong class="text-white">MB Bank (970422)</strong></div>
+                            <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Account No:</span> <strong class="font-monospace text-white">123456789</strong></div>
+                            <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Account Name:</span> <strong class="text-white">SMART CLINIC OPERATIONS</strong></div>
+                            <div class="d-flex justify-content-between mb-1"><span class="text-secondary">Amount:</span> <strong class="text-success font-monospace" th:text="${#numbers.formatDecimal(payosQr.amount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">150,000 ₫</strong></div>
+                            <div class="d-flex justify-content-between"><span class="text-secondary">Order Code:</span> <span class="font-monospace text-warning" th:text="${payosQr.orderCode}">100</span></div>
+                        </div>
+
+                        <p class="text-secondary text-xs m-0">PayOS webhook will automatically reconcile payment once transferred.</p>
+                    </div>
+                    <div class="modal-footer border-top border-secondary justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary px-3" onclick="location.reload();"><i class="fa-solid fa-rotate me-1"></i>Check Status / Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Record Payment Modal -->
         <div class="modal fade" id="recordPaymentModal" tabindex="-1" aria-labelledby="recordPaymentModalLabel" aria-hidden="true" th:if="${invoice.status.name() == 'ISSUED'}">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content glass-panel text-white border-secondary">
@@ -189,10 +236,21 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label text-secondary text-xs text-uppercase fw-bold">Payment Method</label>
-                                <select name="method" class="form-select-custom w-100" required>
+                                <select name="method" id="paymentMethodSelect" class="form-select-custom w-100" required onchange="togglePayOSQRInModal(this.value)">
                                     <option th:each="m : ${paymentMethods}" th:value="${m}" th:text="${m}">CASH</option>
                                 </select>
                             </div>
+
+                            <!-- Dynamic PayOS QR Container inside Modal -->
+                            <div id="payosInModalContainer" class="p-3 bg-dark-subtle border border-secondary rounded text-center mb-3 d-none" th:if="${payosQr != null}">
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-2">PayOS VietQR Realtime</span>
+                                <div class="p-2 bg-white rounded d-inline-block shadow my-2">
+                                    <img th:src="${payosQr.qrCode}" alt="PayOS VietQR" class="img-fluid" style="max-width: 180px;">
+                                </div>
+                                <div class="text-xs text-secondary">Bank: <strong>MB Bank (970422)</strong> | STK: <strong class="font-monospace text-white">123456789</strong></div>
+                                <div class="text-xs text-white-50 mt-1">Quét mã bằng app Ngân hàng để thanh toán tự động qua PayOS</div>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label text-secondary text-xs text-uppercase fw-bold">Transaction Reference / Code</label>
                                 <div class="input-glow-wrapper">
@@ -214,6 +272,18 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            function togglePayOSQRInModal(method) {
+                const container = document.getElementById('payosInModalContainer');
+                if (!container) return;
+                if (method === 'PAYOS_QR') {
+                    container.classList.remove('d-none');
+                } else {
+                    container.classList.add('d-none');
+                }
+            }
+        </script>
     </div>
 </body>
 </html>
