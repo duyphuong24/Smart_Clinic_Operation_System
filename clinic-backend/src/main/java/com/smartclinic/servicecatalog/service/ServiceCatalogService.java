@@ -16,4 +16,6 @@ public interface ServiceCatalogService {
     ServiceCatalogResponse update(Long id, ServiceCatalogRequest request);
 
     void deactivate(Long id);
+
+    ServiceCatalogResponse toggleStatus(Long id);
 }

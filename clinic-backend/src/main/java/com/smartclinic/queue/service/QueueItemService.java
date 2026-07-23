@@ -27,6 +27,9 @@ public interface QueueItemService {
     @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.canManageQueueItem(#id)")
     QueueItemResponse skip(Long id);
 
+    @org.springframework.security.access.prepost.PreAuthorize("@securityHelper.canManageQueueItem(#id)")
+    QueueItemResponse skip(Long id, String reason);
+
     QueueItemResponse transferQueueItem(Long id, QueueTransferRequest request);
 
     QueueItemResponse reQueueItem(Long id);

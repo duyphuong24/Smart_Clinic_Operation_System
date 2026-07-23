@@ -11,11 +11,13 @@ public class DoctorAvailabilityResponse {
     private final Long id;
     private final Long doctorId;
     private final String doctorName;
+    private final String specialtyName;
     private final Integer dayOfWeek;
     private final LocalTime startTime;
     private final LocalTime endTime;
     private final Integer slotMinutes;
     private final Long roomId;
     private final String roomCode;
+    private final String roomName;
     private final boolean active;
 }

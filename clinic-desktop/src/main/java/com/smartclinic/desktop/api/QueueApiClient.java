@@ -75,8 +75,16 @@ public class QueueApiClient {
     }
 
     public CompletableFuture<ApiResponse<QueueItemResponse>> skip(Long id) {
+        return skip(id, null);
+    }
+
+    public CompletableFuture<ApiResponse<QueueItemResponse>> skip(Long id, String reason) {
+        String path = "/queue-items/" + id + "/skip";
+        if (reason != null && !reason.isBlank()) {
+            path += "?reason=" + java.net.URLEncoder.encode(reason, java.nio.charset.StandardCharsets.UTF_8);
+        }
         return apiClient.patch(
-                "/queue-items/" + id + "/skip",
+                path,
                 new TypeReference<ApiResponse<QueueItemResponse>>() {},
                 true
         );

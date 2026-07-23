@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title>Patient Self-Service Portal - Smart Clinic</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-navy mb-1"><i class="bi bi-heart-pulse me-2"></i>Patient Self-Service Portal</h2>
+            <p class="text-muted mb-0">Book online appointments, view doctor schedules, and track your healthcare journey</p>
+        </div>
+    </div>
+
+    <!-- Quick Booking Form Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-navy text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-calendar-plus me-2"></i>Book an Online Doctor Appointment</h5>
+        </div>
+        <div class="card-body p-4">
+            <form th:action="@{/my-portal/book-appointment}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Select Doctor</label>
+                        <select name="doctorId" class="form-select" required>
+                            <option value="">Choose Doctor...</option>
+                            <option th:each="doc : ${doctors}"
+                                    th:value="${doc.id}"
+                                    th:text="${doc.fullName + ' (' + doc.specialtyName + ' - Fee: ' + #numbers.formatDecimal(doc.consultationFee, 0, 'COMMA', 0, 'POINT') + ' ₫)'}">Dr. Smith</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Scheduled Date & Time</label>
+                        <input type="datetime-local" name="scheduledStart" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Reason for Visit / Symptoms</label>
+                        <textarea name="reason" class="form-control" rows="3" placeholder="Describe your symptoms or reason for appointment..." required></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3 px-4 fw-bold">
+                    <i class="bi bi-check-circle me-1"></i>Confirm Appointment Booking
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

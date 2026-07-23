@@ -1,15 +1,18 @@
 package com.smartclinic.billing.controller;
 
+import com.smartclinic.billing.dto.InvoiceCancelRequest;
+import com.smartclinic.billing.dto.InvoiceCreateRequest;
+import com.smartclinic.billing.dto.InvoiceResponse;
+import com.smartclinic.billing.dto.PayOSPaymentRequest;
+import com.smartclinic.billing.dto.PayOSPaymentResponse;
+import com.smartclinic.billing.dto.PaymentRequest;
+import com.smartclinic.billing.dto.PaymentResponse;
+import com.smartclinic.billing.entity.PaymentMethod;
+import com.smartclinic.billing.entity.PaymentStatus;
+import com.smartclinic.billing.service.InvoiceService;
+import com.smartclinic.billing.service.PayOSService;
+import com.smartclinic.billing.service.PaymentService;
 import com.smartclinic.encounter.entity.Encounter;
-import com.smartclinic.invoice.dto.InvoiceCancelRequest;
-import com.smartclinic.invoice.dto.InvoiceCreateRequest;
-import com.smartclinic.invoice.dto.InvoiceResponse;
-import com.smartclinic.invoice.service.InvoiceService;
-import com.smartclinic.payment.dto.PaymentRequest;
-import com.smartclinic.payment.dto.PaymentResponse;
-import com.smartclinic.payment.entity.PaymentMethod;
-import com.smartclinic.payment.entity.PaymentStatus;
-import com.smartclinic.payment.service.PaymentService;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +32,17 @@ public class BillingController {
 
     private final InvoiceService invoiceService;
     private final PaymentService paymentService;
+    private final PayOSService payOSService;
 
     @GetMapping
     public String dashboard(Model model) {
         List<Encounter> pendingBillings = invoiceService.findPendingBillings();
         List<InvoiceResponse> invoiceHistory = invoiceService.findAll(null);
+        List<PaymentResponse> paymentHistory = paymentService.findAll(null, null);
 
         model.addAttribute("pendingBillings", pendingBillings);
         model.addAttribute("invoiceHistory", invoiceHistory);
+        model.addAttribute("paymentHistory", paymentHistory);
         model.addAttribute("title", "Invoices");
         return "billing/dashboard";
     }
@@ -63,6 +69,16 @@ public class BillingController {
         model.addAttribute("invoice", invoice);
         model.addAttribute("payments", payments);
         model.addAttribute("paymentMethods", PaymentMethod.values());
+
+        // Generate PayOS VietQR info for UI modal
+        PayOSPaymentResponse payosQr = payOSService.createPaymentLink(PayOSPaymentRequest.builder()
+                .invoiceId(invoice.getId())
+                .invoiceNumber(invoice.getInvoiceNumber())
+                .amount(invoice.getTotalAmount())
+                .description("Thanh toan hoa don " + invoice.getInvoiceNumber())
+                .build());
+        model.addAttribute("payosQr", payosQr);
+
         model.addAttribute("title", "Invoices");
         return "billing/detail";
     }
@@ -85,7 +101,7 @@ public class BillingController {
             request.setNote(note);
 
             PaymentResponse payment = paymentService.record(id, request);
-            redirectAttributes.addFlashAttribute("success", "Payment of " + payment.getAmount() + " ₫ recorded successfully.");
+            redirectAttributes.addFlashAttribute("success", "Payment of " + payment.getAmount() + " ₫ recorded successfully (" + method + ").");
         } catch (Exception ex) {
             redirectAttributes.addFlashAttribute("error", "Failed to record payment: " + ex.getMessage());
         }
@@ -113,4 +129,3 @@ public class BillingController {
         return "redirect:/billing/invoices/" + id;
     }
 }
-

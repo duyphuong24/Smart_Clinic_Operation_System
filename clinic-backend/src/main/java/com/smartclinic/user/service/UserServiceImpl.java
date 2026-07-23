@@ -1,5 +1,6 @@
 package com.smartclinic.user.service;
 
+import com.smartclinic.audit.service.AuditLogService;
 import com.smartclinic.common.api.PageResponse;
 import com.smartclinic.common.exception.BadRequestException;
 import com.smartclinic.common.exception.DuplicateResourceException;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional(readOnly = true)
@@ -79,6 +81,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         User saved = userRepository.save(user);
+        auditLogService.record("CREATE_USER", "USER", saved.getId(), "Created user account: " + saved.getUserName() + " (" + saved.getFullName() + ")");
         return userMapper.toResponse(saved);
     }
 
@@ -93,6 +96,7 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
 
         User saved = userRepository.save(user);
+        auditLogService.record("UPDATE_USER", "USER", saved.getId(), "Updated user details for " + saved.getUserName());
         return userMapper.toResponse(saved);
     }
 
@@ -108,6 +112,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User saved = userRepository.save(user);
+        auditLogService.record("UPDATE_USER_STATUS", "USER", saved.getId(), "Updated status to " + request.getStatus() + " for " + saved.getUserName());
         return userMapper.toResponse(saved);
     }
 
@@ -120,6 +125,7 @@ public class UserServiceImpl implements UserService {
         user.setLockTime(null);
 
         User saved = userRepository.save(user);
+        auditLogService.record("RESET_PASSWORD", "USER", saved.getId(), "Reset password for user " + saved.getUserName());
         return userMapper.toResponse(saved);
     }
 

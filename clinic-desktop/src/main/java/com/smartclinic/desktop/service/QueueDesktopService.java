@@ -77,7 +77,11 @@ public class QueueDesktopService {
     }
 
     public CompletableFuture<QueueItemResponse> skip(Long queueItemId) {
-        return queueApiClient.skip(queueItemId)
+        return skip(queueItemId, null);
+    }
+
+    public CompletableFuture<QueueItemResponse> skip(Long queueItemId, String reason) {
+        return queueApiClient.skip(queueItemId, reason)
                 .thenApply(ApiResponse::getData);
     }
 }

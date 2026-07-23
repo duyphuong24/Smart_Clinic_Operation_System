@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: layout('Doctor Duty Schedule Board', ~{::content_fragment})}">
+<body>
+<div th:fragment="content_fragment">
+    <!-- Link Module Specific CSS -->
+    <link th:href="@{/css/schedule.css}" rel="stylesheet">
+
+    <!-- Glassmorphism Container Panel -->
+    <div class="glass-panel p-4">
+        <!-- Header Section -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold m-0 text-primary d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-calendar-days text-primary"></i>
+                    <span>Doctor Duty Schedule Board</span>
+                </h3>
+                <p class="text-secondary m-0 text-sm mt-1">Overview of weekly doctor shifts, working hours, and assigned consultation rooms.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button sec:authorize="hasAnyRole('ADMIN','MANAGER')" type="button" class="btn btn-premium px-3 py-2 text-white btn-premium-custom" data-bs-toggle="modal" data-bs-target="#addShiftModal">
+                    <i class="fa-solid fa-plus me-1"></i>Add Doctor Shift
+                </button>
+            </div>
+        </div>
+
+        <!-- Weekly Roster Matrix Table -->
+        <div class="table-responsive rounded-3">
+            <table class="table table-hover align-middle m-0 text-center">
+                <thead>
+                <tr>
+                    <th class="schedule-day-header" style="width: 14%;">Mon (T2)</th>
+                    <th class="schedule-day-header" style="width: 14%;">Tue (T3)</th>
+                    <th class="schedule-day-header" style="width: 14%;">Wed (T4)</th>
+                    <th class="schedule-day-header" style="width: 14%;">Thu (T5)</th>
+                    <th class="schedule-day-header" style="width: 14%;">Fri (T6)</th>
+                    <th class="schedule-day-header" style="width: 14%;">Sat (T7)</th>
+                    <th class="schedule-day-header" style="width: 16%;">Sun (CN)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <!-- Days 1 to 7 -->
+                    <th:block th:each="dayNum : ${#numbers.sequence(1, 7)}">
+                        <td class="p-2 align-top schedule-day-column">
+                            <div th:each="avail : ${availabilities}" th:if="${avail.dayOfWeek == dayNum}" class="schedule-shift-card mb-3 text-start position-relative">
+                                <form sec:authorize="hasAnyRole('ADMIN','MANAGER')" th:action="@{'/schedule/board/' + ${avail.id} + '/delete'}" method="post" class="position-absolute top-0 end-0 m-1">
+                                    <button type="submit" class="btn btn-link text-danger p-0 border-0 text-xs" title="Remove Shift" onclick="return confirm('Remove this shift?');">
+                                        <i class="fa-solid fa-xmark fs-6"></i>
+                                    </button>
+                                </form>
+                                <div class="d-flex align-items-center gap-2 mb-2 pe-3">
+                                    <div class="schedule-doctor-avatar" th:text="${#strings.substring(avail.doctorName, 0, 1)}">D</div>
+                                    <div>
+                                        <div class="schedule-doctor-name" th:text="${avail.doctorName}">Dr. John</div>
+                                        <div class="schedule-specialty" th:text="${avail.specialtyName}">Cardiology</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mt-2">
+                                    <span class="schedule-room-badge" th:text="${avail.roomCode != null ? avail.roomCode : avail.roomName}">Room 101</span>
+                                    <div class="schedule-time-badge">
+                                        <i class="fa-regular fa-clock me-1"></i>
+                                        <span th:text="${avail.startTime}">08:00</span> - <span th:text="${avail.endTime}">12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </th:block>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Standardized Light Glassmorphic Modal -->
+    <div sec:authorize="hasAnyRole('ADMIN','MANAGER')" class="modal fade" id="addShiftModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-panel border-0 shadow-lg">
+                <div class="modal-header border-bottom border-bottom-card-imp">
+                    <h5 class="modal-title fw-bold text-primary"><i class="fa-solid fa-calendar-plus me-2"></i>Assign Doctor Shift</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/schedule/board/save}" th:object="${newShift}" method="post">
+                    <div class="modal-body row g-3 p-4">
+                        <div class="col-md-12">
+                            <label class="form-label">Select Doctor <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select th:field="*{doctorId}" class="form-control-custom select-custom-arrow" required>
+                                    <option value="" disabled selected>Choose Doctor</option>
+                                    <option th:each="doc : ${doctors}" th:value="${doc.id}" th:text="${doc.fullName} + ' (' + ${doc.specialtyName} + ')'"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Day of Week <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select th:field="*{dayOfWeek}" class="form-control-custom select-custom-arrow" required>
+                                    <option value="1">Monday (Thứ 2)</option>
+                                    <option value="2">Tuesday (Thứ 3)</option>
+                                    <option value="3">Wednesday (Thứ 4)</option>
+                                    <option value="4">Thursday (Thứ 5)</option>
+                                    <option value="5">Friday (Thứ 6)</option>
+                                    <option value="6">Saturday (Thứ 7)</option>
+                                    <option value="7">Sunday (Chủ Nhật)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Assign Room <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <select th:field="*{roomId}" class="form-control-custom select-custom-arrow" required>
+                                    <option value="" disabled selected>Choose Room</option>
+                                    <option th:each="rm : ${rooms}" th:value="${rm.id}" th:text="${rm.name} + ' (' + ${rm.roomCode} + ')'"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Start Time <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="time" th:field="*{startTime}" class="form-control-custom" value="08:00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Time <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="time" th:field="*{endTime}" class="form-control-custom" value="12:00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Slot Duration (Minutes) <span class="text-danger">*</span></label>
+                            <div class="input-glow-wrapper">
+                                <input type="number" th:field="*{slotMinutes}" class="form-control-custom" value="30" min="15" max="120" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-card p-3">
+                        <button type="button" class="btn btn-outline-secondary px-4 btn-cancel-custom" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-premium px-4 btn-premium-custom">
+                            <i class="fa-solid fa-floppy-disk me-2"></i>Save Shift
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
